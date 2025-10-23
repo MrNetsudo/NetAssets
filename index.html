@@ -1401,6 +1401,356 @@
             color: #a0a0a0;
         }
 
+        /* Import Button Styles */
+        .import-btn {
+            background: var(--primary-color);
+            padding: 12px 24px;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+
+        .import-btn:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .import-menu-container {
+            position: relative;
+            display: inline-block;
+        }
+
+        .import-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 5px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            z-index: 1000;
+            min-width: 220px;
+            display: none;
+            overflow: hidden;
+        }
+
+        body.dark-mode .import-dropdown {
+            background: var(--dark-card);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        }
+
+        .import-dropdown.show {
+            display: block;
+            animation: slideDown 0.2s ease;
+        }
+
+        /* Import Modal Styles */
+        .import-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 2000;
+            overflow-y: auto;
+        }
+
+        .import-modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .import-modal-content {
+            background: white;
+            border-radius: 12px;
+            max-width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            margin: 20px;
+        }
+
+        body.dark-mode .import-modal-content {
+            background: var(--dark-card);
+        }
+
+        .import-modal-header {
+            padding: 25px 30px;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            border-radius: 12px 12px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .import-modal-title {
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+
+        .import-modal-close {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            transition: all 0.3s;
+        }
+
+        .import-modal-close:hover {
+            background: rgba(255,255,255,0.3);
+            transform: rotate(90deg);
+        }
+
+        .import-modal-body {
+            padding: 30px;
+        }
+
+        .import-section {
+            margin-bottom: 25px;
+        }
+
+        .import-section-title {
+            font-size: 1.1em;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        body.dark-mode .import-section-title {
+            color: var(--dark-text);
+        }
+
+        .file-upload-area {
+            border: 3px dashed #ddd;
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            transition: all 0.3s;
+            cursor: pointer;
+            background: #f8f9fa;
+        }
+
+        body.dark-mode .file-upload-area {
+            background: rgba(26, 35, 50, 0.5);
+            border-color: #2d3748;
+        }
+
+        .file-upload-area:hover {
+            border-color: var(--primary-color);
+            background: rgba(102, 126, 234, 0.05);
+        }
+
+        .file-upload-area.dragover {
+            border-color: var(--primary-color);
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .file-upload-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+            opacity: 0.6;
+        }
+
+        .file-upload-text {
+            font-size: 1.1em;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        body.dark-mode .file-upload-text {
+            color: #a0a0a0;
+        }
+
+        .file-upload-hint {
+            font-size: 0.9em;
+            color: #999;
+        }
+
+        .import-options {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        .import-option-btn {
+            padding: 12px 24px;
+            border: 2px solid var(--primary-color);
+            background: white;
+            color: var(--primary-color);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        body.dark-mode .import-option-btn {
+            background: var(--dark-card);
+        }
+
+        .import-option-btn:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .import-option-btn.active {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .import-preview {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+
+        body.dark-mode .import-preview {
+            border-color: #2d3748;
+        }
+
+        .import-preview-table {
+            width: 100%;
+            font-size: 0.9em;
+        }
+
+        .import-preview-table th {
+            background: #f8f9fa;
+            padding: 10px;
+            text-align: left;
+            border-bottom: 2px solid #ddd;
+            position: sticky;
+            top: 0;
+        }
+
+        body.dark-mode .import-preview-table th {
+            background: #1a2332;
+            border-bottom-color: #2d3748;
+        }
+
+        .import-preview-table td {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        body.dark-mode .import-preview-table td {
+            border-bottom-color: #2d3748;
+        }
+
+        .import-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .import-stat {
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        body.dark-mode .import-stat {
+            background: #1a2332;
+        }
+
+        .import-stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .import-stat-label {
+            font-size: 0.85em;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        body.dark-mode .import-stat-label {
+            color: #a0a0a0;
+        }
+
+        .import-error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border-left: 4px solid var(--danger-color);
+        }
+
+        body.dark-mode .import-error {
+            background: rgba(220, 53, 69, 0.1);
+            color: #ff6b6b;
+        }
+
+        .import-modal-footer {
+            padding: 20px 30px;
+            background: #f8f9fa;
+            border-radius: 0 0 12px 12px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        body.dark-mode .import-modal-footer {
+            background: #0f1419;
+        }
+
+        .import-modal-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .import-modal-btn.cancel {
+            background: #6c757d;
+            color: white;
+        }
+
+        .import-modal-btn.cancel:hover {
+            background: #5a6268;
+        }
+
+        .import-modal-btn.confirm {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .import-modal-btn.confirm:hover {
+            background: #218838;
+        }
+
         @media (max-width: 768px) {
             .header h1 {
                 font-size: 1.8em;
@@ -1453,6 +1803,25 @@
                 </div>
                 <div class="action-buttons">
                     <button class="bulk-copy-btn" onclick="bulkCopySerials()">📋 Copy All SNs</button>
+                    <div class="import-menu-container">
+                        <button class="import-btn" onclick="toggleImportMenu()">📤 Import ▼</button>
+                        <div class="import-dropdown" id="importDropdown">
+                            <div class="export-option" onclick="openImportModal('csv')">
+                                <div class="export-option-icon">📄</div>
+                                <div class="export-option-text">
+                                    <div class="export-option-title">Import CSV</div>
+                                    <div class="export-option-desc">Standard CSV format</div>
+                                </div>
+                            </div>
+                            <div class="export-option" onclick="openImportModal('json')">
+                                <div class="export-option-icon">📦</div>
+                                <div class="export-option-text">
+                                    <div class="export-option-title">Import JSON</div>
+                                    <div class="export-option-desc">JSON data format</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     <div class="export-menu-container">
                         <button class="export-btn" onclick="toggleExportMenu()">📥 Export ▼</button>
                         <div class="export-dropdown" id="exportDropdown">
@@ -1673,6 +2042,54 @@
             </div>
         </div>
     </div>
+
+    <!-- Import Modal -->
+    <div class="import-modal" id="importModal">
+        <div class="import-modal-content">
+            <div class="import-modal-header">
+                <div class="import-modal-title">📤 Import Device Data</div>
+                <button class="import-modal-close" onclick="closeImportModal()">✕</button>
+            </div>
+            <div class="import-modal-body">
+                <div class="import-section">
+                    <div class="import-section-title">📁 Select File</div>
+                    <div class="file-upload-area" id="fileUploadArea" onclick="document.getElementById('fileInput').click()">
+                        <div class="file-upload-icon">📂</div>
+                        <div class="file-upload-text">Click to browse or drag and drop file here</div>
+                        <div class="file-upload-hint">Supported formats: CSV, JSON</div>
+                    </div>
+                    <input type="file" id="fileInput" accept=".csv,.json" style="display: none;" onchange="handleFileSelect(event)">
+                </div>
+
+                <div class="import-section" id="importOptionsSection" style="display: none;">
+                    <div class="import-section-title">⚙️ Import Options</div>
+                    <div class="import-options">
+                        <button class="import-option-btn active" data-option="replace" onclick="selectImportOption('replace')">
+                            🔄 Replace All Data
+                        </button>
+                        <button class="import-option-btn" data-option="append" onclick="selectImportOption('append')">
+                            ➕ Append to Existing
+                        </button>
+                    </div>
+                </div>
+
+                <div class="import-section" id="importPreviewSection" style="display: none;">
+                    <div class="import-section-title">👁️ Data Preview</div>
+                    <div class="import-stats" id="importStats"></div>
+                    <div class="import-preview" id="importPreview"></div>
+                </div>
+
+                <div id="importError" style="display: none;"></div>
+            </div>
+            <div class="import-modal-footer">
+                <button class="import-modal-btn cancel" onclick="closeImportModal()">Cancel</button>
+                <button class="import-modal-btn confirm" id="confirmImportBtn" onclick="confirmImport()" disabled>Import Data</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hidden file input for import -->
+    <input type="file" id="hiddenFileInput" accept=".csv,.json" style="display: none;">
 
     <script src="device_data_combined.js"></script>
     <script>
@@ -2567,6 +2984,318 @@
 
             showNotification(`✅ Exported ${filteredData.length} devices to formatted text`);
             document.getElementById('exportDropdown').classList.remove('show');
+        }
+
+        // Import functionality
+        let importData = [];
+        let importOption = 'replace';
+        let importFileType = null;
+
+        // Toggle import menu
+        function toggleImportMenu() {
+            const dropdown = document.getElementById('importDropdown');
+            dropdown.classList.toggle('show');
+        }
+
+        // Close import dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            const dropdown = document.getElementById('importDropdown');
+            const importBtn = document.querySelector('.import-menu-container');
+
+            if (dropdown && importBtn && !importBtn.contains(e.target)) {
+                dropdown.classList.remove('show');
+            }
+        });
+
+        // Open import modal
+        function openImportModal(fileType) {
+            importFileType = fileType;
+            const modal = document.getElementById('importModal');
+            modal.classList.add('show');
+            document.getElementById('importDropdown').classList.remove('show');
+
+            // Reset modal state
+            document.getElementById('fileInput').value = '';
+            document.getElementById('importOptionsSection').style.display = 'none';
+            document.getElementById('importPreviewSection').style.display = 'none';
+            document.getElementById('importError').style.display = 'none';
+            document.getElementById('confirmImportBtn').disabled = true;
+            importData = [];
+        }
+
+        // Close import modal
+        function closeImportModal() {
+            const modal = document.getElementById('importModal');
+            modal.classList.remove('show');
+        }
+
+        // Handle file selection
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const content = e.target.result;
+                    const fileName = file.name.toLowerCase();
+
+                    if (fileName.endsWith('.csv')) {
+                        importData = parseCSV(content);
+                    } else if (fileName.endsWith('.json')) {
+                        importData = parseJSON(content);
+                    } else {
+                        showImportError('Unsupported file format. Please use CSV or JSON.');
+                        return;
+                    }
+
+                    if (importData.length === 0) {
+                        showImportError('No valid data found in file.');
+                        return;
+                    }
+
+                    // Validate and show preview
+                    const validation = validateImportData(importData);
+                    if (!validation.valid) {
+                        showImportError(validation.error);
+                        return;
+                    }
+
+                    showImportPreview(importData);
+                    document.getElementById('importOptionsSection').style.display = 'block';
+                    document.getElementById('confirmImportBtn').disabled = false;
+
+                } catch (error) {
+                    showImportError('Error reading file: ' + error.message);
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        // Parse CSV content
+        function parseCSV(content) {
+            const lines = content.trim().split('\n');
+            if (lines.length < 2) return [];
+
+            const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
+            const data = [];
+
+            for (let i = 1; i < lines.length; i++) {
+                const line = lines[i].trim();
+                if (!line) continue;
+
+                // Simple CSV parsing (handles quoted values)
+                const values = [];
+                let current = '';
+                let inQuotes = false;
+
+                for (let j = 0; j < line.length; j++) {
+                    const char = line[j];
+                    if (char === '"') {
+                        inQuotes = !inQuotes;
+                    } else if (char === ',' && !inQuotes) {
+                        values.push(current.trim());
+                        current = '';
+                    } else {
+                        current += char;
+                    }
+                }
+                values.push(current.trim());
+
+                // Map to device object
+                const device = {
+                    region: values[0] || '',
+                    deviceName: values[1] || '',
+                    model: values[2] || '',
+                    sn: values[3] || '',
+                    hasHA: values[4] === 'HA Configured' || values[4] === 'true',
+                    sn_ha1: values[5] || '',
+                    sn_ha2: values[6] || ''
+                };
+
+                data.push(device);
+            }
+
+            return data;
+        }
+
+        // Parse JSON content
+        function parseJSON(content) {
+            const json = JSON.parse(content);
+            if (!Array.isArray(json)) {
+                throw new Error('JSON must be an array of devices');
+            }
+
+            return json.map(item => ({
+                region: item.region || item.Region || '',
+                deviceName: item.deviceName || item['Device Name'] || item.device_name || '',
+                model: item.model || item.Model || detectModel(item.sn || item.serialNumber),
+                sn: item.sn || item.serialNumber || item['Serial Number'] || '',
+                hasHA: item.hasHA || item.haConfigured || item['HA Status'] === 'HA Configured' || false,
+                sn_ha1: item.sn_ha1 || item.haSerial1 || item['HA Serial 1'] || '',
+                sn_ha2: item.sn_ha2 || item.haSerial2 || item['HA Serial 2'] || ''
+            }));
+        }
+
+        // Validate import data
+        function validateImportData(data) {
+            if (!data || data.length === 0) {
+                return { valid: false, error: 'No data to import' };
+            }
+
+            // Check for required fields
+            for (let i = 0; i < data.length; i++) {
+                const device = data[i];
+                if (!device.deviceName || !device.sn) {
+                    return {
+                        valid: false,
+                        error: `Row ${i + 1}: Device name and serial number are required`
+                    };
+                }
+            }
+
+            return { valid: true };
+        }
+
+        // Show import preview
+        function showImportPreview(data) {
+            // Show statistics
+            const statsHtml = `
+                <div class="import-stat">
+                    <div class="import-stat-value">${data.length}</div>
+                    <div class="import-stat-label">Total Devices</div>
+                </div>
+                <div class="import-stat">
+                    <div class="import-stat-value">${data.filter(d => d.hasHA).length}</div>
+                    <div class="import-stat-label">HA Configured</div>
+                </div>
+                <div class="import-stat">
+                    <div class="import-stat-value">${data.filter(d => d.region === 'US').length}</div>
+                    <div class="import-stat-label">US Devices</div>
+                </div>
+                <div class="import-stat">
+                    <div class="import-stat-value">${data.filter(d => d.region === 'EU').length}</div>
+                    <div class="import-stat-label">EU Devices</div>
+                </div>
+            `;
+            document.getElementById('importStats').innerHTML = statsHtml;
+
+            // Show preview table (first 10 rows)
+            const previewData = data.slice(0, 10);
+            const tableHtml = `
+                <table class="import-preview-table">
+                    <thead>
+                        <tr>
+                            <th>Region</th>
+                            <th>Device Name</th>
+                            <th>Model</th>
+                            <th>Serial Number</th>
+                            <th>HA Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${previewData.map(device => `
+                            <tr>
+                                <td>${device.region || '-'}</td>
+                                <td>${escapeHtml(device.deviceName)}</td>
+                                <td>${device.model || '-'}</td>
+                                <td>${device.sn}</td>
+                                <td>${device.hasHA ? '✅ HA' : '⚠️ Standalone'}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+                ${data.length > 10 ? `<p style="text-align: center; margin-top: 10px; color: #666;">Showing 10 of ${data.length} devices</p>` : ''}
+            `;
+            document.getElementById('importPreview').innerHTML = tableHtml;
+            document.getElementById('importPreviewSection').style.display = 'block';
+            document.getElementById('importError').style.display = 'none';
+        }
+
+        // Show import error
+        function showImportError(message) {
+            const errorDiv = document.getElementById('importError');
+            errorDiv.className = 'import-error';
+            errorDiv.innerHTML = `<strong>Error:</strong> ${message}`;
+            errorDiv.style.display = 'block';
+            document.getElementById('importPreviewSection').style.display = 'none';
+            document.getElementById('importOptionsSection').style.display = 'none';
+            document.getElementById('confirmImportBtn').disabled = true;
+        }
+
+        // Select import option
+        function selectImportOption(option) {
+            importOption = option;
+            document.querySelectorAll('.import-option-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+        }
+
+        // Confirm import
+        function confirmImport() {
+            if (importData.length === 0) {
+                showNotification('❌ No data to import', 'error');
+                return;
+            }
+
+            if (importOption === 'replace') {
+                // Replace all data
+                deviceData = importData.map(device => ({
+                    ...device,
+                    model: device.model || detectModel(device.sn)
+                }));
+                showNotification(`✅ Imported ${deviceData.length} devices (replaced existing data)`);
+            } else {
+                // Append to existing data
+                const newDevices = importData.map(device => ({
+                    ...device,
+                    model: device.model || detectModel(device.sn)
+                }));
+                deviceData = [...deviceData, ...newDevices];
+                showNotification(`✅ Imported ${newDevices.length} devices (appended to existing ${deviceData.length - newDevices.length} devices)`);
+            }
+
+            // Update the display
+            filteredData = [...deviceData];
+            updateStats();
+            updateModelBreakdown();
+            renderTable();
+            if (currentView === 'card') {
+                renderCardView();
+            }
+
+            // Close modal
+            closeImportModal();
+        }
+
+        // Drag and drop handlers
+        const fileUploadArea = document.getElementById('fileUploadArea');
+        if (fileUploadArea) {
+            fileUploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                fileUploadArea.classList.add('dragover');
+            });
+
+            fileUploadArea.addEventListener('dragleave', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                fileUploadArea.classList.remove('dragover');
+            });
+
+            fileUploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                fileUploadArea.classList.remove('dragover');
+
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    const fileInput = document.getElementById('fileInput');
+                    fileInput.files = files;
+                    handleFileSelect({ target: { files: files } });
+                }
+            });
         }
 
         // Initialize

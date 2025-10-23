@@ -1,0 +1,13 @@
+# Windows/WSL Zone.Identifier files
+*:Zone.Identifier
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~

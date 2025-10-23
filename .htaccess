@@ -1,0 +1,31 @@
+# FortiGate Device Inventory - Security Configuration
+
+# Prevent directory listing
+Options -Indexes
+
+# Enable GZIP compression
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/javascript application/json
+</IfModule>
+
+# Browser caching
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType text/html "access plus 1 hour"
+    ExpiresByType text/css "access plus 1 week"
+    ExpiresByType application/javascript "access plus 1 week"
+    ExpiresByType application/json "access plus 1 hour"
+</IfModule>
+
+# Security headers
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set X-XSS-Protection "1; mode=block"
+</IfModule>
+
+# Require authentication (optional - uncomment if you want password protection)
+# AuthType Basic
+# AuthName "FortiGate Inventory - Authorized Personnel Only"
+# AuthUserFile /path/to/.htpasswd
+# Require valid-user

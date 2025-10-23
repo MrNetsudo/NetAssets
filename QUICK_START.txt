@@ -1,0 +1,134 @@
+═══════════════════════════════════════════════════════════════
+  FORTIGATE DEVICE INVENTORY - QUICK DEPLOYMENT GUIDE
+
+  Author: Miguel Jimenez (Miguel@netsudo.com)
+  Website: https://netsudo.com
+═══════════════════════════════════════════════════════════════
+
+DEPLOY TO: https://firemon.netsudo.com
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📦 REQUIRED FILES (All in current directory):
+   ✓ index.html (84 KB)
+   ✓ device_data_combined.js (184 KB)
+   ✓ .htaccess (optional - security)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🚀 FASTEST DEPLOYMENT METHOD:
+
+1. Extract the deployment package:
+   tar -xzf firemon_deployment.tar.gz
+
+2. Upload to your web server:
+
+   Option A - FTP/SFTP:
+   • Open FileZilla or similar FTP client
+   • Connect to your server
+   • Navigate to /public_html/firemon/ (or wherever firemon.netsudo.com points)
+   • Upload: index.html, device_data_combined.js, .htaccess
+
+   Option B - cPanel:
+   • Login to cPanel
+   • File Manager → Navigate to firemon directory
+   • Upload → Select the 3 files
+
+   Option C - Command Line (SSH):
+   scp index.html device_data_combined.js .htaccess user@server:/path/to/firemon/
+
+3. Test the site:
+   Open: https://firemon.netsudo.com
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔒 SECURITY SETUP (HIGHLY RECOMMENDED):
+
+Since this contains sensitive device information, ADD PASSWORD PROTECTION:
+
+Step 1: Edit .htaccess file, uncomment these lines:
+   AuthType Basic
+   AuthName "FortiGate Inventory - Authorized Personnel Only"
+   AuthUserFile /full/path/to/.htpasswd
+   Require valid-user
+
+Step 2: Create password file (on server via SSH):
+   htpasswd -c /path/to/.htpasswd admin
+   (Enter password when prompted)
+
+Step 3: Update AuthUserFile path in .htaccess with full server path
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ VERIFICATION CHECKLIST:
+
+□ Files uploaded successfully
+□ Visit https://firemon.netsudo.com
+□ Dashboard loads correctly
+□ Device data displays (should show 1,270 devices)
+□ Analytics dashboard opens (click "📊 Analytics Dashboard" button)
+□ Charts display properly
+□ Search and filters work
+□ Export functions work
+□ Authentication working (if configured)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔄 UPDATING DATA IN THE FUTURE:
+
+When devices change:
+1. Get new CSV exports from FortiManager
+2. Run: python3 convert_csv_to_js.py
+3. Upload ONLY the new device_data_combined.js file
+4. No need to re-upload index.html
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+⚡ FEATURES YOUR TEAM GETS:
+
+✓ 1,270 devices (943 US + 327 EU)
+✓ Interactive filtering by Region, HA Status, Model
+✓ Card and Table view modes
+✓ Advanced Analytics Dashboard with charts
+✓ Data Center monitoring (PDC/BDC sites)
+✓ Export to CSV, JSON, Markdown, Formatted Text
+✓ Dark mode
+✓ Print-friendly PDFs
+✓ Mobile responsive
+✓ Copy serial numbers with one click
+✓ Real-time search across all fields
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📁 FILE LOCATIONS:
+
+Current directory: /home/miguel/Firemon_Serials/
+
+Files ready for deployment:
+• index.html
+• device_data_combined.js
+• .htaccess
+• DEPLOYMENT.md (detailed guide)
+• firemon_deployment.tar.gz (complete package)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🆘 TROUBLESHOOTING:
+
+Problem: Blank page
+→ Check browser console (F12) for errors
+→ Verify both files are uploaded
+
+Problem: "DEVICE_DATA undefined"
+→ Ensure device_data_combined.js is in same directory
+→ Check file permissions (should be 644)
+
+Problem: Charts not showing
+→ Check internet connection (Chart.js loads from CDN)
+→ Clear browser cache (Ctrl+Shift+R)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Need help? Check DEPLOYMENT.md for detailed instructions!
+
+═══════════════════════════════════════════════════════════════

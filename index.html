@@ -1,0 +1,2577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="Miguel Jimenez - Miguel@netsudo.com">
+    <meta name="description" content="Interactive FortiGate Device Inventory Dashboard for Network Operations Center - Manage and visualize FortiGate devices across regions with analytics and reporting">
+    <meta name="keywords" content="FortiGate, Fortinet, Device Inventory, NOC Dashboard, Network Management, Serial Numbers, HA Configuration">
+    <title>FortiGate Device Inventory - NOC Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #667eea;
+            --secondary-color: #764ba2;
+            --success-color: #28a745;
+            --danger-color: #dc3545;
+            --warning-color: #ffc107;
+            --info-color: #17a2b8;
+            --dark-bg: #1a1a2e;
+            --dark-card: #16213e;
+            --dark-text: #e4e4e4;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            padding: 20px;
+            min-height: 100vh;
+            transition: background 0.3s;
+        }
+
+        body.dark-mode {
+            background: var(--dark-bg);
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        body.dark-mode .container {
+            background: var(--dark-card);
+            color: var(--dark-text);
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 30px;
+            position: relative;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .header-title {
+            flex: 1;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .theme-toggle {
+            background: rgba(255,255,255,0.2);
+            border: 2px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .theme-toggle:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+
+        .controls {
+            padding: 30px;
+            background: #f8f9fa;
+            border-bottom: 2px solid #dee2e6;
+        }
+
+        body.dark-mode .controls {
+            background: #0f1419;
+            border-bottom-color: #2d3748;
+        }
+
+        .search-container {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 250px;
+            position: relative;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 40px 12px 20px;
+            font-size: 16px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        body.dark-mode .search-box input {
+            background: var(--dark-card);
+            border-color: #2d3748;
+            color: var(--dark-text);
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .search-clear {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: var(--danger-color);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .search-clear.visible {
+            opacity: 1;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .export-btn, .bulk-copy-btn, .print-btn {
+            padding: 12px 24px;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+
+        .export-btn {
+            background: var(--success-color);
+        }
+
+        .export-btn:hover {
+            background: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+        }
+
+        .bulk-copy-btn {
+            background: var(--info-color);
+        }
+
+        .bulk-copy-btn:hover {
+            background: #138496;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(23, 162, 184, 0.3);
+        }
+
+        .print-btn {
+            background: var(--warning-color);
+            color: #333;
+        }
+
+        .print-btn:hover {
+            background: #e0a800;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 193, 7, 0.3);
+        }
+
+        .filter-section {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(255,255,255,0.5);
+            border-radius: 8px;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        body.dark-mode .filter-section {
+            background: rgba(26, 35, 50, 0.5);
+        }
+
+        .filter-section h3 {
+            font-size: 0.95em;
+            color: #2c3e50;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        body.dark-mode .filter-section h3 {
+            color: #a0a0a0;
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 10px 20px;
+            border: 2px solid var(--primary-color);
+            background: white;
+            color: var(--primary-color);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        body.dark-mode .filter-btn {
+            background: var(--dark-card);
+            border-color: var(--primary-color);
+        }
+
+        .filter-btn:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .filter-btn.active {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .filter-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: var(--danger-color);
+            color: white;
+            border-radius: 12px;
+            padding: 2px 8px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .stat-card {
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            border-left: 4px solid var(--primary-color);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        body.dark-mode .stat-card {
+            background: var(--dark-card);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .stat-card.stat-success {
+            border-left-color: var(--success-color);
+        }
+
+        .stat-card.stat-danger {
+            border-left-color: var(--danger-color);
+        }
+
+        .stat-card.stat-info {
+            border-left-color: var(--info-color);
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        body.dark-mode .stat-label {
+            color: #a0a0a0;
+        }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        body.dark-mode .stat-value {
+            color: var(--dark-text);
+        }
+
+        .quick-filters {
+            margin-top: 20px;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        body.dark-mode .quick-filters {
+            background: var(--dark-card);
+        }
+
+        body.dark-mode .quick-filters h3 {
+            color: var(--dark-text) !important;
+        }
+
+        .quick-filter-chips {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        .chip {
+            padding: 6px 15px;
+            background: #e9ecef;
+            border-radius: 20px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        body.dark-mode .chip {
+            background: #2d3748;
+        }
+
+        .chip:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .chip.active {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .table-container {
+            padding: 30px;
+            overflow-x: auto;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        body.dark-mode table {
+            background: var(--dark-card);
+        }
+
+        thead {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.85em;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            user-select: none;
+            white-space: nowrap;
+        }
+
+        th:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        th::after {
+            content: ' ⇅';
+            opacity: 0.5;
+        }
+
+        th.sort-asc::after {
+            content: ' ↑';
+            opacity: 1;
+        }
+
+        th.sort-desc::after {
+            content: ' ↓';
+            opacity: 1;
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        body.dark-mode td {
+            border-bottom-color: #2d3748;
+        }
+
+        tbody tr {
+            transition: all 0.2s;
+        }
+
+        tbody tr:hover {
+            background: #f8f9fa;
+            transform: scale(1.01);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        body.dark-mode tbody tr:hover {
+            background: #1a2332;
+        }
+
+        tbody tr.selected {
+            background: #e3f2fd;
+        }
+
+        body.dark-mode tbody tr.selected {
+            background: #1e3a5f;
+        }
+
+        .row-checkbox {
+            cursor: pointer;
+            width: 18px;
+            height: 18px;
+        }
+
+        .device-badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.75em;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+
+        .badge-fgt60 {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .badge-fg100 {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+
+        .badge-fg200 {
+            background: #f3e5f5;
+            color: #7b1fa2;
+        }
+
+        .badge-fg500 {
+            background: #fce4ec;
+            color: #c2185b;
+        }
+
+        .badge-other {
+            background: #f5f5f5;
+            color: #616161;
+        }
+
+        .ha-indicator {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: 600;
+        }
+
+        .ha-yes {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .ha-no {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .copy-btn {
+            padding: 4px 8px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8em;
+            margin-left: 8px;
+            transition: all 0.2s;
+        }
+
+        .copy-btn:hover {
+            background: #5568d3;
+            transform: scale(1.05);
+        }
+
+        .copy-btn:active {
+            transform: scale(0.95);
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+            font-size: 1.2em;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            background: var(--success-color);
+            color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .model-breakdown {
+            margin-top: 20px;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        body.dark-mode .model-breakdown {
+            background: var(--dark-card);
+        }
+
+        .model-breakdown h3 {
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+
+        body.dark-mode .model-breakdown h3 {
+            color: var(--dark-text);
+        }
+
+        .model-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+        }
+
+        .model-item {
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            text-align: center;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        body.dark-mode .model-item {
+            background: #1a2332;
+        }
+
+        .model-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .model-name {
+            font-weight: bold;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+
+        .model-count {
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+
+        @media print {
+            body {
+                background: white !important;
+                padding: 0;
+                margin: 0;
+            }
+
+            .container {
+                box-shadow: none !important;
+                border-radius: 0;
+                max-width: 100%;
+            }
+
+            /* Hide interactive elements */
+            .header-actions,
+            .search-container,
+            .filter-section,
+            .quick-filters,
+            .stats,
+            .model-breakdown,
+            .footer,
+            .copy-btn,
+            .row-checkbox,
+            th:first-child,
+            td:first-child {
+                display: none !important;
+            }
+
+            /* Header styling */
+            .header {
+                background: white !important;
+                color: black !important;
+                padding: 20px;
+                border-bottom: 3px solid #2c3e50;
+                page-break-after: avoid;
+            }
+
+            .header h1 {
+                color: #2c3e50 !important;
+                font-size: 24pt;
+                margin-bottom: 5px;
+                text-shadow: none;
+            }
+
+            .header p {
+                color: #666 !important;
+                font-size: 11pt;
+                opacity: 1;
+            }
+
+            /* Table container */
+            .table-container {
+                max-height: none !important;
+                overflow: visible !important;
+                padding: 20px;
+            }
+
+            /* Table styling */
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                font-size: 9pt;
+                page-break-inside: auto;
+            }
+
+            thead {
+                background: #2c3e50 !important;
+                color: white !important;
+                position: static;
+            }
+
+            thead tr {
+                page-break-inside: avoid;
+                page-break-after: avoid;
+            }
+
+            th {
+                padding: 10px 8px;
+                text-align: left;
+                font-size: 9pt;
+                font-weight: 700;
+                border: 1px solid #ddd;
+                background: #2c3e50 !important;
+                color: white !important;
+            }
+
+            th::after {
+                content: '' !important;
+            }
+
+            tbody tr {
+                page-break-inside: avoid;
+                page-break-after: auto;
+                border-bottom: 1px solid #ddd;
+            }
+
+            td {
+                padding: 8px;
+                font-size: 8pt;
+                border: 1px solid #ddd;
+                color: black !important;
+            }
+
+            /* Remove hover effects */
+            tbody tr:hover {
+                background: transparent !important;
+                transform: none !important;
+                box-shadow: none !important;
+            }
+
+            /* Badges and indicators */
+            .device-badge,
+            .ha-indicator {
+                display: inline-block;
+                padding: 2px 6px;
+                border-radius: 3px;
+                font-size: 7pt;
+                font-weight: 600;
+                border: 1px solid #ddd;
+            }
+
+            .badge-fgt60 {
+                background: #e3f2fd !important;
+                color: #1976d2 !important;
+            }
+
+            .badge-fg100 {
+                background: #fff3e0 !important;
+                color: #f57c00 !important;
+            }
+
+            .badge-fg200 {
+                background: #f3e5f5 !important;
+                color: #7b1fa2 !important;
+            }
+
+            .badge-fg500 {
+                background: #fce4ec !important;
+                color: #c2185b !important;
+            }
+
+            .badge-other {
+                background: #f5f5f5 !important;
+                color: #616161 !important;
+            }
+
+            .ha-yes {
+                background: #d4edda !important;
+                color: #155724 !important;
+                border-color: #c3e6cb;
+            }
+
+            .ha-no {
+                background: #f8d7da !important;
+                color: #721c24 !important;
+                border-color: #f5c6cb;
+            }
+
+            /* Card view for print */
+            .card-view-container {
+                display: grid !important;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 15px;
+                padding: 20px;
+            }
+
+            .device-card {
+                page-break-inside: avoid;
+                border: 2px solid #ddd;
+                border-radius: 8px;
+                padding: 12px;
+                background: white !important;
+            }
+
+            .device-card-header {
+                border-bottom: 2px solid #2c3e50;
+                margin-bottom: 10px;
+                padding-bottom: 8px;
+            }
+
+            .device-card-title {
+                font-size: 11pt;
+                font-weight: bold;
+                color: #2c3e50 !important;
+            }
+
+            .device-card-region {
+                font-size: 14pt;
+            }
+
+            .device-info-row {
+                padding: 4px 0;
+                display: flex;
+                justify-content: space-between;
+            }
+
+            .device-info-label {
+                font-size: 8pt;
+                color: #666 !important;
+                font-weight: 600;
+            }
+
+            .device-info-value {
+                font-size: 8pt;
+                color: #2c3e50 !important;
+                font-family: 'Courier New', monospace;
+            }
+
+            /* Page headers and footers */
+            @page {
+                margin: 1cm;
+                size: A4;
+            }
+
+            /* Print metadata */
+            .print-header {
+                display: block !important;
+                text-align: right;
+                font-size: 8pt;
+                color: #666;
+                margin-bottom: 10px;
+                padding: 10px 20px;
+                border-bottom: 1px solid #ddd;
+            }
+
+            /* No results message */
+            .no-results {
+                padding: 40px;
+                text-align: center;
+                font-size: 12pt;
+                color: #666;
+            }
+        }
+
+        .footer {
+            padding: 20px 30px;
+            background: #f8f9fa;
+            border-top: 2px solid #dee2e6;
+            text-align: center;
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        body.dark-mode .footer {
+            background: #0f1419;
+            border-top-color: #2d3748;
+            color: #a0a0a0;
+        }
+
+        .keyboard-shortcuts {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        .shortcut {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .key {
+            background: #fff;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 2px 8px;
+            font-family: monospace;
+            font-size: 0.85em;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        body.dark-mode .key {
+            background: var(--dark-card);
+            border-color: #2d3748;
+        }
+
+        /* Print metadata header - hidden by default */
+        .print-header {
+            display: none;
+        }
+
+        /* View Toggle Styles */
+        .view-toggle {
+            display: flex;
+            gap: 5px;
+            background: white;
+            border-radius: 8px;
+            padding: 5px;
+            border: 2px solid #ddd;
+        }
+
+        body.dark-mode .view-toggle {
+            background: var(--dark-card);
+            border-color: #2d3748;
+        }
+
+        .view-btn {
+            padding: 8px 16px;
+            background: transparent;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            color: #666;
+            transition: all 0.3s;
+        }
+
+        body.dark-mode .view-btn {
+            color: #a0a0a0;
+        }
+
+        .view-btn:hover {
+            background: #f0f0f0;
+        }
+
+        body.dark-mode .view-btn:hover {
+            background: #1a2332;
+        }
+
+        .view-btn.active {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        /* Card View Styles */
+        .card-view-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+            padding: 30px;
+        }
+
+        .device-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-left: 5px solid var(--primary-color);
+            transition: all 0.3s;
+        }
+
+        body.dark-mode .device-card {
+            background: var(--dark-card);
+            border-left-color: var(--primary-color);
+        }
+
+        .device-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+        }
+
+        .device-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #eee;
+        }
+
+        body.dark-mode .device-card-header {
+            border-bottom-color: #2d3748;
+        }
+
+        .device-card-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        body.dark-mode .device-card-title {
+            color: var(--dark-text);
+        }
+
+        .device-card-region {
+            font-size: 1.5em;
+        }
+
+        .device-card-body {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .device-info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+        }
+
+        .device-info-label {
+            font-size: 0.85em;
+            color: #666;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        body.dark-mode .device-info-label {
+            color: #a0a0a0;
+        }
+
+        .device-info-value {
+            font-family: monospace;
+            font-size: 0.9em;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        body.dark-mode .device-info-value {
+            color: var(--dark-text);
+        }
+
+        /* Export Menu Styles */
+        .export-menu-container {
+            position: relative;
+            display: inline-block;
+        }
+
+        .export-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 5px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            z-index: 1000;
+            min-width: 220px;
+            display: none;
+            overflow: hidden;
+        }
+
+        body.dark-mode .export-dropdown {
+            background: var(--dark-card);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        }
+
+        .export-dropdown.show {
+            display: block;
+            animation: slideDown 0.2s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .export-option {
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #2c3e50;
+        }
+
+        body.dark-mode .export-option {
+            border-bottom-color: #2d3748;
+            color: var(--dark-text);
+        }
+
+        .export-option:last-child {
+            border-bottom: none;
+        }
+
+        .export-option:hover {
+            background: #f8f9fa;
+        }
+
+        body.dark-mode .export-option:hover {
+            background: #1a2332;
+        }
+
+        .export-option-icon {
+            font-size: 1.2em;
+            width: 24px;
+            text-align: center;
+        }
+
+        .export-option-text {
+            flex: 1;
+        }
+
+        .export-option-title {
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+
+        .export-option-desc {
+            font-size: 0.75em;
+            color: #666;
+            margin-top: 2px;
+        }
+
+        body.dark-mode .export-option-desc {
+            color: #a0a0a0;
+        }
+
+        /* Analytics Dashboard Styles */
+        .analytics-dashboard {
+            display: none;
+            padding: 30px;
+            background: #f8f9fa;
+            border-top: 2px solid #dee2e6;
+        }
+
+        body.dark-mode .analytics-dashboard {
+            background: #0f1419;
+            border-top-color: #2d3748;
+        }
+
+        .analytics-dashboard.show {
+            display: block;
+        }
+
+        .analytics-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .analytics-title {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        body.dark-mode .analytics-title {
+            color: var(--dark-text);
+        }
+
+        .toggle-analytics-btn {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+            margin-left: 10px;
+        }
+
+        .toggle-analytics-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .chart-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            transition: all 0.3s;
+        }
+
+        body.dark-mode .chart-card {
+            background: var(--dark-card);
+        }
+
+        .chart-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+        }
+
+        .chart-title {
+            font-size: 1.1em;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        body.dark-mode .chart-title {
+            color: var(--dark-text);
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+
+        .insights-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .insight-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            border-left: 5px solid var(--primary-color);
+        }
+
+        body.dark-mode .insight-card {
+            background: var(--dark-card);
+        }
+
+        .insight-card.warning {
+            border-left-color: var(--warning-color);
+        }
+
+        .insight-card.danger {
+            border-left-color: var(--danger-color);
+        }
+
+        .insight-card.success {
+            border-left-color: var(--success-color);
+        }
+
+        .insight-icon {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .insight-title {
+            font-size: 1.1em;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
+
+        body.dark-mode .insight-title {
+            color: var(--dark-text);
+        }
+
+        .insight-value {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 5px;
+        }
+
+        .insight-description {
+            font-size: 0.9em;
+            color: #666;
+            line-height: 1.5;
+        }
+
+        body.dark-mode .insight-description {
+            color: #a0a0a0;
+        }
+
+        .site-health-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .site-health-card {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: all 0.3s;
+        }
+
+        body.dark-mode .site-health-card {
+            background: var(--dark-card);
+        }
+
+        .site-health-card:hover {
+            transform: scale(1.02);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+        }
+
+        .site-icon {
+            font-size: 2.5em;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        }
+
+        .site-icon.pdc {
+            background: linear-gradient(135deg, #28a745, #20c997);
+        }
+
+        .site-icon.bdc {
+            background: linear-gradient(135deg, #17a2b8, #138496);
+        }
+
+        .site-details {
+            flex: 1;
+        }
+
+        .site-name {
+            font-weight: 700;
+            color: #2c3e50;
+            font-size: 0.95em;
+            margin-bottom: 5px;
+        }
+
+        body.dark-mode .site-name {
+            color: var(--dark-text);
+        }
+
+        .site-status {
+            font-size: 0.85em;
+            color: #666;
+        }
+
+        body.dark-mode .site-status {
+            color: #a0a0a0;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8em;
+            }
+            .search-container {
+                flex-direction: column;
+            }
+            table {
+                font-size: 0.9em;
+            }
+            th, td {
+                padding: 10px;
+            }
+            .stats {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-content">
+                <div class="header-title">
+                    <h1>🔒 FortiGate Device Inventory</h1>
+                    <p>Network Operations Center - Serial Number Management Dashboard</p>
+                    <p style="font-size: 0.9em; opacity: 0.8; margin-top: 5px;">Last Updated: October 15, 2025</p>
+                </div>
+                <div class="header-actions">
+                    <button class="toggle-analytics-btn" onclick="toggleAnalytics()">📊 Analytics Dashboard</button>
+                    <button class="theme-toggle" onclick="toggleTheme()">🌓 Toggle Theme</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="print-header">
+            <div>Printed: <span id="printDate"></span></div>
+            <div>Total Devices: <span id="printCount"></span></div>
+        </div>
+
+        <div class="controls">
+            <div class="search-container">
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="🔍 Search by device name or serial number...">
+                    <button class="search-clear" id="searchClear" onclick="clearSearch()">✕</button>
+                </div>
+                <div class="view-toggle">
+                    <button class="view-btn active" onclick="switchView('table')">📊 Table</button>
+                    <button class="view-btn" onclick="switchView('card')">🗂️ Cards</button>
+                </div>
+                <div class="action-buttons">
+                    <button class="bulk-copy-btn" onclick="bulkCopySerials()">📋 Copy All SNs</button>
+                    <div class="export-menu-container">
+                        <button class="export-btn" onclick="toggleExportMenu()">📥 Export ▼</button>
+                        <div class="export-dropdown" id="exportDropdown">
+                            <div class="export-option" onclick="exportToCSV()">
+                                <div class="export-option-icon">📄</div>
+                                <div class="export-option-text">
+                                    <div class="export-option-title">Standard CSV</div>
+                                    <div class="export-option-desc">Excel compatible format</div>
+                                </div>
+                            </div>
+                            <div class="export-option" onclick="exportToJSON()">
+                                <div class="export-option-icon">📦</div>
+                                <div class="export-option-text">
+                                    <div class="export-option-title">JSON Format</div>
+                                    <div class="export-option-desc">For APIs and automation</div>
+                                </div>
+                            </div>
+                            <div class="export-option" onclick="exportToMarkdown()">
+                                <div class="export-option-icon">📝</div>
+                                <div class="export-option-text">
+                                    <div class="export-option-title">Markdown Table</div>
+                                    <div class="export-option-desc">For documentation</div>
+                                </div>
+                            </div>
+                            <div class="export-option" onclick="exportToFormattedText()">
+                                <div class="export-option-icon">📋</div>
+                                <div class="export-option-text">
+                                    <div class="export-option-title">Formatted Text</div>
+                                    <div class="export-option-desc">NOC ticket format</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="print-btn" onclick="preparePrint(); window.print()">🖨️ Print</button>
+                </div>
+            </div>
+
+            <div class="filter-section">
+                <h3><span>🌍</span> Region Filter</h3>
+                <div class="filter-buttons">
+                    <button class="filter-btn active" onclick="filterByRegion('all')">
+                        🌍 All Regions
+                        <span class="filter-badge" id="badge-region-all">0</span>
+                    </button>
+                    <button class="filter-btn" onclick="filterByRegion('US')">
+                        🇺🇸 United States
+                        <span class="filter-badge" id="badge-region-us">0</span>
+                    </button>
+                    <button class="filter-btn" onclick="filterByRegion('EU')">
+                        🇪🇺 Europe
+                        <span class="filter-badge" id="badge-region-eu">0</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="filter-section">
+                <h3><span>⚙️</span> Configuration Type</h3>
+                <div class="filter-buttons">
+                    <button class="filter-btn active" onclick="filterData('all')">
+                        📊 All Devices
+                        <span class="filter-badge" id="badge-all">0</span>
+                    </button>
+                    <button class="filter-btn" onclick="filterData('ha')">
+                        ✅ HA Configured
+                        <span class="filter-badge" id="badge-ha">0</span>
+                    </button>
+                    <button class="filter-btn" onclick="filterData('standalone')">
+                        ⚠️ Standalone
+                        <span class="filter-badge" id="badge-standalone">0</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="filter-section">
+                <h3><span>📦</span> Device Series</h3>
+                <div class="filter-buttons">
+                    <button class="filter-btn" onclick="filterData('all')">All Series</button>
+                    <button class="filter-btn" onclick="filterData('fgt60')">🔵 FGT60 Series</button>
+                    <button class="filter-btn" onclick="filterData('fg100')">🟠 FG100 Series</button>
+                    <button class="filter-btn" onclick="filterData('fg200')">🟣 FG200 Series</button>
+                    <button class="filter-btn" onclick="filterData('fg500')">🔴 FG500 Series</button>
+                    <button class="filter-btn" onclick="filterData('fgt81')">⚫ FGT81 Series</button>
+                </div>
+            </div>
+
+            <div class="quick-filters">
+                <h3 style="font-size: 0.95em; color: #2c3e50; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 700;"><span>⚡</span> Quick Access Filters</h3>
+                <div class="quick-filter-chips">
+                    <div class="chip" onclick="quickFilter('VPN')">🔐 VPN Devices</div>
+                    <div class="chip" onclick="quickFilter('FW')">🔥 Firewall Devices</div>
+                    <div class="chip" onclick="quickFilter('PDC')">🏢 PDC Sites</div>
+                    <div class="chip" onclick="quickFilter('BDC')">🏢 BDC Sites</div>
+                    <div class="chip" onclick="quickFilter('root')">👤 Root Access</div>
+                </div>
+            </div>
+
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-label">📊 Total Devices</div>
+                    <div class="stat-value" id="totalDevices">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">🇺🇸 US Devices</div>
+                    <div class="stat-value" id="usDevices">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">🇪🇺 EU Devices</div>
+                    <div class="stat-value" id="euDevices">0</div>
+                </div>
+                <div class="stat-card stat-success">
+                    <div class="stat-label">✅ HA Configured</div>
+                    <div class="stat-value" id="haDevices">0</div>
+                </div>
+                <div class="stat-card stat-danger">
+                    <div class="stat-label">⚠️ Standalone</div>
+                    <div class="stat-value" id="standaloneDevices">0</div>
+                </div>
+                <div class="stat-card stat-info">
+                    <div class="stat-label">👁️ Currently Showing</div>
+                    <div class="stat-value" id="visibleDevices">0</div>
+                </div>
+            </div>
+
+            <div class="model-breakdown">
+                <h3>📈 Device Model Distribution</h3>
+                <div class="model-grid" id="modelGrid"></div>
+            </div>
+        </div>
+
+        <!-- Analytics Dashboard -->
+        <div class="analytics-dashboard" id="analyticsDashboard">
+            <div class="analytics-header">
+                <h2 class="analytics-title">📊 Advanced Analytics & Insights</h2>
+            </div>
+
+            <div class="charts-grid">
+                <div class="chart-card">
+                    <div class="chart-title">🏢 Data Center Distribution</div>
+                    <div class="chart-container">
+                        <canvas id="dcChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="chart-card">
+                    <div class="chart-title">🔧 HA Configuration Status</div>
+                    <div class="chart-container">
+                        <canvas id="haChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="chart-card">
+                    <div class="chart-title">🌍 Regional Distribution</div>
+                    <div class="chart-container">
+                        <canvas id="regionChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="chart-card">
+                    <div class="chart-title">📦 Model Distribution</div>
+                    <div class="chart-container">
+                        <canvas id="modelChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <h3 class="chart-title" style="margin-top: 30px;">🔍 Key Insights</h3>
+            <div class="insights-grid" id="insightsGrid"></div>
+
+            <h3 class="chart-title" style="margin-top: 30px;">🏢 Critical Infrastructure Sites</h3>
+            <div class="site-health-grid" id="siteHealthGrid"></div>
+        </div>
+
+        <div class="table-container" id="tableView">
+            <table id="dataTable">
+                <thead>
+                    <tr>
+                        <th style="width: 40px;"><input type="checkbox" id="selectAll" onchange="toggleSelectAll()"></th>
+                        <th onclick="sortTable(0)">Region</th>
+                        <th onclick="sortTable(1)">Device Name</th>
+                        <th onclick="sortTable(2)">Model</th>
+                        <th onclick="sortTable(3)">Primary Serial Number</th>
+                        <th onclick="sortTable(4)">HA Status</th>
+                        <th onclick="sortTable(5)">HA Serial 1</th>
+                        <th onclick="sortTable(6)">HA Serial 2</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody"></tbody>
+            </table>
+            <div id="noResults" class="no-results" style="display: none;">
+                🔍 No devices found matching your search criteria.
+            </div>
+        </div>
+
+        <div class="card-view-container" id="cardView" style="display: none;">
+            <!-- Cards will be rendered here -->
+        </div>
+
+        <div class="footer">
+            <p><strong>FortiGate Device Inventory Dashboard</strong> - Network Operations Center</p>
+            <p style="font-size: 0.85em; margin-top: 5px; opacity: 0.8;">
+                Developed by <strong>Miguel Jimenez</strong> |
+                <a href="mailto:Miguel@netsudo.com" style="color: inherit; text-decoration: none;">Miguel@netsudo.com</a> |
+                <a href="https://netsudo.com" target="_blank" style="color: inherit; text-decoration: none;">netsudo.com</a>
+            </p>
+            <div class="keyboard-shortcuts">
+                <div class="shortcut">
+                    <span class="key">Ctrl</span> + <span class="key">F</span>
+                    <span>Focus Search</span>
+                </div>
+                <div class="shortcut">
+                    <span class="key">Ctrl</span> + <span class="key">K</span>
+                    <span>Clear Filters</span>
+                </div>
+                <div class="shortcut">
+                    <span class="key">Ctrl</span> + <span class="key">P</span>
+                    <span>Print</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="device_data_combined.js"></script>
+    <script>
+        let deviceData = [];
+        let filteredData = [];
+        let selectedRows = new Set();
+        let currentFilter = 'all';
+        let currentRegion = 'all';
+        let sortColumn = 0;
+        let sortAscending = true;
+
+        // Detect device model from serial number
+        function detectModel(sn) {
+            if (!sn) return 'Unknown';
+            if (sn.includes('FGT60') || sn.includes('FG60')) return 'FGT60';
+            if (sn.includes('FG100')) return 'FG100';
+            if (sn.includes('FG200')) return 'FG200';
+            if (sn.includes('FG5') || sn.includes('FG500')) return 'FG500';
+            if (sn.includes('FGT81') || sn.includes('FG81')) return 'FGT81';
+            if (sn.includes('FG2')) return 'FG200';
+            return 'Other';
+        }
+
+        // Load data
+        function loadData() {
+            console.log('loadData() called');
+            console.log('DEVICE_DATA type:', typeof DEVICE_DATA);
+
+            if (typeof DEVICE_DATA !== 'undefined') {
+                console.log('DEVICE_DATA found, length:', DEVICE_DATA.length);
+                deviceData = DEVICE_DATA.map(device => ({
+                    ...device,
+                    model: detectModel(device.sn)
+                }));
+                console.log('deviceData created, length:', deviceData.length);
+                filteredData = [...deviceData];
+                console.log('filteredData created, length:', filteredData.length);
+                updateStats();
+                updateModelBreakdown();
+                renderTable();
+                console.log('All functions called, table should be rendered');
+            } else {
+                console.error('DEVICE_DATA is undefined!');
+                alert('Error: Device data not loaded. Please ensure device_data_combined.js is in the same directory.');
+            }
+        }
+
+        // Update statistics
+        function updateStats() {
+            const haCount = deviceData.filter(d => d.hasHA).length;
+            const total = deviceData.length;
+            const usCount = deviceData.filter(d => d.region === 'US').length;
+            const euCount = deviceData.filter(d => d.region === 'EU').length;
+
+            document.getElementById('totalDevices').textContent = total;
+            document.getElementById('usDevices').textContent = usCount;
+            document.getElementById('euDevices').textContent = euCount;
+            document.getElementById('haDevices').textContent = haCount;
+            document.getElementById('standaloneDevices').textContent = total - haCount;
+            document.getElementById('visibleDevices').textContent = filteredData.length;
+
+            // Update filter badges
+            document.getElementById('badge-all').textContent = total;
+            document.getElementById('badge-ha').textContent = haCount;
+            document.getElementById('badge-standalone').textContent = total - haCount;
+            document.getElementById('badge-region-all').textContent = total;
+            document.getElementById('badge-region-us').textContent = usCount;
+            document.getElementById('badge-region-eu').textContent = euCount;
+        }
+
+        // Update model breakdown
+        function updateModelBreakdown() {
+            const modelCounts = {};
+            deviceData.forEach(device => {
+                modelCounts[device.model] = (modelCounts[device.model] || 0) + 1;
+            });
+
+            const modelGrid = document.getElementById('modelGrid');
+            modelGrid.innerHTML = Object.entries(modelCounts)
+                .sort((a, b) => b[1] - a[1])
+                .map(([model, count]) => `
+                    <div class="model-item" onclick="filterData('${model.toLowerCase()}')">
+                        <div class="model-name">${model}</div>
+                        <div class="model-count">${count}</div>
+                    </div>
+                `).join('');
+        }
+
+        // Get badge class for model
+        function getModelBadgeClass(model) {
+            const classes = {
+                'FGT60': 'badge-fgt60',
+                'FG100': 'badge-fg100',
+                'FG200': 'badge-fg200',
+                'FG500': 'badge-fg500'
+            };
+            return classes[model] || 'badge-other';
+        }
+
+        // Render table
+        function renderTable() {
+            const tbody = document.getElementById('tableBody');
+            const noResults = document.getElementById('noResults');
+
+            if (filteredData.length === 0) {
+                tbody.innerHTML = '';
+                noResults.style.display = 'block';
+                return;
+            }
+
+            noResults.style.display = 'none';
+
+            const html = filteredData.map((device, index) => `
+                <tr class="${selectedRows.has(index) ? 'selected' : ''}" data-index="${index}">
+                    <td><input type="checkbox" class="row-checkbox" ${selectedRows.has(index) ? 'checked' : ''} onchange="toggleRowSelection(${index})"></td>
+                    <td><strong>${device.region === 'US' ? '🇺🇸 US' : '🇪🇺 EU'}</strong></td>
+                    <td>
+                        <strong>${escapeHtml(device.deviceName)}</strong>
+                        <span class="device-badge ${getModelBadgeClass(device.model)}">${device.model}</span>
+                    </td>
+                    <td>${device.model}</td>
+                    <td>
+                        ${escapeHtml(device.sn)}
+                        ${device.sn ? '<button class="copy-btn" onclick="copyToClipboard(\'' + escapeHtml(device.sn) + '\')">Copy</button>' : ''}
+                    </td>
+                    <td>
+                        <span class="ha-indicator ${device.hasHA ? 'ha-yes' : 'ha-no'}">
+                            ${device.hasHA ? '✅ HA Configured' : '⚠️ Standalone'}
+                        </span>
+                    </td>
+                    <td>
+                        ${escapeHtml(device.sn_ha1) || '-'}
+                        ${device.sn_ha1 ? '<button class="copy-btn" onclick="copyToClipboard(\'' + escapeHtml(device.sn_ha1) + '\')">Copy</button>' : ''}
+                    </td>
+                    <td>
+                        ${escapeHtml(device.sn_ha2) || '-'}
+                        ${device.sn_ha2 ? '<button class="copy-btn" onclick="copyToClipboard(\'' + escapeHtml(device.sn_ha2) + '\')">Copy</button>' : ''}
+                    </td>
+                </tr>
+            `).join('');
+
+            tbody.innerHTML = html;
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Filter by region
+        function filterByRegion(region) {
+            currentRegion = region;
+
+            // Update active button - only for region buttons
+            const regionSection = document.querySelectorAll('.filter-section')[0];
+            const regionButtons = regionSection.querySelectorAll('.filter-btn');
+            regionButtons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            applyFilters();
+        }
+
+        // Filter data
+        function filterData(type) {
+            currentFilter = type;
+
+            // Update active button for config type and device series
+            // Check if it's a config type filter or device series
+            const clickedButton = event.target;
+            const parentSection = clickedButton.closest('.filter-section');
+            const buttonsInSection = parentSection.querySelectorAll('.filter-btn');
+
+            // Remove active from buttons in the same section
+            buttonsInSection.forEach(btn => btn.classList.remove('active'));
+            clickedButton.classList.add('active');
+
+            applyFilters();
+        }
+
+        // Apply all filters
+        function applyFilters() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+
+            filteredData = deviceData.filter(device => {
+                // Region filter
+                let regionMatch = true;
+                if (currentRegion !== 'all') {
+                    regionMatch = device.region === currentRegion;
+                }
+
+                // Type filter
+                let typeMatch = true;
+                switch(currentFilter.toLowerCase()) {
+                    case 'ha':
+                        typeMatch = device.hasHA;
+                        break;
+                    case 'standalone':
+                        typeMatch = !device.hasHA;
+                        break;
+                    case 'fgt60':
+                        typeMatch = device.model === 'FGT60';
+                        break;
+                    case 'fg100':
+                        typeMatch = device.model === 'FG100';
+                        break;
+                    case 'fg200':
+                        typeMatch = device.model === 'FG200';
+                        break;
+                    case 'fg500':
+                        typeMatch = device.model === 'FG500';
+                        break;
+                    case 'fgt81':
+                        typeMatch = device.model === 'FGT81';
+                        break;
+                    case 'all':
+                    default:
+                        typeMatch = true;
+                }
+
+                // Search filter
+                const searchMatch = !searchTerm ||
+                    (device.deviceName && device.deviceName.toLowerCase().includes(searchTerm)) ||
+                    (device.sn && device.sn.toLowerCase().includes(searchTerm)) ||
+                    (device.sn_ha1 && device.sn_ha1.toLowerCase().includes(searchTerm)) ||
+                    (device.sn_ha2 && device.sn_ha2.toLowerCase().includes(searchTerm)) ||
+                    (device.model && device.model.toLowerCase().includes(searchTerm)) ||
+                    (device.region && device.region.toLowerCase().includes(searchTerm));
+
+                return regionMatch && typeMatch && searchMatch;
+            });
+
+            updateStats();
+            renderTable();
+        }
+
+        // Quick filter
+        function quickFilter(keyword) {
+            document.getElementById('searchInput').value = keyword;
+            searchData();
+
+            // Highlight active chip
+            document.querySelectorAll('.chip').forEach(chip => chip.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        // Search data
+        function searchData() {
+            const searchTerm = document.getElementById('searchInput').value;
+            const clearBtn = document.getElementById('searchClear');
+
+            if (searchTerm) {
+                clearBtn.classList.add('visible');
+            } else {
+                clearBtn.classList.remove('visible');
+            }
+
+            applyFilters();
+        }
+
+        // Clear search
+        function clearSearch() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('searchClear').classList.remove('visible');
+            document.querySelectorAll('.chip').forEach(chip => chip.classList.remove('active'));
+            searchData();
+        }
+
+        // Sort table
+        function sortTable(column) {
+            // Update sort indicators
+            document.querySelectorAll('th').forEach(th => {
+                th.classList.remove('sort-asc', 'sort-desc');
+            });
+
+            if (sortColumn === column) {
+                sortAscending = !sortAscending;
+            } else {
+                sortColumn = column;
+                sortAscending = true;
+            }
+
+            const fields = ['region', 'deviceName', 'model', 'sn', 'hasHA', 'sn_ha1', 'sn_ha2'];
+            const field = fields[column];
+
+            filteredData.sort((a, b) => {
+                let valA = a[field];
+                let valB = b[field];
+
+                if (typeof valA === 'boolean') {
+                    valA = valA ? 1 : 0;
+                    valB = valB ? 1 : 0;
+                }
+
+                if (valA < valB) return sortAscending ? -1 : 1;
+                if (valA > valB) return sortAscending ? 1 : -1;
+                return 0;
+            });
+
+            // Add sort indicator to clicked column
+            const th = event.target;
+            th.classList.add(sortAscending ? 'sort-asc' : 'sort-desc');
+
+            renderTable();
+        }
+
+        // Row selection
+        function toggleRowSelection(index) {
+            if (selectedRows.has(index)) {
+                selectedRows.delete(index);
+            } else {
+                selectedRows.add(index);
+            }
+            renderTable();
+        }
+
+        function toggleSelectAll() {
+            const selectAll = document.getElementById('selectAll');
+            if (selectAll.checked) {
+                filteredData.forEach((_, index) => selectedRows.add(index));
+            } else {
+                selectedRows.clear();
+            }
+            renderTable();
+        }
+
+        // Copy to clipboard
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                showNotification('✅ Copied: ' + text);
+                const btn = event.target;
+                const originalText = btn.textContent;
+                btn.textContent = 'Copied!';
+                btn.style.background = '#28a745';
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.style.background = '';
+                }, 1500);
+            }).catch(err => {
+                console.error('Failed to copy:', err);
+                showNotification('❌ Failed to copy', 'error');
+            });
+        }
+
+        // Bulk copy serials
+        function bulkCopySerials() {
+            const serials = filteredData
+                .map(d => d.sn)
+                .filter(sn => sn)
+                .join('\n');
+
+            navigator.clipboard.writeText(serials).then(() => {
+                showNotification(`✅ Copied ${filteredData.length} serial numbers!`);
+            }).catch(err => {
+                showNotification('❌ Failed to copy', 'error');
+            });
+        }
+
+        // Export to CSV
+        function exportToCSV() {
+            let csv = 'Region,Device Name,Model,Serial Number,HA Status,HA Serial 1,HA Serial 2\n';
+
+            filteredData.forEach(device => {
+                csv += `"${device.region}","${device.deviceName}","${device.model}","${device.sn}","${device.hasHA ? 'HA Configured' : 'Standalone'}","${device.sn_ha1 || ''}","${device.sn_ha2 || ''}"\n`;
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `fortigate_inventory_${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+            window.URL.revokeObjectURL(url);
+
+            showNotification(`✅ Exported ${filteredData.length} devices to CSV`);
+        }
+
+        // Theme toggle
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            showNotification(`🌓 ${isDark ? 'Dark' : 'Light'} mode enabled`);
+        }
+
+        // Load saved theme
+        function loadTheme() {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+            }
+        }
+
+        // Show notification
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            notification.textContent = message;
+
+            if (type === 'error') {
+                notification.style.background = 'var(--danger-color)';
+            }
+
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.style.animation = 'slideIn 0.3s ease reverse';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        // Event listeners
+        document.getElementById('searchInput').addEventListener('input', searchData);
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.key === 'f') {
+                e.preventDefault();
+                document.getElementById('searchInput').focus();
+            }
+            if (e.ctrlKey && e.key === 'k') {
+                e.preventDefault();
+                clearSearch();
+            }
+            if (e.ctrlKey && e.key === 'p') {
+                e.preventDefault();
+                preparePrint();
+                setTimeout(() => window.print(), 100);
+            }
+        });
+
+        // Prepare print metadata
+        function preparePrint() {
+            document.getElementById('printDate').textContent = new Date().toLocaleString();
+            document.getElementById('printCount').textContent = filteredData.length;
+        }
+
+        // Update print metadata before printing
+        window.addEventListener('beforeprint', preparePrint);
+
+        // Analytics Dashboard
+        let analyticsCharts = {};
+
+        function toggleAnalytics() {
+            const dashboard = document.getElementById('analyticsDashboard');
+            dashboard.classList.toggle('show');
+
+            if (dashboard.classList.contains('show')) {
+                initializeAnalytics();
+            }
+        }
+
+        function initializeAnalytics() {
+            generateInsights();
+            generateSiteHealth();
+            createDataCenterChart();
+            createHAChart();
+            createRegionChart();
+            createModelChart();
+        }
+
+        function generateInsights() {
+            const pdcDevices = deviceData.filter(d => d.deviceName.includes('PDC'));
+            const bdcDevices = deviceData.filter(d => d.deviceName.includes('BDC'));
+            const noHADevices = deviceData.filter(d => !d.hasHA);
+            const criticalSites = [...new Set(deviceData.filter(d => d.deviceName.match(/PDC|BDC/)).map(d => {
+                const match = d.deviceName.match(/^([A-Z]{2,4})-(?:PDC|BDC)/);
+                return match ? match[1] : null;
+            }).filter(Boolean))].length;
+
+            const insights = [
+                {
+                    icon: '🏢',
+                    title: 'Primary Data Centers',
+                    value: pdcDevices.length,
+                    description: 'Devices in PDC sites with high availability requirements',
+                    class: 'success'
+                },
+                {
+                    icon: '🔄',
+                    title: 'Backup Data Centers',
+                    value: bdcDevices.length,
+                    description: 'Devices providing disaster recovery capabilities',
+                    class: 'info'
+                },
+                {
+                    icon: '⚠️',
+                    title: 'Single Point of Failure',
+                    value: noHADevices.length,
+                    description: 'Devices without HA configuration - potential risk',
+                    class: 'danger'
+                },
+                {
+                    icon: '🌐',
+                    title: 'Critical Sites',
+                    value: criticalSites,
+                    description: 'Unique data center locations across infrastructure',
+                    class: 'primary'
+                }
+            ];
+
+            const insightsHTML = insights.map(insight => `
+                <div class="insight-card ${insight.class}">
+                    <div class="insight-icon">${insight.icon}</div>
+                    <div class="insight-title">${insight.title}</div>
+                    <div class="insight-value">${insight.value}</div>
+                    <div class="insight-description">${insight.description}</div>
+                </div>
+            `).join('');
+
+            document.getElementById('insightsGrid').innerHTML = insightsHTML;
+        }
+
+        function generateSiteHealth() {
+            const sites = {};
+
+            deviceData.forEach(device => {
+                const pdcMatch = device.deviceName.match(/^([A-Z]{2,4})-PDC/);
+                const bdcMatch = device.deviceName.match(/^([A-Z]{2,4})-BDC/);
+
+                if (pdcMatch) {
+                    const siteName = pdcMatch[1];
+                    if (!sites[siteName]) sites[siteName] = { pdc: 0, bdc: 0, pdcHA: 0, bdcHA: 0 };
+                    sites[siteName].pdc++;
+                    if (device.hasHA) sites[siteName].pdcHA++;
+                }
+                if (bdcMatch) {
+                    const siteName = bdcMatch[1];
+                    if (!sites[siteName]) sites[siteName] = { pdc: 0, bdc: 0, pdcHA: 0, bdcHA: 0 };
+                    sites[siteName].bdc++;
+                    if (device.hasHA) sites[siteName].bdcHA++;
+                }
+            });
+
+            const siteHealthHTML = Object.entries(sites)
+                .sort((a, b) => (b[1].pdc + b[1].bdc) - (a[1].pdc + a[1].bdc))
+                .map(([siteName, counts]) => `
+                    <div class="site-health-card">
+                        <div class="site-icon pdc">🏢</div>
+                        <div class="site-details">
+                            <div class="site-name">${siteName} Data Center</div>
+                            <div class="site-status">
+                                PDC: ${counts.pdc} devices (${counts.pdcHA} HA) |
+                                BDC: ${counts.bdc} devices (${counts.bdcHA} HA)
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+
+            document.getElementById('siteHealthGrid').innerHTML = siteHealthHTML || '<p>No critical infrastructure sites detected</p>';
+        }
+
+        function createDataCenterChart() {
+            const ctx = document.getElementById('dcChart');
+            if (!ctx) return;
+
+            const pdcCount = deviceData.filter(d => d.deviceName.includes('PDC')).length;
+            const bdcCount = deviceData.filter(d => d.deviceName.includes('BDC')).length;
+            const otherCount = deviceData.length - pdcCount - bdcCount;
+
+            if (analyticsCharts.dcChart) analyticsCharts.dcChart.destroy();
+
+            analyticsCharts.dcChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Primary DC (PDC)', 'Backup DC (BDC)', 'Other Sites'],
+                    datasets: [{
+                        data: [pdcCount, bdcCount, otherCount],
+                        backgroundColor: ['#28a745', '#17a2b8', '#6c757d'],
+                        borderWidth: 2,
+                        borderColor: '#fff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+
+        function createHAChart() {
+            const ctx = document.getElementById('haChart');
+            if (!ctx) return;
+
+            const haCount = deviceData.filter(d => d.hasHA).length;
+            const standaloneCount = deviceData.length - haCount;
+
+            if (analyticsCharts.haChart) analyticsCharts.haChart.destroy();
+
+            analyticsCharts.haChart = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: ['HA Configured', 'Standalone'],
+                    datasets: [{
+                        data: [haCount, standaloneCount],
+                        backgroundColor: ['#28a745', '#dc3545'],
+                        borderWidth: 2,
+                        borderColor: '#fff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+
+        function createRegionChart() {
+            const ctx = document.getElementById('regionChart');
+            if (!ctx) return;
+
+            const usCount = deviceData.filter(d => d.region === 'US').length;
+            const euCount = deviceData.filter(d => d.region === 'EU').length;
+
+            if (analyticsCharts.regionChart) analyticsCharts.regionChart.destroy();
+
+            analyticsCharts.regionChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['United States', 'Europe'],
+                    datasets: [{
+                        label: 'Device Count',
+                        data: [usCount, euCount],
+                        backgroundColor: ['#667eea', '#764ba2'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        function createModelChart() {
+            const ctx = document.getElementById('modelChart');
+            if (!ctx) return;
+
+            const modelCounts = {};
+            deviceData.forEach(device => {
+                modelCounts[device.model] = (modelCounts[device.model] || 0) + 1;
+            });
+
+            const sortedModels = Object.entries(modelCounts).sort((a, b) => b[1] - a[1]);
+
+            if (analyticsCharts.modelChart) analyticsCharts.modelChart.destroy();
+
+            analyticsCharts.modelChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: sortedModels.map(([model]) => model),
+                    datasets: [{
+                        label: 'Devices',
+                        data: sortedModels.map(([, count]) => count),
+                        backgroundColor: ['#667eea', '#764ba2', '#f093fb', '#4facfe', '#43e97b'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    indexAxis: 'y',
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        // View Toggle
+        let currentView = 'table';
+
+        function switchView(view) {
+            currentView = view;
+
+            // Update button states
+            document.querySelectorAll('.view-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            // Toggle views
+            if (view === 'table') {
+                document.getElementById('tableView').style.display = 'block';
+                document.getElementById('cardView').style.display = 'none';
+            } else {
+                document.getElementById('tableView').style.display = 'none';
+                document.getElementById('cardView').style.display = 'grid';
+                renderCardView();
+            }
+        }
+
+        // Render Card View
+        function renderCardView() {
+            const cardView = document.getElementById('cardView');
+
+            if (filteredData.length === 0) {
+                cardView.innerHTML = '<div class="no-results">🔍 No devices found matching your search criteria.</div>';
+                return;
+            }
+
+            const cards = filteredData.map(device => `
+                <div class="device-card">
+                    <div class="device-card-header">
+                        <div class="device-card-title">${escapeHtml(device.deviceName)}</div>
+                        <div class="device-card-region">${device.region === 'US' ? '🇺🇸' : '🇪🇺'}</div>
+                    </div>
+                    <div class="device-card-body">
+                        <div class="device-info-row">
+                            <div class="device-info-label">Model</div>
+                            <div class="device-info-value">
+                                <span class="device-badge ${getModelBadgeClass(device.model)}">${device.model}</span>
+                            </div>
+                        </div>
+                        <div class="device-info-row">
+                            <div class="device-info-label">Primary Serial</div>
+                            <div class="device-info-value">
+                                ${escapeHtml(device.sn)}
+                                ${device.sn ? '<button class="copy-btn" onclick="copyToClipboard(\'' + escapeHtml(device.sn) + '\')">Copy</button>' : ''}
+                            </div>
+                        </div>
+                        <div class="device-info-row">
+                            <div class="device-info-label">HA Status</div>
+                            <div class="device-info-value">
+                                <span class="ha-indicator ${device.hasHA ? 'ha-yes' : 'ha-no'}">
+                                    ${device.hasHA ? '✅ HA' : '⚠️ Standalone'}
+                                </span>
+                            </div>
+                        </div>
+                        ${device.sn_ha1 ? `
+                        <div class="device-info-row">
+                            <div class="device-info-label">HA Serial 1</div>
+                            <div class="device-info-value">
+                                ${escapeHtml(device.sn_ha1)}
+                                <button class="copy-btn" onclick="copyToClipboard('${escapeHtml(device.sn_ha1)}')">Copy</button>
+                            </div>
+                        </div>
+                        ` : ''}
+                        ${device.sn_ha2 ? `
+                        <div class="device-info-row">
+                            <div class="device-info-label">HA Serial 2</div>
+                            <div class="device-info-value">
+                                ${escapeHtml(device.sn_ha2)}
+                                <button class="copy-btn" onclick="copyToClipboard('${escapeHtml(device.sn_ha2)}')">Copy</button>
+                            </div>
+                        </div>
+                        ` : ''}
+                    </div>
+                </div>
+            `).join('');
+
+            cardView.innerHTML = cards;
+        }
+
+        // Export Menu Toggle
+        function toggleExportMenu() {
+            const dropdown = document.getElementById('exportDropdown');
+            dropdown.classList.toggle('show');
+        }
+
+        // Close export menu when clicking outside
+        document.addEventListener('click', (e) => {
+            const dropdown = document.getElementById('exportDropdown');
+            const exportBtn = document.querySelector('.export-menu-container');
+
+            if (dropdown && !exportBtn.contains(e.target)) {
+                dropdown.classList.remove('show');
+            }
+        });
+
+        // Export to JSON
+        function exportToJSON() {
+            const data = filteredData.map(device => ({
+                region: device.region,
+                deviceName: device.deviceName,
+                model: device.model,
+                serialNumber: device.sn,
+                haConfigured: device.hasHA,
+                haSerial1: device.sn_ha1 || null,
+                haSerial2: device.sn_ha2 || null
+            }));
+
+            const json = JSON.stringify(data, null, 2);
+            const blob = new Blob([json], { type: 'application/json' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `fortigate_inventory_${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            window.URL.revokeObjectURL(url);
+
+            showNotification(`✅ Exported ${filteredData.length} devices to JSON`);
+            document.getElementById('exportDropdown').classList.remove('show');
+        }
+
+        // Export to Markdown
+        function exportToMarkdown() {
+            let md = '# FortiGate Device Inventory\n\n';
+            md += `**Generated:** ${new Date().toLocaleString()}\n\n`;
+            md += `**Total Devices:** ${filteredData.length}\n\n`;
+            md += '| Region | Device Name | Model | Serial Number | HA Status | HA Serial 1 | HA Serial 2 |\n';
+            md += '|--------|-------------|-------|---------------|-----------|-------------|-------------|\n';
+
+            filteredData.forEach(device => {
+                const region = device.region === 'US' ? '🇺🇸 US' : '🇪🇺 EU';
+                const haStatus = device.hasHA ? '✅ HA' : '⚠️ Standalone';
+                md += `| ${region} | ${device.deviceName} | ${device.model} | ${device.sn} | ${haStatus} | ${device.sn_ha1 || '-'} | ${device.sn_ha2 || '-'} |\n`;
+            });
+
+            const blob = new Blob([md], { type: 'text/markdown' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `fortigate_inventory_${new Date().toISOString().split('T')[0]}.md`;
+            a.click();
+            window.URL.revokeObjectURL(url);
+
+            showNotification(`✅ Exported ${filteredData.length} devices to Markdown`);
+            document.getElementById('exportDropdown').classList.remove('show');
+        }
+
+        // Export to Formatted Text
+        function exportToFormattedText() {
+            let text = '═══════════════════════════════════════════════════════════════\n';
+            text += '           FORTIGATE DEVICE INVENTORY - NOC REFERENCE\n';
+            text += '═══════════════════════════════════════════════════════════════\n\n';
+            text += `Generated: ${new Date().toLocaleString()}\n`;
+            text += `Total Devices: ${filteredData.length}\n\n`;
+
+            // Group by region
+            const regions = ['US', 'EU'];
+            regions.forEach(region => {
+                const regionDevices = filteredData.filter(d => d.region === region);
+                if (regionDevices.length === 0) return;
+
+                text += `\n${'─'.repeat(60)}\n`;
+                text += `REGION: ${region === 'US' ? '🇺🇸 UNITED STATES' : '🇪🇺 EUROPE'} (${regionDevices.length} devices)\n`;
+                text += `${'─'.repeat(60)}\n\n`;
+
+                regionDevices.forEach((device, idx) => {
+                    text += `[${idx + 1}] ${device.deviceName}\n`;
+                    text += `    Model:           ${device.model}\n`;
+                    text += `    Serial Number:   ${device.sn}\n`;
+                    text += `    HA Status:       ${device.hasHA ? '✅ HA Configured' : '⚠️  Standalone'}\n`;
+                    if (device.sn_ha1) {
+                        text += `    HA Serial 1:     ${device.sn_ha1}\n`;
+                    }
+                    if (device.sn_ha2) {
+                        text += `    HA Serial 2:     ${device.sn_ha2}\n`;
+                    }
+                    text += '\n';
+                });
+            });
+
+            text += '\n═══════════════════════════════════════════════════════════════\n';
+            text += '                     END OF REPORT\n';
+            text += '═══════════════════════════════════════════════════════════════\n';
+
+            const blob = new Blob([text], { type: 'text/plain' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `fortigate_inventory_${new Date().toISOString().split('T')[0]}.txt`;
+            a.click();
+            window.URL.revokeObjectURL(url);
+
+            showNotification(`✅ Exported ${filteredData.length} devices to formatted text`);
+            document.getElementById('exportDropdown').classList.remove('show');
+        }
+
+        // Initialize
+        loadTheme();
+        loadData();
+    </script>
+</body>
+</html>

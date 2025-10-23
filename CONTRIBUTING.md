@@ -1,6 +1,6 @@
-# Contributing to FortiGate Device Inventory Dashboard
+# Contributing to NetAssets
 
-First off, thank you for considering contributing to this project! This dashboard is designed to help NOC teams manage FortiGate inventories more effectively.
+First off, thank you for considering contributing to this project! NetAssets is designed to help NOC teams manage network device inventories more effectively across multiple vendors and platforms.
 
 ## How to Contribute
 

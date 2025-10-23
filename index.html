@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="author" content="Miguel Jimenez - Miguel@netsudo.com">
-    <meta name="description" content="Interactive FortiGate Device Inventory Dashboard for Network Operations Center - Manage and visualize FortiGate devices across regions with analytics and reporting">
-    <meta name="keywords" content="FortiGate, Fortinet, Device Inventory, NOC Dashboard, Network Management, Serial Numbers, HA Configuration">
-    <title>FortiGate Device Inventory - NOC Dashboard</title>
+    <meta name="description" content="NetAssets - Network Device Inventory Dashboard for Network Operations Center - Manage and visualize network devices across regions with analytics and reporting">
+    <meta name="keywords" content="NetAssets, Network Inventory, Device Management, NOC Dashboard, Network Operations, Asset Management, Serial Numbers, HA Configuration, FortiGate, Cisco, Palo Alto">
+    <title>NetAssets - Network Device Inventory Dashboard</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <style>
         :root {
@@ -1775,8 +1775,8 @@
         <div class="header">
             <div class="header-content">
                 <div class="header-title">
-                    <h1>🔒 FortiGate Device Inventory</h1>
-                    <p>Network Operations Center - Serial Number Management Dashboard</p>
+                    <h1>🔒 NetAssets</h1>
+                    <p>Network Device Inventory Dashboard - Asset Management & Analytics</p>
                     <p style="font-size: 0.9em; opacity: 0.8; margin-top: 5px;">Last Updated: October 15, 2025</p>
                 </div>
                 <div class="header-actions">
@@ -2020,7 +2020,7 @@
         </div>
 
         <div class="footer">
-            <p><strong>FortiGate Device Inventory Dashboard</strong> - Network Operations Center</p>
+            <p><strong>NetAssets</strong> - Network Device Inventory Dashboard</p>
             <p style="font-size: 0.85em; margin-top: 5px; opacity: 0.8;">
                 Developed by <strong>Miguel Jimenez</strong> |
                 <a href="mailto:Miguel@netsudo.com" style="color: inherit; text-decoration: none;">Miguel@netsudo.com</a> |
@@ -2461,7 +2461,7 @@
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `fortigate_inventory_${new Date().toISOString().split('T')[0]}.csv`;
+            a.download = `netassets_inventory_${new Date().toISOString().split('T')[0]}.csv`;
             a.click();
             window.URL.revokeObjectURL(url);
 
@@ -2903,7 +2903,7 @@
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `fortigate_inventory_${new Date().toISOString().split('T')[0]}.json`;
+            a.download = `netassets_inventory_${new Date().toISOString().split('T')[0]}.json`;
             a.click();
             window.URL.revokeObjectURL(url);
 
@@ -2913,7 +2913,7 @@
 
         // Export to Markdown
         function exportToMarkdown() {
-            let md = '# FortiGate Device Inventory\n\n';
+            let md = '# NetAssets - Network Device Inventory\n\n';
             md += `**Generated:** ${new Date().toLocaleString()}\n\n`;
             md += `**Total Devices:** ${filteredData.length}\n\n`;
             md += '| Region | Device Name | Model | Serial Number | HA Status | HA Serial 1 | HA Serial 2 |\n';
@@ -2929,7 +2929,7 @@
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `fortigate_inventory_${new Date().toISOString().split('T')[0]}.md`;
+            a.download = `netassets_inventory_${new Date().toISOString().split('T')[0]}.md`;
             a.click();
             window.URL.revokeObjectURL(url);
 
@@ -2978,7 +2978,7 @@
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `fortigate_inventory_${new Date().toISOString().split('T')[0]}.txt`;
+            a.download = `netassets_inventory_${new Date().toISOString().split('T')[0]}.txt`;
             a.click();
             window.URL.revokeObjectURL(url);
 

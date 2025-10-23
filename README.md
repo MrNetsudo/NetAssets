@@ -1,23 +1,29 @@
-# FortiGate Device Inventory Dashboard
+# NetAssets - Network Device Inventory Dashboard
 
-A modern, interactive web-based dashboard for managing and visualizing FortiGate device inventories across multiple regions and data centers.
+A modern, interactive web-based dashboard for managing and visualizing network device inventories across multiple regions and data centers. Supporting FortiGate, Cisco, Palo Alto, and other enterprise network equipment.
 
 **Author:** Miguel Jimenez (Miguel@netsudo.com)
 
 ## Overview
 
-This dashboard provides Network Operations Center (NOC) teams with a comprehensive view of FortiGate device inventory, including serial numbers, HA configurations, regional distribution, and analytics insights. Built as a single-page application with no server dependencies.
+NetAssets provides Network Operations Center (NOC) teams with a comprehensive view of network device inventory, including serial numbers, HA configurations, regional distribution, and analytics insights. Built as a single-page application with no server dependencies, making it easy to deploy anywhere.
 
 ## Features
 
 ### Core Functionality
-- **Interactive Device Management**: View and manage 1,270+ FortiGate devices across US and EU regions
-- **Dual View Modes**: Switch between table and card layouts
+- **Interactive Device Management**: View and manage 1,000+ network devices across multiple regions
+- **Dual View Modes**: Switch between table and card layouts for optimal viewing
 - **Advanced Filtering**: Filter by region, HA status, device model, and custom criteria
 - **Real-time Search**: Search across device names, serial numbers, and models
 - **Smart Analytics**: Visual charts and insights for infrastructure monitoring
+- **Multi-Vendor Support**: Works with FortiGate, Cisco, Palo Alto, and other network devices
 
 ### Data Operations
+- **Import Capabilities**:
+  - CSV import with preview
+  - JSON import with validation
+  - Replace or append modes
+  - Field mapping and validation
 - **Export Capabilities**:
   - CSV (Excel-compatible)
   - JSON (API-ready)
@@ -48,8 +54,8 @@ This dashboard provides Network Operations Center (NOC) teams with a comprehensi
 
 1. Clone this repository:
 ```bash
-git clone https://github.com/yourusername/firemon.git
-cd firemon
+git clone https://github.com/MrNetsudo/Network-Assets-Inventory.git
+cd Network-Assets-Inventory
 ```
 
 2. Deploy to your web server:
@@ -80,17 +86,26 @@ htpasswd -c /path/to/.htpasswd admin
 ## Usage
 
 ### Filtering Devices
-- **Region Filter**: Click US or EU buttons to filter by region
+- **Region Filter**: Click region buttons to filter by geographic location
 - **Configuration Type**: Filter by HA Configured or Standalone devices
-- **Device Series**: Filter by specific FortiGate models (FGT60, FG100, FG200, FG500, FGT81)
+- **Device Series**: Filter by device models and series
 - **Quick Access**: Use predefined filters for VPN, Firewall, PDC/BDC sites
+- **Custom Filters**: Create your own filter combinations
 
 ### Searching
 - Use the search box to find devices by name or serial number
 - Press `Ctrl+F` to quickly focus the search input
 - Click the X button or press `Ctrl+K` to clear search and filters
 
-### Exporting Data
+### Importing & Exporting Data
+
+**Import:**
+1. Click the "Import" button
+2. Choose CSV or JSON format
+3. Preview data before importing
+4. Select Replace or Append mode
+
+**Export:**
 1. Click the "Export" button
 2. Select your preferred format:
    - **Standard CSV**: For Excel and spreadsheet applications
@@ -112,21 +127,24 @@ htpasswd -c /path/to/.htpasswd admin
 ## File Structure
 
 ```
-firemon/
+netassets/
 ├── index.html                  # Main dashboard application
 ├── device_data_combined.js     # Device inventory data
 ├── .htaccess                   # Apache security configuration
 ├── .gitignore                  # Git ignore rules
+├── LICENSE                     # MIT License
+├── CONTRIBUTING.md             # Contribution guidelines
 ├── README.md                   # This file
-└── QUICK_START.txt            # Quick deployment guide
+├── QUICK_START.txt             # Quick deployment guide
+└── push-to-github.sh           # GitHub upload helper script
 ```
 
 ## Updating Device Data
 
-When your FortiGate inventory changes:
+When your network device inventory changes:
 
-1. Export new CSV data from FortiManager
-2. Convert CSV to JavaScript format:
+1. Export new CSV data from your management platform (FortiManager, Cisco DNA, Panorama, etc.)
+2. Use the Import feature in the dashboard, or convert CSV to JavaScript format:
 ```javascript
 const DEVICE_DATA = [
   {
@@ -218,7 +236,8 @@ For issues, questions, or feature requests:
 
 - Built for enterprise network operations teams
 - Designed for Network Operations Centers (NOC)
-- Optimized for FortiGate infrastructure management
+- Supports multi-vendor network infrastructure management
+- Initially designed for FortiGate but expandable to any network device
 
 ---
 

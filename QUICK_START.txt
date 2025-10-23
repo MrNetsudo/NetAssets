@@ -1,11 +1,12 @@
 ═══════════════════════════════════════════════════════════════
-  FORTIGATE DEVICE INVENTORY - QUICK DEPLOYMENT GUIDE
+  NETASSETS - NETWORK DEVICE INVENTORY
+  QUICK DEPLOYMENT GUIDE
 
   Author: Miguel Jimenez (Miguel@netsudo.com)
   Website: https://netsudo.com
 ═══════════════════════════════════════════════════════════════
 
-DEPLOY TO: https://firemon.netsudo.com
+DEPLOY TO: Your web server (e.g., https://netassets.yourcompany.com)
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -18,27 +19,27 @@ DEPLOY TO: https://firemon.netsudo.com
 
 🚀 FASTEST DEPLOYMENT METHOD:
 
-1. Extract the deployment package:
-   tar -xzf firemon_deployment.tar.gz
+1. Clone or download from GitHub:
+   git clone https://github.com/MrNetsudo/Network-Assets-Inventory.git
 
 2. Upload to your web server:
 
    Option A - FTP/SFTP:
    • Open FileZilla or similar FTP client
    • Connect to your server
-   • Navigate to /public_html/firemon/ (or wherever firemon.netsudo.com points)
+   • Navigate to /public_html/netassets/
    • Upload: index.html, device_data_combined.js, .htaccess
 
    Option B - cPanel:
    • Login to cPanel
-   • File Manager → Navigate to firemon directory
-   • Upload → Select the 3 files
+   • File Manager → Navigate to deployment directory
+   • Upload → Select the files
 
    Option C - Command Line (SSH):
-   scp index.html device_data_combined.js .htaccess user@server:/path/to/firemon/
+   scp index.html device_data_combined.js .htaccess user@server:/path/to/netassets/
 
 3. Test the site:
-   Open: https://firemon.netsudo.com
+   Open: https://yourserver.com/netassets/
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -48,7 +49,7 @@ Since this contains sensitive device information, ADD PASSWORD PROTECTION:
 
 Step 1: Edit .htaccess file, uncomment these lines:
    AuthType Basic
-   AuthName "FortiGate Inventory - Authorized Personnel Only"
+   AuthName "NetAssets - Authorized Personnel Only"
    AuthUserFile /full/path/to/.htpasswd
    Require valid-user
 
@@ -63,13 +64,13 @@ Step 3: Update AuthUserFile path in .htaccess with full server path
 ✅ VERIFICATION CHECKLIST:
 
 □ Files uploaded successfully
-□ Visit https://firemon.netsudo.com
+□ Visit your deployment URL
 □ Dashboard loads correctly
-□ Device data displays (should show 1,270 devices)
+□ Device data displays
 □ Analytics dashboard opens (click "📊 Analytics Dashboard" button)
 □ Charts display properly
 □ Search and filters work
-□ Export functions work
+□ Import and Export functions work
 □ Authentication working (if configured)
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -77,39 +78,43 @@ Step 3: Update AuthUserFile path in .htaccess with full server path
 🔄 UPDATING DATA IN THE FUTURE:
 
 When devices change:
-1. Get new CSV exports from FortiManager
-2. Run: python3 convert_csv_to_js.py
-3. Upload ONLY the new device_data_combined.js file
+1. Use the Import feature in the dashboard (CSV or JSON)
+2. Or get new CSV exports from your management platform
+3. Upload using the web interface or replace device_data_combined.js
 4. No need to re-upload index.html
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 ⚡ FEATURES YOUR TEAM GETS:
 
-✓ 1,270 devices (943 US + 327 EU)
+✓ Multi-vendor network device inventory management
 ✓ Interactive filtering by Region, HA Status, Model
 ✓ Card and Table view modes
 ✓ Advanced Analytics Dashboard with charts
 ✓ Data Center monitoring (PDC/BDC sites)
+✓ Import from CSV and JSON with preview
 ✓ Export to CSV, JSON, Markdown, Formatted Text
-✓ Dark mode
+✓ Dark mode with persistent preferences
 ✓ Print-friendly PDFs
-✓ Mobile responsive
+✓ Mobile responsive design
 ✓ Copy serial numbers with one click
 ✓ Real-time search across all fields
+✓ Supports FortiGate, Cisco, Palo Alto, and more
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 📁 FILE LOCATIONS:
 
-Current directory: /home/miguel/Firemon_Serials/
+Current directory: /home/miguel/Firemon/
 
 Files ready for deployment:
 • index.html
 • device_data_combined.js
 • .htaccess
-• DEPLOYMENT.md (detailed guide)
-• firemon_deployment.tar.gz (complete package)
+• README.md (detailed documentation)
+• CONTRIBUTING.md (contribution guide)
+• LICENSE (MIT License)
+• push-to-github.sh (GitHub helper script)
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -129,6 +134,7 @@ Problem: Charts not showing
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Need help? Check DEPLOYMENT.md for detailed instructions!
+Need help? Check README.md for detailed instructions!
+GitHub: https://github.com/MrNetsudo/Network-Assets-Inventory
 
 ═══════════════════════════════════════════════════════════════

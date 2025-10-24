@@ -3340,35 +3340,16 @@
 
             <!-- Multi-Level Region Filter -->
             <div class="filter-section">
-                <h3><span>🌍</span> Geographic Region</h3>
+                <h3><span>🌍</span> Geographic Region (US States)</h3>
                 <div class="filter-buttons">
                     <button class="filter-btn active" onclick="filterByRegion('all')">
-                        🌍 All Regions <span class="filter-badge" id="badge-region-all">0</span>
+                        🌍 All States <span class="filter-badge" id="badge-region-all">0</span>
                     </button>
                 </div>
                 <div class="filter-subgroup">
-                    <h4>North America</h4>
-                    <div class="filter-buttons compact">
-                        <button class="filter-btn" onclick="filterByRegion('US')">🇺🇸 United States <span class="filter-badge" id="badge-region-us">0</span></button>
-                        <button class="filter-btn" onclick="filterByRegion('CA')">🇨🇦 Canada <span class="filter-badge" id="badge-region-ca">0</span></button>
-                        <button class="filter-btn" onclick="filterByRegion('MX')">🇲🇽 Mexico <span class="filter-badge" id="badge-region-mx">0</span></button>
-                    </div>
-                </div>
-                <div class="filter-subgroup">
-                    <h4>Europe</h4>
-                    <div class="filter-buttons compact">
-                        <button class="filter-btn" onclick="filterByRegion('EU')">🇪🇺 Europe (All) <span class="filter-badge" id="badge-region-eu">0</span></button>
-                        <button class="filter-btn" onclick="filterByRegion('UK')">🇬🇧 United Kingdom <span class="filter-badge" id="badge-region-uk">0</span></button>
-                        <button class="filter-btn" onclick="filterByRegion('DE')">🇩🇪 Germany <span class="filter-badge" id="badge-region-de">0</span></button>
-                        <button class="filter-btn" onclick="filterByRegion('FR')">🇫🇷 France <span class="filter-badge" id="badge-region-fr">0</span></button>
-                    </div>
-                </div>
-                <div class="filter-subgroup">
-                    <h4>Asia Pacific & Other</h4>
-                    <div class="filter-buttons compact">
-                        <button class="filter-btn" onclick="filterByRegion('APAC')">🌏 Asia Pacific <span class="filter-badge" id="badge-region-apac">0</span></button>
-                        <button class="filter-btn" onclick="filterByRegion('LATAM')">🌎 Latin America <span class="filter-badge" id="badge-region-latam">0</span></button>
-                        <button class="filter-btn" onclick="filterByRegion('MEA')">🌍 Middle East/Africa <span class="filter-badge" id="badge-region-mea">0</span></button>
+                    <h4>US States - Auto-Detected from Data</h4>
+                    <div class="filter-buttons compact" id="stateFiltersContainer">
+                        <!-- Auto-populated from tenant data -->
                     </div>
                 </div>
             </div>
@@ -3378,12 +3359,9 @@
                 <h3><span>🏢</span> Vendor</h3>
                 <div class="filter-buttons">
                     <button class="filter-btn active" onclick="filterByVendor('all')">All Vendors <span class="filter-badge" id="badge-vendor-all">0</span></button>
-                    <button class="filter-btn" onclick="filterByVendor('Fortinet')">🔥 Fortinet <span class="filter-badge" id="badge-vendor-fortinet">0</span></button>
-                    <button class="filter-btn" onclick="filterByVendor('Palo Alto Networks')">🛡️ Palo Alto <span class="filter-badge" id="badge-vendor-paloalto">0</span></button>
-                    <button class="filter-btn" onclick="filterByVendor('Cisco')">📡 Cisco <span class="filter-badge" id="badge-vendor-cisco">0</span></button>
-                    <button class="filter-btn" onclick="filterByVendor('Check Point')">✅ Check Point <span class="filter-badge" id="badge-vendor-checkpoint">0</span></button>
-                    <button class="filter-btn" onclick="filterByVendor('Juniper')">🌲 Juniper <span class="filter-badge" id="badge-vendor-juniper">0</span></button>
-                    <button class="filter-btn" onclick="filterByVendor('F5 Networks')">⚖️ F5 Networks <span class="filter-badge" id="badge-vendor-f5">0</span></button>
+                </div>
+                <div class="filter-buttons compact" id="vendorFiltersContainer">
+                    <!-- Auto-populated from device data -->
                 </div>
             </div>
 
@@ -3392,10 +3370,9 @@
                 <h3><span>🔌</span> Device Type</h3>
                 <div class="filter-buttons">
                     <button class="filter-btn active" onclick="filterByDeviceType('all')">All Types <span class="filter-badge" id="badge-type-all">0</span></button>
-                    <button class="filter-btn" onclick="filterByDeviceType('Firewall')">🔥 Firewalls <span class="filter-badge" id="badge-type-firewall">0</span></button>
-                    <button class="filter-btn" onclick="filterByDeviceType('Router')">🔀 Routers <span class="filter-badge" id="badge-type-router">0</span></button>
-                    <button class="filter-btn" onclick="filterByDeviceType('Switch')">🔗 Switches <span class="filter-badge" id="badge-type-switch">0</span></button>
-                    <button class="filter-btn" onclick="filterByDeviceType('Load Balancer')">⚖️ Load Balancers <span class="filter-badge" id="badge-type-lb">0</span></button>
+                </div>
+                <div class="filter-buttons compact" id="deviceTypeFiltersContainer">
+                    <!-- Auto-populated from device data -->
                 </div>
             </div>
 
@@ -3404,13 +3381,9 @@
                 <h3><span>🏢</span> Site Type</h3>
                 <div class="filter-buttons">
                     <button class="filter-btn active" onclick="filterBySiteType('all')">All Sites <span class="filter-badge" id="badge-site-all">0</span></button>
-                    <button class="filter-btn" onclick="filterBySiteType('PDC')">🏢 Primary DC <span class="filter-badge" id="badge-site-pdc">0</span></button>
-                    <button class="filter-btn" onclick="filterBySiteType('BDC')">🏢 Backup DC <span class="filter-badge" id="badge-site-bdc">0</span></button>
-                    <button class="filter-btn" onclick="filterBySiteType('CAT')">📁 CAT Sites <span class="filter-badge" id="badge-site-cat">0</span></button>
-                    <button class="filter-btn" onclick="filterBySiteType('HQ')">🏛️ Headquarters <span class="filter-badge" id="badge-site-hq">0</span></button>
-                    <button class="filter-btn" onclick="filterBySiteType('Branch')">🏪 Branch <span class="filter-badge" id="badge-site-branch">0</span></button>
-                    <button class="filter-btn" onclick="filterBySiteType('Remote')">📡 Remote <span class="filter-badge" id="badge-site-remote">0</span></button>
-                    <button class="filter-btn" onclick="filterBySiteType('Cloud')">☁️ Cloud <span class="filter-badge" id="badge-site-cloud">0</span></button>
+                </div>
+                <div class="filter-buttons compact" id="siteTypeFiltersContainer">
+                    <!-- Auto-populated from device names -->
                 </div>
             </div>
 
@@ -3419,12 +3392,9 @@
                 <h3><span>🎯</span> Device Role</h3>
                 <div class="filter-buttons">
                     <button class="filter-btn active" onclick="filterByDeviceRole('all')">All Roles <span class="filter-badge" id="badge-role-all">0</span></button>
-                    <button class="filter-btn" onclick="filterByDeviceRole('VPN Gateway')">🔐 VPN Gateway <span class="filter-badge" id="badge-role-vpn">0</span></button>
-                    <button class="filter-btn" onclick="filterByDeviceRole('WAN Edge')">🌐 WAN Edge <span class="filter-badge" id="badge-role-wan">0</span></button>
-                    <button class="filter-btn" onclick="filterByDeviceRole('DMZ Firewall')">🛡️ DMZ Firewall <span class="filter-badge" id="badge-role-dmz">0</span></button>
-                    <button class="filter-btn" onclick="filterByDeviceRole('Internet Edge')">🌍 Internet Edge <span class="filter-badge" id="badge-role-internet">0</span></button>
-                    <button class="filter-btn" onclick="filterByDeviceRole('Access')">🚪 Access <span class="filter-badge" id="badge-role-access">0</span></button>
-                    <button class="filter-btn" onclick="filterByDeviceRole('Firewall')">🔥 Firewall <span class="filter-badge" id="badge-role-firewall">0</span></button>
+                </div>
+                <div class="filter-buttons compact" id="deviceRoleFiltersContainer">
+                    <!-- Auto-populated from device names -->
                 </div>
             </div>
 
@@ -3912,6 +3882,306 @@
         let sortColumn = 0;
         let sortAscending = true;
 
+        // ============================================
+        // COMPREHENSIVE DATA MAPPING SYSTEM - $5M Edition
+        // ============================================
+
+        // Device Category ID to Device Type Mapping (from CSV analysis)
+        const DEVICE_CATEGORY_MAP = {
+            '685': 'UPS',
+            '688': 'Firewall',
+            '691': 'Switch',
+            '692': 'Switch',
+            '694': 'Switch',
+            '695': 'Switch',
+            '696': 'Router',
+            '699': 'Firewall',
+            '703': 'Load Balancer'
+        };
+
+        // Device Vendor ID to Vendor Name Mapping
+        const VENDOR_ID_MAP = {
+            '1924': 'APC',
+            '1925': 'APC',
+            '3038': 'Cisco',
+            '705': 'A10 Networks',
+            '706': 'A10 Networks',
+            '7652': 'Fortinet',
+            '7653': 'Fortinet',
+            '7655': 'Fortinet',
+            '11348': 'Juniper',
+            '11537': 'Juniper',
+            '11579': 'Juniper',
+            '11800': 'Juniper',
+            '12162': 'Palo Alto Networks'
+        };
+
+        // Vendor Icons Mapping
+        const VENDOR_ICONS = {
+            'Cisco': '📡',
+            'Fortinet': '🔥',
+            'Juniper': '🌲',
+            'Palo Alto Networks': '🛡️',
+            'A10 Networks': '⚖️',
+            'APC': '🔌',
+            'Check Point': '✅',
+            'F5 Networks': '⚖️',
+            'Unknown': '❓'
+        };
+
+        // Device Type Icons Mapping
+        const DEVICE_TYPE_ICONS = {
+            'Firewall': '🔥',
+            'Router': '🔀',
+            'Switch': '🔗',
+            'Load Balancer': '⚖️',
+            'UPS': '🔌',
+            'Unknown': '❓'
+        };
+
+        // Site Type Icons and Labels
+        const SITE_TYPE_INFO = {
+            'PDC': { icon: '🏢', label: 'Primary DC' },
+            'BDC': { icon: '🏢', label: 'Backup DC' },
+            'CAT': { icon: '📁', label: 'CAT Sites' },
+            'HQ': { icon: '🏛️', label: 'Headquarters' },
+            'Branch': { icon: '🏪', label: 'Branch' },
+            'Remote': { icon: '📡', label: 'Remote' },
+            'Cloud': { icon: '☁️', label: 'Cloud' },
+            'Colo': { icon: '🏭', label: 'Colocation' },
+            'Other': { icon: '📍', label: 'Other' }
+        };
+
+        // Device Role Icons and Labels
+        const DEVICE_ROLE_INFO = {
+            'VPN Gateway': { icon: '🔐', label: 'VPN Gateway' },
+            'WAN Edge': { icon: '🌐', label: 'WAN Edge' },
+            'DMZ Firewall': { icon: '🛡️', label: 'DMZ Firewall' },
+            'Internet Edge': { icon: '🌍', label: 'Internet Edge' },
+            'Access': { icon: '🚪', label: 'Access' },
+            'Core': { icon: '⚙️', label: 'Core' },
+            'Distribution': { icon: '🔄', label: 'Distribution' },
+            'Firewall': { icon: '🔥', label: 'Firewall' },
+            'Load Balancer': { icon: '⚖️', label: 'Load Balancer' },
+            'General Purpose': { icon: '📦', label: 'General Purpose' }
+        };
+
+        // ============================================
+        // INTELLIGENT AUTO-DETECTION FUNCTIONS
+        // ============================================
+
+        // Detect vendor from CSV fields (Device Vendor ID + System Description fallback)
+        function detectVendorFromCSV(device) {
+            // Try Device Vendor ID first
+            if (device.deviceVendor && VENDOR_ID_MAP[device.deviceVendor]) {
+                return VENDOR_ID_MAP[device.deviceVendor];
+            }
+
+            // Fallback to System Description field
+            const sysDesc = (device.systemDescription || '').toLowerCase();
+            if (sysDesc.includes('cisco')) return 'Cisco';
+            if (sysDesc.includes('fortinet') || sysDesc.includes('fortigate')) return 'Fortinet';
+            if (sysDesc.includes('juniper')) return 'Juniper';
+            if (sysDesc.includes('palo alto') || sysDesc.includes('pan-os')) return 'Palo Alto Networks';
+            if (sysDesc.includes('a10') || sysDesc.includes('thunder') || sysDesc.includes('ax series')) return 'A10 Networks';
+            if (sysDesc.includes('apc')) return 'APC';
+            if (sysDesc.includes('checkpoint') || sysDesc.includes('check point')) return 'Check Point';
+            if (sysDesc.includes('f5')) return 'F5 Networks';
+
+            // Tertiary fallback to device name
+            const name = (device.deviceName || '').toLowerCase();
+            if (name.includes('cisco') || name.includes('cis-')) return 'Cisco';
+            if (name.includes('forti') || name.includes('fg-') || name.includes('fgt')) return 'Fortinet';
+            if (name.includes('juniper') || name.includes('jun-') || name.includes('srx') || name.includes('ex-')) return 'Juniper';
+            if (name.includes('palo') || name.includes('pa-')) return 'Palo Alto Networks';
+            if (name.includes('a10')) return 'A10 Networks';
+            if (name.includes('apc') || name.includes('ups')) return 'APC';
+
+            return 'Unknown';
+        }
+
+        // Detect device type from Device Category
+        function detectDeviceTypeFromCSV(device) {
+            // Try Device Category mapping first
+            if (device.deviceCategory && DEVICE_CATEGORY_MAP[device.deviceCategory]) {
+                return DEVICE_CATEGORY_MAP[device.deviceCategory];
+            }
+
+            // Fallback to device name patterns
+            const name = (device.deviceName || '').toUpperCase();
+            if (name.includes('FW') || name.includes('FIREWALL')) return 'Firewall';
+            if (name.includes('RTR') || name.includes('ROUTER')) return 'Router';
+            if (name.includes('SW') || name.includes('SWITCH')) return 'Switch';
+            if (name.includes('LB') || name.includes('A10')) return 'Load Balancer';
+            if (name.includes('UPS')) return 'UPS';
+
+            // Tertiary fallback to System Description
+            const sysDesc = (device.systemDescription || '').toLowerCase();
+            if (sysDesc.includes('firewall') || sysDesc.includes('pix') || sysDesc.includes('asa') || sysDesc.includes('fortigate')) return 'Firewall';
+            if (sysDesc.includes('router') || sysDesc.includes('ios software')) return 'Router';
+            if (sysDesc.includes('switch') || sysDesc.includes('catalyst')) return 'Switch';
+            if (sysDesc.includes('load balancer') || sysDesc.includes('thunder') || sysDesc.includes('ax series')) return 'Load Balancer';
+            if (sysDesc.includes('ups') || sysDesc.includes('apc')) return 'UPS';
+
+            return 'Unknown';
+        }
+
+        // Extract state name from tenant field
+        function extractStateFromTenant(tenantName) {
+            if (!tenantName || tenantName === 'Default Tenant') return 'Unknown';
+
+            // Remove "_Tenant" suffix and clean up
+            let state = tenantName.replace(/_Tenant$/i, '').replace(/_/g, ' ').trim();
+
+            // Handle special cases
+            if (state === 'DCA Hosted Services') return 'DCA';
+            if (state === 'NRC') return 'NRC';
+
+            return state;
+        }
+
+        // ============================================
+        // AUTO-POPULATION OF FILTER SECTIONS
+        // ============================================
+
+        function populateAllFilters() {
+            if (deviceData.length === 0) return;
+
+            populateStateFilters();
+            populateVendorFilters();
+            populateDeviceTypeFilters();
+            populateSiteTypeFilters();
+            populateDeviceRoleFilters();
+        }
+
+        function populateStateFilters() {
+            const states = {};
+            deviceData.forEach(device => {
+                const state = extractStateFromTenant(device.tenant);
+                states[state] = (states[state] || 0) + 1;
+            });
+
+            const container = document.getElementById('stateFiltersContainer');
+            if (!container) return;
+
+            container.innerHTML = Object.entries(states)
+                .filter(([state]) => state !== 'Unknown')
+                .sort((a, b) => a[0].localeCompare(b[0]))
+                .map(([state, count]) => {
+                    const id = state.toLowerCase().replace(/\s+/g, '-');
+                    return `
+                        <button class="filter-btn" onclick="filterByRegion('${state.replace(/'/g, "\\'")}')">
+                            🏛️ ${state} <span class="filter-badge" id="badge-region-${id}">${count}</span>
+                        </button>
+                    `;
+                }).join('');
+        }
+
+        function populateVendorFilters() {
+            const vendors = {};
+            deviceData.forEach(device => {
+                const vendor = detectVendorFromCSV(device);
+                if (vendor !== 'Unknown') {
+                    vendors[vendor] = (vendors[vendor] || 0) + 1;
+                }
+            });
+
+            const container = document.getElementById('vendorFiltersContainer');
+            if (!container) return;
+
+            container.innerHTML = Object.entries(vendors)
+                .sort((a, b) => b[1] - a[1]) // Sort by count descending
+                .map(([vendor, count]) => {
+                    const icon = VENDOR_ICONS[vendor] || '❓';
+                    const id = vendor.toLowerCase().replace(/\s+/g, '-');
+                    return `
+                        <button class="filter-btn" onclick="filterByVendor('${vendor.replace(/'/g, "\\'")}')">
+                            ${icon} ${vendor} <span class="filter-badge" id="badge-vendor-${id}">${count}</span>
+                        </button>
+                    `;
+                }).join('');
+        }
+
+        function populateDeviceTypeFilters() {
+            const types = {};
+            deviceData.forEach(device => {
+                const type = detectDeviceTypeFromCSV(device);
+                if (type !== 'Unknown') {
+                    types[type] = (types[type] || 0) + 1;
+                }
+            });
+
+            const container = document.getElementById('deviceTypeFiltersContainer');
+            if (!container) return;
+
+            container.innerHTML = Object.entries(types)
+                .sort((a, b) => b[1] - a[1])
+                .map(([type, count]) => {
+                    const icon = DEVICE_TYPE_ICONS[type] || '❓';
+                    const id = type.toLowerCase().replace(/\s+/g, '-');
+                    const label = type === 'Firewall' ? 'Firewalls' :
+                                  type === 'Router' ? 'Routers' :
+                                  type === 'Switch' ? 'Switches' :
+                                  type === 'Load Balancer' ? 'Load Balancers' :
+                                  type + 's';
+                    return `
+                        <button class="filter-btn" onclick="filterByDeviceType('${type.replace(/'/g, "\\'")}')">
+                            ${icon} ${label} <span class="filter-badge" id="badge-type-${id}">${count}</span>
+                        </button>
+                    `;
+                }).join('');
+        }
+
+        function populateSiteTypeFilters() {
+            const siteTypes = {};
+            deviceData.forEach(device => {
+                const siteType = detectSiteType(device.deviceName);
+                if (siteType && siteType !== 'Unknown') {
+                    siteTypes[siteType] = (siteTypes[siteType] || 0) + 1;
+                }
+            });
+
+            const container = document.getElementById('siteTypeFiltersContainer');
+            if (!container) return;
+
+            container.innerHTML = Object.entries(siteTypes)
+                .sort((a, b) => b[1] - a[1])
+                .map(([siteType, count]) => {
+                    const info = SITE_TYPE_INFO[siteType] || { icon: '📍', label: siteType };
+                    const id = siteType.toLowerCase().replace(/\s+/g, '-');
+                    return `
+                        <button class="filter-btn" onclick="filterBySiteType('${siteType.replace(/'/g, "\\'")}')">
+                            ${info.icon} ${info.label} <span class="filter-badge" id="badge-site-${id}">${count}</span>
+                        </button>
+                    `;
+                }).join('');
+        }
+
+        function populateDeviceRoleFilters() {
+            const roles = {};
+            deviceData.forEach(device => {
+                const role = detectDeviceRole(device.deviceName);
+                if (role && role !== 'Unknown') {
+                    roles[role] = (roles[role] || 0) + 1;
+                }
+            });
+
+            const container = document.getElementById('deviceRoleFiltersContainer');
+            if (!container) return;
+
+            container.innerHTML = Object.entries(roles)
+                .sort((a, b) => b[1] - a[1])
+                .map(([role, count]) => {
+                    const info = DEVICE_ROLE_INFO[role] || { icon: '📦', label: role };
+                    const id = role.toLowerCase().replace(/\s+/g, '-');
+                    return `
+                        <button class="filter-btn" onclick="filterByDeviceRole('${role.replace(/'/g, "\\'")}')">
+                            ${info.icon} ${info.label} <span class="filter-badge" id="badge-role-${id}">${count}</span>
+                        </button>
+                    `;
+                }).join('');
+        }
+
         // Enhanced device detection system
         function detectDeviceInfo(device) {
             const sn = device.sn || '';
@@ -4227,6 +4497,7 @@
             updateStats();
             updateModelBreakdown();
             updateMonitoringDashboard();
+            populateAllFilters();
             renderTable();
             console.log('All functions called, table should be rendered');
         }
@@ -5165,40 +5436,39 @@
             const searchTerm = document.getElementById('searchInput').value.toLowerCase();
 
             filteredData = deviceData.filter(device => {
-                // Region filter (supports both continent and country codes)
+                // Region filter - Match by state extracted from tenant
                 let regionMatch = true;
                 if (currentRegion !== 'all') {
-                    if (currentRegion === 'EU' || currentRegion === 'APAC' || currentRegion === 'LATAM' || currentRegion === 'MEA') {
-                        // Continent-level filtering (expand as needed based on your region mapping)
-                        regionMatch = device.region === currentRegion;
-                    } else {
-                        // Country-level filtering
-                        regionMatch = device.region === currentRegion;
-                    }
+                    const deviceState = extractStateFromTenant(device.tenant);
+                    regionMatch = deviceState === currentRegion;
                 }
 
-                // Vendor filter
+                // Vendor filter - Use intelligent detection
                 let vendorMatch = true;
                 if (currentVendor !== 'all') {
-                    vendorMatch = device.vendor === currentVendor;
+                    const detectedVendor = detectVendorFromCSV(device);
+                    vendorMatch = detectedVendor === currentVendor;
                 }
 
-                // Device Type filter
+                // Device Type filter - Use intelligent detection
                 let deviceTypeMatch = true;
                 if (currentDeviceType !== 'all') {
-                    deviceTypeMatch = device.deviceType === currentDeviceType;
+                    const detectedType = detectDeviceTypeFromCSV(device);
+                    deviceTypeMatch = detectedType === currentDeviceType;
                 }
 
-                // Site Type filter
+                // Site Type filter - Use intelligent detection
                 let siteTypeMatch = true;
                 if (currentSiteType !== 'all') {
-                    siteTypeMatch = device.siteType === currentSiteType;
+                    const detectedSiteType = detectSiteType(device.deviceName);
+                    siteTypeMatch = detectedSiteType === currentSiteType;
                 }
 
-                // Device Role filter
+                // Device Role filter - Use intelligent detection
                 let deviceRoleMatch = true;
                 if (currentDeviceRole !== 'all') {
-                    deviceRoleMatch = device.deviceRole === currentDeviceRole;
+                    const detectedRole = detectDeviceRole(device.deviceName);
+                    deviceRoleMatch = detectedRole === currentDeviceRole;
                 }
 
                 // Configuration filter (HA vs Standalone)
@@ -6396,6 +6666,7 @@
 
             // Smart column mapping - handles various column name formats
             const columnMap = {
+                // Basic fields
                 region: findColumn(headers, ['region', 'location', 'country', 'geo']),
                 deviceName: findColumn(headers, ['devicename', 'device name', 'device', 'name', 'hostname', 'host']),
                 vendor: findColumn(headers, ['vendor', 'manufacturer', 'make', 'brand']),
@@ -6409,7 +6680,19 @@
                 sn_ha2: findColumn(headers, ['sn_ha2', 'ha serial 2', 'ha sn 2', 'ha2', 'hasn2', 'tertiary sn']),
                 city: findColumn(headers, ['city', 'town', 'locality']),
                 state: findColumn(headers, ['state', 'province', 'region']),
-                country: findColumn(headers, ['country', 'nation'])
+                country: findColumn(headers, ['country', 'nation']),
+
+                // Advanced fields for comprehensive CSV
+                status: findColumn(headers, ['status', 'health status', 'device status']),
+                deviceCategory: findColumn(headers, ['device category', 'devicecategory', 'category']),
+                deviceVendor: findColumn(headers, ['device vendor', 'devicevendor', 'vendor id']),
+                systemDescription: findColumn(headers, ['system description', 'systemdescription', 'sys description', 'sysdescr']),
+                tenant: findColumn(headers, ['tenant', 'tenant name', 'organization']),
+                managementIP: findColumn(headers, ['management address', 'managementaddress', 'management ip', 'ip address', 'ip']),
+                snmpState: findColumn(headers, ['agent snmp state', 'snmp state', 'snmpstate']),
+                icmpState: findColumn(headers, ['management address icmp state', 'icmp state', 'icmpstate', 'ping state']),
+                managementMode: findColumn(headers, ['node management mode', 'management mode', 'managementmode']),
+                discoveryState: findColumn(headers, ['discovery state', 'discoverystate'])
             };
 
             for (let i = 1; i < lines.length; i++) {
@@ -6421,6 +6704,7 @@
 
                 // Build device object using smart column mapping
                 const device = {
+                    // Basic fields
                     region: getValue(values, columnMap.region) || 'US',
                     deviceName: getValue(values, columnMap.deviceName) || `Device-${i}`,
                     vendor: getValue(values, columnMap.vendor) || '',
@@ -6435,7 +6719,19 @@
                     sn_ha2: getValue(values, columnMap.sn_ha2) || '',
                     city: getValue(values, columnMap.city) || '',
                     state: getValue(values, columnMap.state) || '',
-                    country: getValue(values, columnMap.country) || ''
+                    country: getValue(values, columnMap.country) || '',
+
+                    // Advanced fields for monitoring integration
+                    status: getValue(values, columnMap.status) || 'UNKNOWN',
+                    deviceCategory: getValue(values, columnMap.deviceCategory) || '',
+                    deviceVendor: getValue(values, columnMap.deviceVendor) || '',
+                    systemDescription: getValue(values, columnMap.systemDescription) || '',
+                    tenant: getValue(values, columnMap.tenant) || 'Default Tenant',
+                    managementIP: getValue(values, columnMap.managementIP) || '',
+                    snmpState: getValue(values, columnMap.snmpState) || 'UNKNOWN',
+                    icmpState: getValue(values, columnMap.icmpState) || 'UNKNOWN',
+                    managementMode: getValue(values, columnMap.managementMode) || 'UNKNOWN',
+                    discoveryState: getValue(values, columnMap.discoveryState) || 'UNKNOWN'
                 };
 
                 data.push(device);
@@ -6727,6 +7023,7 @@
                     updateFilterBadges();
                     updateModelBreakdown();
                     updateMonitoringDashboard();
+                    populateAllFilters();
                     renderTable();
                     if (currentView === 'card') {
                         renderCardView();
@@ -6761,6 +7058,7 @@
                 updateStats();
                 updateModelBreakdown();
                 updateMonitoringDashboard();
+                populateAllFilters();
                 renderTable();
                 if (currentView === 'card') {
                     renderCardView();

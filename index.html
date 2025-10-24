@@ -6632,47 +6632,78 @@
         // Handle file selection
         function handleFileSelect(event) {
             const file = event.target.files[0];
-            if (!file) return;
+            if (!file) {
+                console.log('No file selected');
+                return;
+            }
+
+            console.log('Processing file:', file.name, 'Size:', file.size);
 
             const reader = new FileReader();
             reader.onload = function(e) {
                 try {
+                    console.log('File loaded, parsing...');
                     const content = e.target.result;
                     const fileName = file.name.toLowerCase();
 
+                    console.log('File name:', fileName, 'Content length:', content.length);
+
                     if (fileName.endsWith('.csv')) {
+                        console.log('Parsing as CSV...');
                         importData = parseCSV(content);
+                        console.log('CSV parsed, rows:', importData.length);
                     } else if (fileName.endsWith('.json')) {
+                        console.log('Parsing as JSON...');
                         importData = parseJSON(content);
+                        console.log('JSON parsed, rows:', importData.length);
                     } else {
                         showImportError('Unsupported file format. Please use CSV or JSON.');
                         return;
                     }
 
-                    if (importData.length === 0) {
+                    if (!importData || importData.length === 0) {
                         showImportError('No valid data found in file.');
                         return;
                     }
 
+                    console.log('Validating import data...');
                     // Validate and show preview
                     const validation = validateImportData(importData);
                     if (!validation.valid) {
+                        console.error('Validation failed:', validation.error);
                         showImportError(validation.error);
                         return;
                     }
 
+                    console.log('Showing preview...');
                     showImportPreview(importData);
 
                     const optionsSection = document.getElementById('importOptionsSection');
-                    if (optionsSection) optionsSection.style.display = 'block';
+                    if (optionsSection) {
+                        optionsSection.style.display = 'block';
+                        console.log('Options section displayed');
+                    }
 
                     const confirmBtn = document.getElementById('confirmImportBtn');
-                    if (confirmBtn) confirmBtn.disabled = false;
+                    if (confirmBtn) {
+                        confirmBtn.disabled = false;
+                        console.log('Confirm button enabled');
+                    }
+
+                    console.log('Import preview ready!');
 
                 } catch (error) {
+                    console.error('Error in handleFileSelect:', error);
+                    console.error('Error stack:', error.stack);
                     showImportError('Error reading file: ' + error.message);
                 }
             };
+
+            reader.onerror = function(error) {
+                console.error('FileReader error:', error);
+                showImportError('Error reading file: Could not read the file.');
+            };
+
             reader.readAsText(file);
         }
 
@@ -6764,13 +6795,14 @@
                 data.push(device);
             }
 
-            console.log('Successfully parsed', data.length, 'devices');
-            return data;
-        } catch (error) {
-            console.error('Error in parseCSV:', error);
-            throw new Error('CSV parsing failed: ' + error.message);
+                console.log('Successfully parsed', data.length, 'devices');
+                return data;
+            } catch (error) {
+                console.error('Error in parseCSV:', error);
+                console.error('Error stack:', error.stack);
+                throw new Error('CSV parsing failed: ' + error.message);
+            }
         }
-    }
 
         // Helper: Find column index by multiple possible names
         function findColumn(headers, possibleNames) {

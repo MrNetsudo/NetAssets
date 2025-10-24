@@ -2227,6 +2227,363 @@
             color: #a0a0a0;
         }
 
+        /* Enterprise Monitoring Health Dashboard - $5M Edition */
+        .monitoring-health-dashboard {
+            padding: 30px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-top: 4px solid var(--danger-color);
+            margin-top: 25px;
+        }
+
+        body.dark-mode .monitoring-health-dashboard {
+            background: linear-gradient(135deg, #1a2332 0%, #0f172a 100%);
+        }
+
+        .monitoring-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .monitoring-title {
+            font-size: 2em;
+            font-weight: 800;
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .monitoring-last-update {
+            font-size: 0.9em;
+            color: #64748b;
+            font-weight: 600;
+        }
+
+        .health-overview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .health-card {
+            background: white;
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+            border-left: 6px solid;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        body.dark-mode .health-card {
+            background: var(--dark-card);
+        }
+
+        .health-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100px;
+            height: 100px;
+            opacity: 0.1;
+            font-size: 80px;
+        }
+
+        .health-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+        }
+
+        .health-card.critical {
+            border-left-color: #ef4444;
+        }
+
+        .health-card.critical::before {
+            content: '🔥';
+        }
+
+        .health-card.major {
+            border-left-color: #f97316;
+        }
+
+        .health-card.major::before {
+            content: '🚨';
+        }
+
+        .health-card.minor {
+            border-left-color: #f59e0b;
+        }
+
+        .health-card.minor::before {
+            content: '⚠️';
+        }
+
+        .health-card.warning {
+            border-left-color: #eab308;
+        }
+
+        .health-card.warning::before {
+            content: '⚡';
+        }
+
+        .health-card.normal {
+            border-left-color: #10b981;
+        }
+
+        .health-card.normal::before {
+            content: '✅';
+        }
+
+        .health-card.unknown {
+            border-left-color: #6b7280;
+        }
+
+        .health-card.unknown::before {
+            content: '❓';
+        }
+
+        .health-card.nostatus {
+            border-left-color: #9ca3af;
+        }
+
+        .health-card.nostatus::before {
+            content: '🔴';
+        }
+
+        .health-label {
+            font-size: 0.85em;
+            color: #64748b;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        .health-value {
+            font-size: 2.5em;
+            font-weight: 800;
+            margin-bottom: 5px;
+            line-height: 1;
+        }
+
+        .health-percentage {
+            font-size: 0.9em;
+            color: #64748b;
+            font-weight: 600;
+        }
+
+        .health-trend {
+            font-size: 0.85em;
+            margin-top: 8px;
+            padding: 4px 8px;
+            border-radius: 6px;
+            display: inline-block;
+        }
+
+        .health-trend.up {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .health-trend.down {
+            background: #d1fae5;
+            color: #059669;
+        }
+
+        .monitoring-sections {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .monitoring-section {
+            background: white;
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+        }
+
+        body.dark-mode .monitoring-section {
+            background: var(--dark-card);
+        }
+
+        .monitoring-section-title {
+            font-size: 1.2em;
+            font-weight: 700;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #1e293b;
+        }
+
+        body.dark-mode .monitoring-section-title {
+            color: var(--dark-text);
+        }
+
+        .status-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 4px solid;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        body.dark-mode .status-item {
+            background: #1a2332;
+        }
+
+        .status-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .status-item-label {
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-item-value {
+            font-size: 1.3em;
+            font-weight: 700;
+        }
+
+        .problem-devices {
+            background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+            border: 2px solid #fecaca;
+            padding: 25px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+        }
+
+        body.dark-mode .problem-devices {
+            background: linear-gradient(135deg, #7f1d1d 0%, #991b1b 100%);
+            border-color: #dc2626;
+        }
+
+        .problem-devices-title {
+            font-size: 1.3em;
+            font-weight: 700;
+            color: #dc2626;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        body.dark-mode .problem-devices-title {
+            color: #fca5a5;
+        }
+
+        .problem-devices-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .problem-device-item {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        body.dark-mode .problem-device-item {
+            background: var(--dark-card-hover);
+        }
+
+        .problem-device-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .problem-device-name {
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 5px;
+        }
+
+        body.dark-mode .problem-device-name {
+            color: var(--dark-text);
+        }
+
+        .problem-device-status {
+            font-size: 0.85em;
+            font-weight: 600;
+            padding: 3px 8px;
+            border-radius: 6px;
+            display: inline-block;
+        }
+
+        .tenant-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .tenant-card {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            transition: all 0.3s;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+
+        body.dark-mode .tenant-card {
+            background: #1a2332;
+        }
+
+        .tenant-card:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-3px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .tenant-name {
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 8px;
+        }
+
+        body.dark-mode .tenant-name {
+            color: var(--dark-text);
+        }
+
+        .tenant-count {
+            font-size: 1.8em;
+            font-weight: 800;
+            color: var(--primary-color);
+        }
+
+        .monitoring-chart-container {
+            height: 350px;
+            margin-top: 20px;
+        }
+
         /* Analytics Dashboard Styles */
         .analytics-dashboard {
             display: none;
@@ -2895,6 +3252,12 @@
                     <p class="last-updated">Last Updated: <span id="lastUpdatedDate"></span></p>
                 </div>
                 <div class="header-actions">
+                    <button class="toggle-analytics-btn" onclick="exportZabbixData()" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+                        📡 Zabbix Export
+                    </button>
+                    <button class="toggle-analytics-btn" onclick="exportProblemDevicesOnly()" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);">
+                        🚨 Problem Devices
+                    </button>
                     <button class="toggle-analytics-btn" onclick="toggleAnalytics()">📊 Analytics Dashboard</button>
                     <button class="theme-toggle" onclick="toggleTheme()">🌓 Toggle Theme</button>
                 </div>
@@ -3296,6 +3659,97 @@
                         </div>
                         <div class="model-drill-content" id="drillDownContent"></div>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Enterprise Monitoring Health Dashboard - $5M Edition -->
+        <div class="monitoring-health-dashboard" id="monitoringDashboard">
+            <div class="monitoring-header">
+                <h2 class="monitoring-title">🏥 Network Health & Monitoring Status</h2>
+                <div class="monitoring-last-update">
+                    Last updated: <span id="monitoringLastUpdate">--</span>
+                </div>
+            </div>
+
+            <!-- Health Overview Cards -->
+            <div class="health-overview" id="healthOverview">
+                <!-- Populated dynamically -->
+            </div>
+
+            <!-- Problem Devices Alert -->
+            <div class="problem-devices" id="problemDevices" style="display: none;">
+                <div class="problem-devices-title">
+                    <span>🚨</span>
+                    <span>Critical & Problem Devices Requiring Attention</span>
+                </div>
+                <div class="problem-devices-list" id="problemDevicesList">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
+
+            <!-- Monitoring Sections Grid -->
+            <div class="monitoring-sections">
+                <!-- SNMP Monitoring Status -->
+                <div class="monitoring-section">
+                    <h3 class="monitoring-section-title">
+                        <span>📡</span> SNMP Monitoring Status
+                    </h3>
+                    <div class="status-list" id="snmpStatusList">
+                        <!-- Populated dynamically -->
+                    </div>
+                    <div class="monitoring-chart-container">
+                        <canvas id="snmpStatusChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Network Reachability (ICMP) -->
+                <div class="monitoring-section">
+                    <h3 class="monitoring-section-title">
+                        <span>🌐</span> Network Reachability (ICMP)
+                    </h3>
+                    <div class="status-list" id="icmpStatusList">
+                        <!-- Populated dynamically -->
+                    </div>
+                    <div class="monitoring-chart-container">
+                        <canvas id="icmpStatusChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Management Status -->
+                <div class="monitoring-section">
+                    <h3 class="monitoring-section-title">
+                        <span>⚙️</span> Device Management Status
+                    </h3>
+                    <div class="status-list" id="managementStatusList">
+                        <!-- Populated dynamically -->
+                    </div>
+                    <div class="monitoring-chart-container">
+                        <canvas id="managementStatusChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Discovery Status -->
+                <div class="monitoring-section">
+                    <h3 class="monitoring-section-title">
+                        <span>🔍</span> Discovery Status
+                    </h3>
+                    <div class="status-list" id="discoveryStatusList">
+                        <!-- Populated dynamically -->
+                    </div>
+                    <div class="monitoring-chart-container">
+                        <canvas id="discoveryStatusChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Multi-Tenant Overview -->
+            <div class="monitoring-section" style="grid-column: 1 / -1;">
+                <h3 class="monitoring-section-title">
+                    <span>🏢</span> Multi-Tenant Device Distribution
+                </h3>
+                <div class="tenant-grid" id="tenantGrid">
+                    <!-- Populated dynamically -->
                 </div>
             </div>
         </div>
@@ -3772,6 +4226,7 @@
             console.log('filteredData created, length:', filteredData.length);
             updateStats();
             updateModelBreakdown();
+            updateMonitoringDashboard();
             renderTable();
             console.log('All functions called, table should be rendered');
         }
@@ -4393,6 +4848,144 @@
             showNotification(`📥 Exported ${filteredData.length} devices`);
         }
 
+        // ============================================
+        // ZABBIX-READY EXPORT - COMPREHENSIVE MONITORING DATA
+        // ============================================
+
+        function exportZabbixData() {
+            if (deviceData.length === 0) {
+                showNotification('⚠️ No data to export');
+                return;
+            }
+
+            // Comprehensive CSV export with ALL monitoring fields for Zabbix integration
+            let csv = 'Status,Device Name,Hostname,Management IP,Tenant,Security Group,System Location,SNMP Enabled,';
+            csv += 'Node Management Mode,Device Vendor,Device Family,Protocol Version,Agent SNMP State,';
+            csv += 'Management Address ICMP State,Discovery State,System Name,System Contact,System Description,';
+            csv += 'Vendor,Type,Model,Site,Role,Primary SN,HA Status,HA SN 1,HA SN 2,';
+            csv += 'Region,Country,State,City,Created Date,Last Modified Date\n';
+
+            deviceData.forEach(device => {
+                // Monitoring fields
+                csv += `"${device.status || ''}",`;
+                csv += `"${device.deviceName || ''}",`;
+                csv += `"${device.hostname || ''}",`;
+                csv += `"${device.managementIP || ''}",`;
+                csv += `"${device.tenant || ''}",`;
+                csv += `"${device.securityGroup || ''}",`;
+                csv += `"${device.systemLocation || ''}",`;
+                csv += `"${device.snmpEnabled || ''}",`;
+
+                // Management fields
+                csv += `"${device.managementMode || ''}",`;
+                csv += `"${device.deviceVendor || ''}",`;
+                csv += `"${device.deviceFamily || ''}",`;
+                csv += `"${device.protocolVersion || ''}",`;
+                csv += `"${device.snmpState || ''}",`;
+                csv += `"${device.icmpState || ''}",`;
+                csv += `"${device.discoveryState || ''}",`;
+
+                // System info
+                csv += `"${device.systemName || ''}",`;
+                csv += `"${device.systemContact || ''}",`;
+                csv += `"${(device.systemDescription || '').replace(/"/g, '""')}",`;
+
+                // Device details
+                csv += `"${device.vendor || ''}",`;
+                csv += `"${device.deviceType || ''}",`;
+                csv += `"${device.model || ''}",`;
+                csv += `"${device.siteType || ''}",`;
+                csv += `"${device.deviceRole || ''}",`;
+                csv += `"${device.sn || ''}",`;
+                csv += `"${device.hasHA ? 'Yes' : 'No'}",`;
+                csv += `"${device.sn_ha1 || ''}",`;
+                csv += `"${device.sn_ha2 || ''}",`;
+
+                // Location details
+                csv += `"${device.region || ''}",`;
+                csv += `"${device.country || ''}",`;
+                csv += `"${device.state || ''}",`;
+                csv += `"${device.city || ''}",`;
+                csv += `"${device.created || ''}",`;
+                csv += `"${device.lastModified || ''}"\n`;
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `zabbix-monitoring-data-${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+            window.URL.revokeObjectURL(url);
+
+            showNotification(`📥 Zabbix export complete: ${deviceData.length} devices with full monitoring data`);
+        }
+
+        function exportProblemDevicesOnly() {
+            const problemStatuses = ['CRITICAL', 'MAJOR', 'MINOR', 'WARNING'];
+            const problemDevices = deviceData.filter(d => problemStatuses.includes(d.status));
+
+            if (problemDevices.length === 0) {
+                showNotification('✅ No problem devices found!');
+                return;
+            }
+
+            let csv = 'Status,Device Name,Management IP,Tenant,SNMP State,ICMP State,System Contact,Last Modified\n';
+
+            problemDevices.forEach(device => {
+                csv += `"${device.status}",`;
+                csv += `"${device.deviceName || ''}",`;
+                csv += `"${device.managementIP || ''}",`;
+                csv += `"${device.tenant || ''}",`;
+                csv += `"${device.snmpState || ''}",`;
+                csv += `"${device.icmpState || ''}",`;
+                csv += `"${device.systemContact || ''}",`;
+                csv += `"${device.lastModified || ''}"\n`;
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `problem-devices-${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+            window.URL.revokeObjectURL(url);
+
+            showNotification(`📥 Exported ${problemDevices.length} problem devices requiring attention`);
+        }
+
+        function exportTenantReport(tenantName) {
+            const tenantDevices = deviceData.filter(d => d.tenant === tenantName);
+
+            if (tenantDevices.length === 0) {
+                showNotification(`⚠️ No devices found for tenant: ${tenantName}`);
+                return;
+            }
+
+            let csv = 'Status,Device Name,Management IP,Type,Model,SNMP State,ICMP State,HA Status\n';
+
+            tenantDevices.forEach(device => {
+                csv += `"${device.status || ''}",`;
+                csv += `"${device.deviceName || ''}",`;
+                csv += `"${device.managementIP || ''}",`;
+                csv += `"${device.deviceType || ''}",`;
+                csv += `"${device.model || ''}",`;
+                csv += `"${device.snmpState || ''}",`;
+                csv += `"${device.icmpState || ''}",`;
+                csv += `"${device.hasHA ? 'Yes' : 'No'}"\n`;
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `tenant-${tenantName.replace(/\s+/g, '-')}-${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+            window.URL.revokeObjectURL(url);
+
+            showNotification(`📥 Exported ${tenantDevices.length} devices for ${tenantName}`);
+        }
+
         // Get badge class for model
         function getModelBadgeClass(model) {
             const classes = {
@@ -4910,6 +5503,347 @@
 
         // Update print metadata before printing
         window.addEventListener('beforeprint', preparePrint);
+
+        // ============================================
+        // ENTERPRISE MONITORING HEALTH DASHBOARD - $5M EDITION
+        // ============================================
+
+        let monitoringCharts = {};
+
+        function updateMonitoringDashboard() {
+            updateHealthOverview();
+            updateProblemDevices();
+            updateSNMPStatus();
+            updateICMPStatus();
+            updateManagementStatus();
+            updateDiscoveryStatus();
+            updateTenantGrid();
+            updateMonitoringTimestamp();
+        }
+
+        function updateMonitoringTimestamp() {
+            const now = new Date();
+            document.getElementById('monitoringLastUpdate').textContent = now.toLocaleString();
+        }
+
+        function updateHealthOverview() {
+            // Count devices by health status (auto-detects all statuses)
+            const statusCounts = {};
+            const total = deviceData.length;
+
+            deviceData.forEach(device => {
+                const status = device.status || 'UNKNOWN';
+                statusCounts[status] = (statusCounts[status] || 0) + 1;
+            });
+
+            // Define status configurations with colors and icons
+            const statusConfig = {
+                'CRITICAL': { color: '#ef4444', icon: '🔥', class: 'critical' },
+                'MAJOR': { color: '#f97316', icon: '🚨', class: 'major' },
+                'MINOR': { color: '#f59e0b', icon: '⚠️', class: 'minor' },
+                'WARNING': { color: '#eab308', icon: '⚡', class: 'warning' },
+                'NORMAL': { color: '#10b981', icon: '✅', class: 'normal' },
+                'UNKNOWN': { color: '#6b7280', icon: '❓', class: 'unknown' },
+                'NOSTATUS': { color: '#9ca3af', icon: '🔴', class: 'nostatus' }
+            };
+
+            const container = document.getElementById('healthOverview');
+            container.innerHTML = Object.entries(statusCounts)
+                .sort((a, b) => {
+                    const order = ['CRITICAL', 'MAJOR', 'MINOR', 'WARNING', 'NORMAL', 'UNKNOWN', 'NOSTATUS'];
+                    return order.indexOf(a[0]) - order.indexOf(b[0]);
+                })
+                .map(([status, count]) => {
+                    const config = statusConfig[status] || { color: '#6b7280', icon: '❓', class: 'unknown' };
+                    const percentage = ((count / total) * 100).toFixed(1);
+
+                    return `
+                        <div class="health-card ${config.class}" onclick="filterByHealthStatus('${status}')">
+                            <div class="health-label">${status}</div>
+                            <div class="health-value" style="color: ${config.color}">${count}</div>
+                            <div class="health-percentage">${percentage}% of total</div>
+                        </div>
+                    `;
+                }).join('');
+        }
+
+        function updateProblemDevices() {
+            // Get devices with problems (CRITICAL, MAJOR, MINOR, WARNING)
+            const problemStatuses = ['CRITICAL', 'MAJOR', 'MINOR', 'WARNING'];
+            const problemDevices = deviceData.filter(d => problemStatuses.includes(d.status));
+
+            const container = document.getElementById('problemDevices');
+            const list = document.getElementById('problemDevicesList');
+
+            if (problemDevices.length === 0) {
+                container.style.display = 'none';
+                return;
+            }
+
+            container.style.display = 'block';
+
+            const statusColors = {
+                'CRITICAL': '#ef4444',
+                'MAJOR': '#f97316',
+                'MINOR': '#f59e0b',
+                'WARNING': '#eab308'
+            };
+
+            const statusBgColors = {
+                'CRITICAL': '#fee2e2',
+                'MAJOR': '#ffedd5',
+                'MINOR': '#fef3c7',
+                'WARNING': '#fef9c3'
+            };
+
+            list.innerHTML = problemDevices
+                .sort((a, b) => {
+                    const order = ['CRITICAL', 'MAJOR', 'MINOR', 'WARNING'];
+                    return order.indexOf(a.status) - order.indexOf(b.status);
+                })
+                .slice(0, 20) // Top 20 problem devices
+                .map(device => `
+                    <div class="problem-device-item" style="border-left-color: ${statusColors[device.status] || '#6b7280'}">
+                        <div class="problem-device-name">${device.deviceName || 'Unknown'}</div>
+                        <div class="problem-device-status" style="background: ${statusBgColors[device.status]}; color: ${statusColors[device.status]}">
+                            ${device.status}
+                        </div>
+                        <div style="font-size: 0.85em; color: #64748b; margin-top: 5px;">
+                            ${device.managementIP || 'No IP'}
+                        </div>
+                    </div>
+                `).join('');
+        }
+
+        function updateSNMPStatus() {
+            // Auto-detect all SNMP states from data
+            const snmpStates = {};
+            deviceData.forEach(device => {
+                const state = device.snmpState || 'UNKNOWN';
+                snmpStates[state] = (snmpStates[state] || 0) + 1;
+            });
+
+            const list = document.getElementById('snmpStatusList');
+            const stateColors = {
+                'NORMAL': '#10b981',
+                'UNRESPONSIVE': '#ef4444',
+                'NOT_POLLED': '#6b7280',
+                'UNKNOWN': '#9ca3af'
+            };
+
+            list.innerHTML = Object.entries(snmpStates)
+                .sort((a, b) => b[1] - a[1])
+                .map(([state, count]) => `
+                    <div class="status-item" style="border-left-color: ${stateColors[state] || '#6b7280'}" onclick="filterBySNMPStatus('${state}')">
+                        <div class="status-item-label">${state}</div>
+                        <div class="status-item-value" style="color: ${stateColors[state] || '#6b7280'}">${count}</div>
+                    </div>
+                `).join('');
+
+            // Create chart
+            createMonitoringChart('snmpStatusChart', 'SNMP Status', snmpStates, stateColors);
+        }
+
+        function updateICMPStatus() {
+            // Auto-detect all ICMP states from data
+            const icmpStates = {};
+            deviceData.forEach(device => {
+                const state = device.icmpState || 'UNKNOWN';
+                icmpStates[state] = (icmpStates[state] || 0) + 1;
+            });
+
+            const list = document.getElementById('icmpStatusList');
+            const stateColors = {
+                'RESPONDING': '#10b981',
+                'NOT_RESPONDING': '#ef4444',
+                'NOT_POLLED': '#6b7280',
+                'UNKNOWN': '#9ca3af'
+            };
+
+            list.innerHTML = Object.entries(icmpStates)
+                .sort((a, b) => b[1] - a[1])
+                .map(([state, count]) => `
+                    <div class="status-item" style="border-left-color: ${stateColors[state] || '#6b7280'}" onclick="filterByICMPStatus('${state}')">
+                        <div class="status-item-label">${state}</div>
+                        <div class="status-item-value" style="color: ${stateColors[state] || '#6b7280'}">${count}</div>
+                    </div>
+                `).join('');
+
+            // Create chart
+            createMonitoringChart('icmpStatusChart', 'ICMP Status', icmpStates, stateColors);
+        }
+
+        function updateManagementStatus() {
+            // Auto-detect all management modes from data
+            const managementModes = {};
+            deviceData.forEach(device => {
+                const mode = device.managementMode || 'UNKNOWN';
+                managementModes[mode] = (managementModes[mode] || 0) + 1;
+            });
+
+            const list = document.getElementById('managementStatusList');
+            const modeColors = {
+                'MANAGED': '#10b981',
+                'OUTOFSERVICE': '#6b7280',
+                'UNKNOWN': '#9ca3af'
+            };
+
+            list.innerHTML = Object.entries(managementModes)
+                .sort((a, b) => b[1] - a[1])
+                .map(([mode, count]) => `
+                    <div class="status-item" style="border-left-color: ${modeColors[mode] || '#6b7280'}" onclick="filterByManagementMode('${mode}')">
+                        <div class="status-item-label">${mode}</div>
+                        <div class="status-item-value" style="color: ${modeColors[mode] || '#6b7280'}">${count}</div>
+                    </div>
+                `).join('');
+
+            // Create chart
+            createMonitoringChart('managementStatusChart', 'Management Mode', managementModes, modeColors);
+        }
+
+        function updateDiscoveryStatus() {
+            // Auto-detect all discovery states from data
+            const discoveryStates = {};
+            deviceData.forEach(device => {
+                const state = device.discoveryState || 'UNKNOWN';
+                discoveryStates[state] = (discoveryStates[state] || 0) + 1;
+            });
+
+            const list = document.getElementById('discoveryStatusList');
+            const stateColors = {
+                'DISCOVERY_COMPLETED': '#10b981',
+                'REDISCOVERY_IN_PROGRESS': '#f59e0b',
+                'UNKNOWN': '#9ca3af'
+            };
+
+            list.innerHTML = Object.entries(discoveryStates)
+                .sort((a, b) => b[1] - a[1])
+                .map(([state, count]) => `
+                    <div class="status-item" style="border-left-color: ${stateColors[state] || '#6b7280'}" onclick="filterByDiscoveryState('${state}')">
+                        <div class="status-item-label">${state.replace(/_/g, ' ')}</div>
+                        <div class="status-item-value" style="color: ${stateColors[state] || '#6b7280'}">${count}</div>
+                    </div>
+                `).join('');
+
+            // Create chart
+            createMonitoringChart('discoveryStatusChart', 'Discovery Status', discoveryStates, stateColors);
+        }
+
+        function updateTenantGrid() {
+            // Auto-detect all tenants from data
+            const tenants = {};
+            deviceData.forEach(device => {
+                const tenant = device.tenant || 'Unknown';
+                tenants[tenant] = (tenants[tenant] || 0) + 1;
+            });
+
+            const grid = document.getElementById('tenantGrid');
+            grid.innerHTML = Object.entries(tenants)
+                .sort((a, b) => b[1] - a[1])
+                .map(([tenant, count]) => `
+                    <div class="tenant-card" onclick="filterByTenant('${tenant.replace(/'/g, "\\'")}')">
+                        <div class="tenant-name">${tenant}</div>
+                        <div class="tenant-count">${count}</div>
+                    </div>
+                `).join('');
+        }
+
+        function createMonitoringChart(canvasId, title, data, colors) {
+            const ctx = document.getElementById(canvasId);
+            if (!ctx) return;
+
+            const labels = Object.keys(data);
+            const values = Object.values(data);
+            const backgroundColors = labels.map(label => colors[label] || '#6b7280');
+
+            // Destroy existing chart if it exists
+            if (monitoringCharts[canvasId]) {
+                monitoringCharts[canvasId].destroy();
+            }
+
+            monitoringCharts[canvasId] = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: values,
+                        backgroundColor: backgroundColors,
+                        borderWidth: 3,
+                        borderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 10,
+                                font: {
+                                    size: 11,
+                                    weight: '600'
+                                }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.label || '';
+                                    const value = context.parsed;
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = ((value / total) * 100).toFixed(1);
+                                    return `${label}: ${value} (${percentage}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Filter functions for monitoring dashboard
+        function filterByHealthStatus(status) {
+            filteredData = deviceData.filter(d => d.status === status);
+            updateStats();
+            renderTable();
+            showNotification(`Showing ${filteredData.length} devices with status: ${status}`);
+        }
+
+        function filterBySNMPStatus(state) {
+            filteredData = deviceData.filter(d => d.snmpState === state);
+            updateStats();
+            renderTable();
+            showNotification(`Showing ${filteredData.length} devices with SNMP status: ${state}`);
+        }
+
+        function filterByICMPStatus(state) {
+            filteredData = deviceData.filter(d => d.icmpState === state);
+            updateStats();
+            renderTable();
+            showNotification(`Showing ${filteredData.length} devices with ICMP status: ${state}`);
+        }
+
+        function filterByManagementMode(mode) {
+            filteredData = deviceData.filter(d => d.managementMode === mode);
+            updateStats();
+            renderTable();
+            showNotification(`Showing ${filteredData.length} devices with management mode: ${mode}`);
+        }
+
+        function filterByDiscoveryState(state) {
+            filteredData = deviceData.filter(d => d.discoveryState === state);
+            updateStats();
+            renderTable();
+            showNotification(`Showing ${filteredData.length} devices with discovery state: ${state}`);
+        }
+
+        function filterByTenant(tenant) {
+            filteredData = deviceData.filter(d => d.tenant === tenant);
+            updateStats();
+            renderTable();
+            showNotification(`Showing ${filteredData.length} devices in tenant: ${tenant}`);
+        }
 
         // Analytics Dashboard
         let analyticsCharts = {};
@@ -5792,6 +6726,7 @@
                     updateStats();
                     updateFilterBadges();
                     updateModelBreakdown();
+                    updateMonitoringDashboard();
                     renderTable();
                     if (currentView === 'card') {
                         renderCardView();
@@ -5825,6 +6760,7 @@
                 // Update the display
                 updateStats();
                 updateModelBreakdown();
+                updateMonitoringDashboard();
                 renderTable();
                 if (currentView === 'card') {
                     renderCardView();

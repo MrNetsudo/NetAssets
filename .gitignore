@@ -11,3 +11,19 @@ Thumbs.db
 *.swp
 *.swo
 *~
+
+# Sensitive data - DO NOT COMMIT
+device_data_combined.js
+Chassis/
+*.csv
+*.xlsx
+*.json
+data/
+backups/
+
+# Environment and config files
+.env
+.env.local
+*.key
+*.pem
+credentials.*

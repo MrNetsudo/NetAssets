@@ -10,15 +10,41 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <style>
         :root {
-            --primary-color: #667eea;
-            --secondary-color: #764ba2;
-            --success-color: #28a745;
-            --danger-color: #dc3545;
-            --warning-color: #ffc107;
-            --info-color: #17a2b8;
-            --dark-bg: #1a1a2e;
-            --dark-card: #16213e;
-            --dark-text: #e4e4e4;
+            /* Premium Color Palette */
+            --primary-color: #6366f1;
+            --primary-light: #818cf8;
+            --primary-dark: #4f46e5;
+            --secondary-color: #8b5cf6;
+            --accent-color: #ec4899;
+            --success-color: #10b981;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
+            --info-color: #3b82f6;
+
+            /* Dark Mode Colors */
+            --dark-bg: #0f172a;
+            --dark-card: #1e293b;
+            --dark-card-hover: #334155;
+            --dark-text: #f1f5f9;
+            --dark-text-secondary: #cbd5e1;
+
+            /* Glass Effect */
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+
+            /* Spacing */
+            --spacing-xs: 4px;
+            --spacing-sm: 8px;
+            --spacing-md: 16px;
+            --spacing-lg: 24px;
+            --spacing-xl: 32px;
+
+            /* Border Radius */
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 24px;
         }
 
         * {
@@ -28,36 +54,61 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-            padding: 20px;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            background-attachment: fixed;
+            padding: var(--spacing-lg);
             min-height: 100vh;
-            transition: background 0.3s;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="%23ffffff" fill-opacity="0.05" d="M0,96L48,112C96,128,192,160,288,160C384,160,480,128,576,112C672,96,768,96,864,112C960,128,1056,160,1152,160C1248,160,1344,128,1392,112L1440,96L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>');
+            background-size: cover;
+            pointer-events: none;
+            z-index: 0;
         }
 
         body.dark-mode {
-            background: var(--dark-bg);
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+        }
+
+        body.dark-mode::before {
+            opacity: 0.3;
         }
 
         .container {
-            max-width: 1600px;
+            max-width: 1800px;
             margin: 0 auto;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: var(--radius-xl);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25),
+                        0 0 0 1px rgba(255, 255, 255, 0.1);
             overflow: hidden;
-            transition: background 0.3s, color 0.3s;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            z-index: 1;
         }
 
         body.dark-mode .container {
-            background: var(--dark-card);
+            background: rgba(30, 41, 59, 0.95);
             color: var(--dark-text);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5),
+                        0 0 0 1px rgba(255, 255, 255, 0.05);
         }
 
         .header {
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #7e22ce 100%);
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%);
             color: white;
-            padding: 40px 30px;
+            padding: var(--spacing-xl) var(--spacing-lg);
             position: relative;
             overflow: hidden;
         }
@@ -70,9 +121,16 @@
             right: 0;
             bottom: 0;
             background:
-                radial-gradient(circle at 20% 50%, rgba(126, 34, 206, 0.2) 0%, transparent 50%),
-                radial-gradient(circle at 80% 80%, rgba(42, 82, 152, 0.2) 0%, transparent 50%);
+                radial-gradient(circle at 20% 50%, rgba(139, 92, 246, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(236, 72, 153, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 50% 20%, rgba(99, 102, 241, 0.2) 0%, transparent 50%);
             pointer-events: none;
+            animation: headerGlow 10s ease-in-out infinite alternate;
+        }
+
+        @keyframes headerGlow {
+            0% { opacity: 0.5; }
+            100% { opacity: 1; }
         }
 
         .header-content {
@@ -334,31 +392,60 @@
         }
 
         .filter-section {
-            margin-bottom: 20px;
-            padding: 15px;
-            background: rgba(255,255,255,0.5);
-            border-radius: 8px;
-            border-left: 4px solid var(--primary-color);
+            margin-bottom: var(--spacing-md);
+            padding: var(--spacing-lg);
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            border-radius: var(--radius-md);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+                        0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .filter-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(180deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+        }
+
+        .filter-section:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+                        0 4px 6px -2px rgba(0, 0, 0, 0.05);
         }
 
         body.dark-mode .filter-section {
-            background: rgba(26, 35, 50, 0.5);
+            background: rgba(30, 41, 59, 0.7);
+            border-color: rgba(255, 255, 255, 0.1);
         }
 
         .filter-section h3 {
-            font-size: 0.95em;
-            color: #2c3e50;
-            margin-bottom: 12px;
+            font-size: 1em;
+            color: #1e293b;
+            margin-bottom: var(--spacing-md);
             text-transform: uppercase;
-            letter-spacing: 1.5px;
+            letter-spacing: 1.2px;
             font-weight: 700;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: var(--spacing-sm);
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .filter-section h3:hover {
+            color: var(--primary-color);
         }
 
         body.dark-mode .filter-section h3 {
-            color: #a0a0a0;
+            color: var(--dark-text);
         }
 
         .filter-buttons {
@@ -368,32 +455,51 @@
         }
 
         .filter-btn {
-            padding: 10px 20px;
-            border: 2px solid var(--primary-color);
-            background: white;
-            color: var(--primary-color);
-            border-radius: 8px;
+            padding: 10px 18px;
+            border: 2px solid transparent;
+            background: rgba(255, 255, 255, 0.8);
+            color: #475569;
             cursor: pointer;
-            font-size: 14px;
+            border-radius: 10px;
             font-weight: 600;
-            transition: all 0.3s;
+            font-size: 0.875rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
-        }
-
-        body.dark-mode .filter-btn {
-            background: var(--dark-card);
-            border-color: var(--primary-color);
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
         }
 
         .filter-btn:hover {
-            background: var(--primary-color);
-            color: white;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+            background: rgba(255, 255, 255, 1);
+            color: var(--primary-color);
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+            border-color: var(--primary-light);
         }
 
         .filter-btn.active {
-            background: var(--primary-color);
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            border-color: transparent;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+        }
+
+        .filter-btn.active:hover {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 6px 16px rgba(99, 102, 241, 0.5);
+        }
+
+        body.dark-mode .filter-btn {
+            background: rgba(30, 41, 59, 0.8);
+            color: var(--dark-text-secondary);
+        }
+
+        body.dark-mode .filter-btn:hover {
+            background: var(--dark-card-hover);
+            color: var(--primary-light);
+        }
+
+        body.dark-mode .filter-btn.active {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
             color: white;
         }
 
@@ -409,6 +515,30 @@
             font-weight: bold;
         }
 
+        .filter-subgroup {
+            margin-top: 15px;
+            padding-left: 10px;
+            border-left: 3px solid rgba(102, 126, 234, 0.3);
+        }
+
+        .filter-subgroup h4 {
+            font-size: 0.85em;
+            color: #546e7a;
+            margin-bottom: 8px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        body.dark-mode .filter-subgroup h4 {
+            color: #90a4ae;
+        }
+
+        .filter-buttons.compact .filter-btn {
+            padding: 8px 16px;
+            font-size: 0.9em;
+        }
+
         .stats {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -417,33 +547,49 @@
         }
 
         .stat-card {
-            padding: 20px;
-            background: white;
-            border-radius: 10px;
-            border-left: 4px solid var(--primary-color);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            transition: transform 0.3s, box-shadow 0.3s;
+            padding: var(--spacing-lg);
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border-radius: var(--radius-md);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+                        0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
         }
 
-        body.dark-mode .stat-card {
-            background: var(--dark-card);
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color) 0%, var(--secondary-color) 100%);
         }
 
         .stat-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+                        0 4px 6px -2px rgba(0, 0, 0, 0.05);
         }
 
-        .stat-card.stat-success {
-            border-left-color: var(--success-color);
+        .stat-card.stat-success::before {
+            background: linear-gradient(90deg, #10b981 0%, #34d399 100%);
         }
 
-        .stat-card.stat-danger {
-            border-left-color: var(--danger-color);
+        .stat-card.stat-danger::before {
+            background: linear-gradient(90deg, #ef4444 0%, #f87171 100%);
         }
 
-        .stat-card.stat-info {
-            border-left-color: var(--info-color);
+        .stat-card.stat-info::before {
+            background: linear-gradient(90deg, #3b82f6 0%, #60a5fa 100%);
+        }
+
+        body.dark-mode .stat-card {
+            background: rgba(30, 41, 59, 0.9);
+            border-color: rgba(255, 255, 255, 0.1);
         }
 
         .stat-label {
@@ -525,24 +671,29 @@
 
         table {
             width: 100%;
-            border-collapse: collapse;
-            background: white;
+            border-collapse: separate;
+            border-spacing: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: var(--radius-md);
+            overflow: hidden;
         }
 
         body.dark-mode table {
-            background: var(--dark-card);
+            background: rgba(30, 41, 59, 0.95);
         }
 
         thead {
-            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%);
             color: white;
             position: sticky;
             top: 0;
             z-index: 10;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         th {
-            padding: 15px;
+            padding: 16px;
             text-align: left;
             font-weight: 600;
             text-transform: uppercase;
@@ -573,21 +724,30 @@
         }
 
         td {
-            padding: 15px;
-            border-bottom: 1px solid #eee;
+            padding: 16px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
         }
 
         body.dark-mode td {
-            border-bottom-color: #2d3748;
+            border-bottom-color: rgba(255, 255, 255, 0.05);
         }
 
         tbody tr {
-            transition: all 0.2s;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        tbody tr:nth-child(even) {
+            background: rgba(0, 0, 0, 0.02);
+        }
+
+        body.dark-mode tbody tr:nth-child(even) {
+            background: rgba(255, 255, 255, 0.02);
         }
 
         tbody tr:hover {
-            background: #f8f9fa;
-            transform: scale(1.01);
+            background: linear-gradient(90deg, rgba(99, 102, 241, 0.08) 0%, rgba(139, 92, 246, 0.08) 100%);
+            transform: translateX(4px);
+            box-shadow: -4px 0 0 0 var(--primary-color);
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
 
@@ -659,6 +819,62 @@
         .ha-no {
             background: #f8d7da;
             color: #721c24;
+        }
+
+        /* New badge styles */
+        .vendor-badge, .type-badge, .site-badge, .role-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 0.85em;
+            font-weight: 500;
+        }
+
+        .vendor-badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .type-badge {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+
+        .site-badge {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+        }
+
+        .role-badge {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            color: #1a1a2e;
+        }
+
+        /* Location cell styling */
+        .location-cell {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .location-primary {
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 0.95em;
+        }
+
+        .location-detail {
+            font-size: 0.8em;
+            color: #7f8c8d;
+            font-style: italic;
+        }
+
+        body.dark-mode .location-primary {
+            color: #e4e4e4;
+        }
+
+        body.dark-mode .location-detail {
+            color: #a0a0a0;
         }
 
         .copy-btn {
@@ -2028,64 +2244,121 @@
                         </div>
                     </div>
                     <button class="print-btn" onclick="preparePrint(); window.print()">🖨️ Print</button>
+                    <button class="clear-data-btn" onclick="clearAllData()" style="background: linear-gradient(135deg, #dc3545 0%, #c82333 100%); color: white; padding: 12px 24px; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 600; transition: all 0.3s; box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3);">🗑️ Clear Data</button>
                 </div>
             </div>
 
+            <!-- Multi-Level Region Filter -->
             <div class="filter-section">
-                <h3><span>🌍</span> Region Filter</h3>
+                <h3><span>🌍</span> Geographic Region</h3>
                 <div class="filter-buttons">
                     <button class="filter-btn active" onclick="filterByRegion('all')">
-                        🌍 All Regions
-                        <span class="filter-badge" id="badge-region-all">0</span>
+                        🌍 All Regions <span class="filter-badge" id="badge-region-all">0</span>
                     </button>
-                    <button class="filter-btn" onclick="filterByRegion('US')">
-                        🇺🇸 United States
-                        <span class="filter-badge" id="badge-region-us">0</span>
-                    </button>
-                    <button class="filter-btn" onclick="filterByRegion('EU')">
-                        🇪🇺 Europe
-                        <span class="filter-badge" id="badge-region-eu">0</span>
-                    </button>
+                </div>
+                <div class="filter-subgroup">
+                    <h4>North America</h4>
+                    <div class="filter-buttons compact">
+                        <button class="filter-btn" onclick="filterByRegion('US')">🇺🇸 United States <span class="filter-badge" id="badge-region-us">0</span></button>
+                        <button class="filter-btn" onclick="filterByRegion('CA')">🇨🇦 Canada <span class="filter-badge" id="badge-region-ca">0</span></button>
+                        <button class="filter-btn" onclick="filterByRegion('MX')">🇲🇽 Mexico <span class="filter-badge" id="badge-region-mx">0</span></button>
+                    </div>
+                </div>
+                <div class="filter-subgroup">
+                    <h4>Europe</h4>
+                    <div class="filter-buttons compact">
+                        <button class="filter-btn" onclick="filterByRegion('EU')">🇪🇺 Europe (All) <span class="filter-badge" id="badge-region-eu">0</span></button>
+                        <button class="filter-btn" onclick="filterByRegion('UK')">🇬🇧 United Kingdom <span class="filter-badge" id="badge-region-uk">0</span></button>
+                        <button class="filter-btn" onclick="filterByRegion('DE')">🇩🇪 Germany <span class="filter-badge" id="badge-region-de">0</span></button>
+                        <button class="filter-btn" onclick="filterByRegion('FR')">🇫🇷 France <span class="filter-badge" id="badge-region-fr">0</span></button>
+                    </div>
+                </div>
+                <div class="filter-subgroup">
+                    <h4>Asia Pacific & Other</h4>
+                    <div class="filter-buttons compact">
+                        <button class="filter-btn" onclick="filterByRegion('APAC')">🌏 Asia Pacific <span class="filter-badge" id="badge-region-apac">0</span></button>
+                        <button class="filter-btn" onclick="filterByRegion('LATAM')">🌎 Latin America <span class="filter-badge" id="badge-region-latam">0</span></button>
+                        <button class="filter-btn" onclick="filterByRegion('MEA')">🌍 Middle East/Africa <span class="filter-badge" id="badge-region-mea">0</span></button>
+                    </div>
                 </div>
             </div>
 
+            <!-- Vendor Filter -->
+            <div class="filter-section">
+                <h3><span>🏢</span> Vendor</h3>
+                <div class="filter-buttons">
+                    <button class="filter-btn active" onclick="filterByVendor('all')">All Vendors <span class="filter-badge" id="badge-vendor-all">0</span></button>
+                    <button class="filter-btn" onclick="filterByVendor('Fortinet')">🔥 Fortinet <span class="filter-badge" id="badge-vendor-fortinet">0</span></button>
+                    <button class="filter-btn" onclick="filterByVendor('Palo Alto Networks')">🛡️ Palo Alto <span class="filter-badge" id="badge-vendor-paloalto">0</span></button>
+                    <button class="filter-btn" onclick="filterByVendor('Cisco')">📡 Cisco <span class="filter-badge" id="badge-vendor-cisco">0</span></button>
+                    <button class="filter-btn" onclick="filterByVendor('Check Point')">✅ Check Point <span class="filter-badge" id="badge-vendor-checkpoint">0</span></button>
+                    <button class="filter-btn" onclick="filterByVendor('Juniper')">🌲 Juniper <span class="filter-badge" id="badge-vendor-juniper">0</span></button>
+                    <button class="filter-btn" onclick="filterByVendor('F5 Networks')">⚖️ F5 Networks <span class="filter-badge" id="badge-vendor-f5">0</span></button>
+                </div>
+            </div>
+
+            <!-- Device Type Filter -->
+            <div class="filter-section">
+                <h3><span>🔌</span> Device Type</h3>
+                <div class="filter-buttons">
+                    <button class="filter-btn active" onclick="filterByDeviceType('all')">All Types <span class="filter-badge" id="badge-type-all">0</span></button>
+                    <button class="filter-btn" onclick="filterByDeviceType('Firewall')">🔥 Firewalls <span class="filter-badge" id="badge-type-firewall">0</span></button>
+                    <button class="filter-btn" onclick="filterByDeviceType('Router')">🔀 Routers <span class="filter-badge" id="badge-type-router">0</span></button>
+                    <button class="filter-btn" onclick="filterByDeviceType('Switch')">🔗 Switches <span class="filter-badge" id="badge-type-switch">0</span></button>
+                    <button class="filter-btn" onclick="filterByDeviceType('Load Balancer')">⚖️ Load Balancers <span class="filter-badge" id="badge-type-lb">0</span></button>
+                </div>
+            </div>
+
+            <!-- Site Type Filter -->
+            <div class="filter-section">
+                <h3><span>🏢</span> Site Type</h3>
+                <div class="filter-buttons">
+                    <button class="filter-btn active" onclick="filterBySiteType('all')">All Sites <span class="filter-badge" id="badge-site-all">0</span></button>
+                    <button class="filter-btn" onclick="filterBySiteType('PDC')">🏢 Primary DC <span class="filter-badge" id="badge-site-pdc">0</span></button>
+                    <button class="filter-btn" onclick="filterBySiteType('BDC')">🏢 Backup DC <span class="filter-badge" id="badge-site-bdc">0</span></button>
+                    <button class="filter-btn" onclick="filterBySiteType('CAT')">📁 CAT Sites <span class="filter-badge" id="badge-site-cat">0</span></button>
+                    <button class="filter-btn" onclick="filterBySiteType('HQ')">🏛️ Headquarters <span class="filter-badge" id="badge-site-hq">0</span></button>
+                    <button class="filter-btn" onclick="filterBySiteType('Branch')">🏪 Branch <span class="filter-badge" id="badge-site-branch">0</span></button>
+                    <button class="filter-btn" onclick="filterBySiteType('Remote')">📡 Remote <span class="filter-badge" id="badge-site-remote">0</span></button>
+                    <button class="filter-btn" onclick="filterBySiteType('Cloud')">☁️ Cloud <span class="filter-badge" id="badge-site-cloud">0</span></button>
+                </div>
+            </div>
+
+            <!-- Device Role Filter -->
+            <div class="filter-section">
+                <h3><span>🎯</span> Device Role</h3>
+                <div class="filter-buttons">
+                    <button class="filter-btn active" onclick="filterByDeviceRole('all')">All Roles <span class="filter-badge" id="badge-role-all">0</span></button>
+                    <button class="filter-btn" onclick="filterByDeviceRole('VPN Gateway')">🔐 VPN Gateway <span class="filter-badge" id="badge-role-vpn">0</span></button>
+                    <button class="filter-btn" onclick="filterByDeviceRole('WAN Edge')">🌐 WAN Edge <span class="filter-badge" id="badge-role-wan">0</span></button>
+                    <button class="filter-btn" onclick="filterByDeviceRole('DMZ Firewall')">🛡️ DMZ Firewall <span class="filter-badge" id="badge-role-dmz">0</span></button>
+                    <button class="filter-btn" onclick="filterByDeviceRole('Internet Edge')">🌍 Internet Edge <span class="filter-badge" id="badge-role-internet">0</span></button>
+                    <button class="filter-btn" onclick="filterByDeviceRole('Access')">🚪 Access <span class="filter-badge" id="badge-role-access">0</span></button>
+                    <button class="filter-btn" onclick="filterByDeviceRole('Firewall')">🔥 Firewall <span class="filter-badge" id="badge-role-firewall">0</span></button>
+                </div>
+            </div>
+
+            <!-- Configuration Type Filter -->
             <div class="filter-section">
                 <h3><span>⚙️</span> Configuration Type</h3>
                 <div class="filter-buttons">
-                    <button class="filter-btn active" onclick="filterData('all')">
-                        📊 All Devices
-                        <span class="filter-badge" id="badge-all">0</span>
-                    </button>
-                    <button class="filter-btn" onclick="filterData('ha')">
-                        ✅ HA Configured
-                        <span class="filter-badge" id="badge-ha">0</span>
-                    </button>
-                    <button class="filter-btn" onclick="filterData('standalone')">
-                        ⚠️ Standalone
-                        <span class="filter-badge" id="badge-standalone">0</span>
-                    </button>
+                    <button class="filter-btn active" onclick="filterByConfig('all')">📊 All Devices <span class="filter-badge" id="badge-all">0</span></button>
+                    <button class="filter-btn" onclick="filterByConfig('ha')">✅ HA Configured <span class="filter-badge" id="badge-ha">0</span></button>
+                    <button class="filter-btn" onclick="filterByConfig('standalone')">⚠️ Standalone <span class="filter-badge" id="badge-standalone">0</span></button>
                 </div>
             </div>
 
-            <div class="filter-section">
-                <h3><span>📦</span> Device Series</h3>
-                <div class="filter-buttons">
-                    <button class="filter-btn" onclick="filterData('all')">All Series</button>
-                    <button class="filter-btn" onclick="filterData('fgt60')">🔵 FGT60 Series</button>
-                    <button class="filter-btn" onclick="filterData('fg100')">🟠 FG100 Series</button>
-                    <button class="filter-btn" onclick="filterData('fg200')">🟣 FG200 Series</button>
-                    <button class="filter-btn" onclick="filterData('fg500')">🔴 FG500 Series</button>
-                    <button class="filter-btn" onclick="filterData('fgt81')">⚫ FGT81 Series</button>
-                </div>
-            </div>
-
+            <!-- Quick Access Filters -->
             <div class="quick-filters">
                 <h3 style="font-size: 0.95em; color: #2c3e50; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 700;"><span>⚡</span> Quick Access Filters</h3>
                 <div class="quick-filter-chips">
                     <div class="chip" onclick="quickFilter('VPN')">🔐 VPN Devices</div>
-                    <div class="chip" onclick="quickFilter('FW')">🔥 Firewall Devices</div>
+                    <div class="chip" onclick="quickFilter('FW')">🔥 Firewalls</div>
                     <div class="chip" onclick="quickFilter('PDC')">🏢 PDC Sites</div>
                     <div class="chip" onclick="quickFilter('BDC')">🏢 BDC Sites</div>
+                    <div class="chip" onclick="quickFilter('HA')">✅ HA Pairs</div>
+                    <div class="chip" onclick="quickFilter('Fortinet')">🔥 Fortinet</div>
+                    <div class="chip" onclick="quickFilter('Cisco')">📡 Cisco</div>
                     <div class="chip" onclick="quickFilter('root')">👤 Root Access</div>
                 </div>
             </div>
@@ -2171,13 +2444,17 @@
                 <thead>
                     <tr>
                         <th style="width: 40px;"><input type="checkbox" id="selectAll" onchange="toggleSelectAll()"></th>
-                        <th onclick="sortTable(0)">Region</th>
+                        <th onclick="sortTable(0)">Location</th>
                         <th onclick="sortTable(1)">Device Name</th>
-                        <th onclick="sortTable(2)">Model</th>
-                        <th onclick="sortTable(3)">Primary Serial Number</th>
-                        <th onclick="sortTable(4)">HA Status</th>
-                        <th onclick="sortTable(5)">HA Serial 1</th>
-                        <th onclick="sortTable(6)">HA Serial 2</th>
+                        <th onclick="sortTable(2)">Vendor</th>
+                        <th onclick="sortTable(3)">Type</th>
+                        <th onclick="sortTable(4)">Model</th>
+                        <th onclick="sortTable(5)">Site</th>
+                        <th onclick="sortTable(6)">Role</th>
+                        <th onclick="sortTable(7)">Primary SN</th>
+                        <th onclick="sortTable(8)">HA Status</th>
+                        <th onclick="sortTable(9)">HA SN 1</th>
+                        <th onclick="sortTable(10)">HA SN 2</th>
                     </tr>
                 </thead>
                 <tbody id="tableBody"></tbody>
@@ -2193,11 +2470,6 @@
 
         <div class="footer">
             <p><strong>NetAssets</strong> - Network Device Inventory Dashboard</p>
-            <p style="font-size: 0.85em; margin-top: 5px; opacity: 0.8;">
-                Developed by <strong>Miguel Jimenez</strong> |
-                <a href="mailto:Miguel@netsudo.com" style="color: inherit; text-decoration: none;">Miguel@netsudo.com</a> |
-                <a href="https://netsudo.com" target="_blank" style="color: inherit; text-decoration: none;">netsudo.com</a>
-            </p>
             <div class="keyboard-shortcuts">
                 <div class="shortcut">
                     <span class="key">Ctrl</span> + <span class="key">F</span>
@@ -2212,6 +2484,9 @@
                     <span>Print</span>
                 </div>
             </div>
+            <p style="font-size: 0.8em; margin-top: 15px; opacity: 0.6; text-align: center; border-top: 1px solid rgba(0,0,0,0.1); padding-top: 15px;">
+                Developed by Miguel Jimenez
+            </p>
         </div>
     </div>
 
@@ -2263,26 +2538,301 @@
     <!-- Hidden file input for import -->
     <input type="file" id="hiddenFileInput" accept=".csv,.json" style="display: none;">
 
-    <script src="device_data_combined.js"></script>
+    <!-- Uncomment below to preload CSV data -->
+    <!-- <script src="device_data_combined.js"></script> -->
     <script>
         let deviceData = [];
         let filteredData = [];
         let selectedRows = new Set();
         let currentFilter = 'all';
         let currentRegion = 'all';
+        let currentVendor = 'all';
+        let currentDeviceType = 'all';
+        let currentSiteType = 'all';
+        let currentDeviceRole = 'all';
+        let currentConfig = 'all';
         let sortColumn = 0;
         let sortAscending = true;
 
-        // Detect device model from serial number
-        function detectModel(sn) {
-            if (!sn) return 'Unknown';
-            if (sn.includes('FGT60') || sn.includes('FG60')) return 'FGT60';
-            if (sn.includes('FG100')) return 'FG100';
-            if (sn.includes('FG200')) return 'FG200';
-            if (sn.includes('FG5') || sn.includes('FG500')) return 'FG500';
-            if (sn.includes('FGT81') || sn.includes('FG81')) return 'FGT81';
-            if (sn.includes('FG2')) return 'FG200';
+        // Enhanced device detection system
+        function detectDeviceInfo(device) {
+            const sn = device.sn || '';
+            const deviceName = device.deviceName || '';
+            const region = device.region || 'US';
+
+            let vendor = 'Unknown';
+            let deviceType = 'Firewall'; // Default based on current data
+            let model = 'Unknown';
+            let series = 'Unknown';
+            let siteType = detectSiteType(deviceName);
+            let deviceRole = detectDeviceRole(deviceName);
+            let location = detectLocation(deviceName, region);
+
+            // Vendor and Model Detection
+            if (sn.includes('FG') || sn.includes('FGT') || deviceName.includes('Forti')) {
+                vendor = 'Fortinet';
+                deviceType = 'Firewall';
+
+                // FortiGate Model Detection
+                if (sn.includes('FGT30') || sn.includes('FG30')) { model = 'FortiGate-30'; series = 'FGT30'; }
+                else if (sn.includes('FGT40') || sn.includes('FG40')) { model = 'FortiGate-40'; series = 'FGT40'; }
+                else if (sn.includes('FGT60') || sn.includes('FG60')) { model = 'FortiGate-60'; series = 'FGT60'; }
+                else if (sn.includes('FGT80') || sn.includes('FG80')) { model = 'FortiGate-80'; series = 'FGT80'; }
+                else if (sn.includes('FGT81') || sn.includes('FG81') || sn.includes('FG181')) { model = 'FortiGate-81'; series = 'FGT81'; }
+                else if (sn.includes('FG100') || sn.includes('FG101')) { model = 'FortiGate-100'; series = 'FG100'; }
+                else if (sn.includes('FG200')) { model = 'FortiGate-200'; series = 'FG200'; }
+                else if (sn.includes('FG300')) { model = 'FortiGate-300'; series = 'FG300'; }
+                else if (sn.includes('FG400')) { model = 'FortiGate-400'; series = 'FG400'; }
+                else if (sn.includes('FG5') || sn.includes('FG500')) { model = 'FortiGate-500'; series = 'FG500'; }
+                else if (sn.includes('FG600')) { model = 'FortiGate-600'; series = 'FG600'; }
+                else if (sn.includes('FG1000') || sn.includes('FG1K')) { model = 'FortiGate-1000'; series = 'FG1000'; }
+                else if (sn.includes('FG2K') || sn.includes('FG2000')) { model = 'FortiGate-2000'; series = 'FG2000'; }
+                else if (sn.includes('FG3K') || sn.includes('FG3000')) { model = 'FortiGate-3000'; series = 'FG3000'; }
+                else if (sn.includes('FGVM') || sn.includes('FG-VM')) { model = 'FortiGate-VM'; series = 'FGVM'; }
+                else if (sn.includes('FG2H0')) { model = 'FortiGate-200'; series = 'FG200'; }
+                else { model = 'FortiGate-Other'; series = 'Other'; }
+            }
+            // Palo Alto Networks Detection
+            else if (sn.includes('PA-') || deviceName.includes('PA-') || deviceName.includes('Palo')) {
+                vendor = 'Palo Alto Networks';
+                deviceType = 'Firewall';
+                if (sn.includes('PA-220') || deviceName.includes('PA-220')) { model = 'PA-220'; series = 'PA-200'; }
+                else if (sn.includes('PA-410') || deviceName.includes('PA-410')) { model = 'PA-410'; series = 'PA-400'; }
+                else if (sn.includes('PA-440') || deviceName.includes('PA-440')) { model = 'PA-440'; series = 'PA-400'; }
+                else if (sn.includes('PA-450') || deviceName.includes('PA-450')) { model = 'PA-450'; series = 'PA-400'; }
+                else if (sn.includes('PA-850') || deviceName.includes('PA-850')) { model = 'PA-850'; series = 'PA-800'; }
+                else if (sn.includes('PA-3020') || deviceName.includes('PA-3020')) { model = 'PA-3020'; series = 'PA-3000'; }
+                else if (sn.includes('PA-3050') || deviceName.includes('PA-3050')) { model = 'PA-3050'; series = 'PA-3000'; }
+                else if (sn.includes('PA-5220') || deviceName.includes('PA-5220')) { model = 'PA-5220'; series = 'PA-5000'; }
+                else if (sn.includes('PA-5250') || deviceName.includes('PA-5250')) { model = 'PA-5250'; series = 'PA-5000'; }
+                else if (sn.includes('PA-7050') || deviceName.includes('PA-7050')) { model = 'PA-7050'; series = 'PA-7000'; }
+                else if (sn.includes('PA-VM') || deviceName.includes('PA-VM')) { model = 'PA-VM'; series = 'PA-VM'; }
+                else { model = 'PA-Other'; series = 'PA-Other'; }
+            }
+            // Cisco ASA Detection
+            else if (sn.includes('ASA') || deviceName.includes('ASA') || sn.includes('FPR')) {
+                vendor = 'Cisco';
+                deviceType = 'Firewall';
+                if (sn.includes('5505') || deviceName.includes('5505')) { model = 'ASA-5505'; series = 'ASA-5500'; }
+                else if (sn.includes('5506') || deviceName.includes('5506')) { model = 'ASA-5506'; series = 'ASA-5500'; }
+                else if (sn.includes('5508') || deviceName.includes('5508')) { model = 'ASA-5508'; series = 'ASA-5500'; }
+                else if (sn.includes('5516') || deviceName.includes('5516')) { model = 'ASA-5516'; series = 'ASA-5500'; }
+                else if (sn.includes('5525') || deviceName.includes('5525')) { model = 'ASA-5525'; series = 'ASA-5500'; }
+                else if (sn.includes('5545') || deviceName.includes('5545')) { model = 'ASA-5545'; series = 'ASA-5500'; }
+                else if (sn.includes('5555') || deviceName.includes('5555')) { model = 'ASA-5555'; series = 'ASA-5500'; }
+                else if (sn.includes('5585') || deviceName.includes('5585')) { model = 'ASA-5585'; series = 'ASA-5500'; }
+                else if (sn.includes('FPR1') || deviceName.includes('Firepower-1')) { model = 'Firepower-1000'; series = 'Firepower'; }
+                else if (sn.includes('FPR2') || deviceName.includes('Firepower-2')) { model = 'Firepower-2100'; series = 'Firepower'; }
+                else if (sn.includes('FPR4') || deviceName.includes('Firepower-4')) { model = 'Firepower-4100'; series = 'Firepower'; }
+                else if (sn.includes('FPR9') || deviceName.includes('Firepower-9')) { model = 'Firepower-9300'; series = 'Firepower'; }
+                else { model = 'Cisco-ASA-Other'; series = 'ASA'; }
+            }
+            // Check Point Detection
+            else if (sn.includes('CP-') || deviceName.toLowerCase().includes('checkpoint') || deviceName.includes('CP-')) {
+                vendor = 'Check Point';
+                deviceType = 'Firewall';
+                if (deviceName.includes('1500') || sn.includes('1500')) { model = 'Check Point-1500'; series = 'CP-1000'; }
+                else if (deviceName.includes('3000') || sn.includes('3000')) { model = 'Check Point-3000'; series = 'CP-3000'; }
+                else if (deviceName.includes('5000') || sn.includes('5000')) { model = 'Check Point-5000'; series = 'CP-5000'; }
+                else if (deviceName.includes('15000') || sn.includes('15000')) { model = 'Check Point-15000'; series = 'CP-15000'; }
+                else if (deviceName.includes('23000') || sn.includes('23000')) { model = 'Check Point-23000'; series = 'CP-23000'; }
+                else { model = 'Check Point-Other'; series = 'CP-Other'; }
+            }
+            // Juniper Detection
+            else if (sn.includes('SRX') || deviceName.includes('SRX') || sn.includes('JN')) {
+                vendor = 'Juniper';
+                deviceType = 'Firewall';
+                if (deviceName.includes('SRX300') || sn.includes('SRX300')) { model = 'SRX300'; series = 'SRX-300'; }
+                else if (deviceName.includes('SRX550') || sn.includes('SRX550')) { model = 'SRX550'; series = 'SRX-500'; }
+                else if (deviceName.includes('SRX1500') || sn.includes('SRX1500')) { model = 'SRX1500'; series = 'SRX-1500'; }
+                else if (deviceName.includes('SRX4000') || sn.includes('SRX4000')) { model = 'SRX4000'; series = 'SRX-4000'; }
+                else { model = 'Juniper-SRX'; series = 'SRX'; }
+            }
+            // F5 Detection (Load Balancers)
+            else if (sn.includes('F5-') || deviceName.toLowerCase().includes('bigip') || deviceName.includes('F5')) {
+                vendor = 'F5 Networks';
+                deviceType = 'Load Balancer';
+                if (deviceName.includes('2000') || sn.includes('2000')) { model = 'BIG-IP 2000'; series = 'BIG-IP-2000'; }
+                else if (deviceName.includes('4000') || sn.includes('4000')) { model = 'BIG-IP 4000'; series = 'BIG-IP-4000'; }
+                else if (deviceName.includes('5000') || sn.includes('5000')) { model = 'BIG-IP 5000'; series = 'BIG-IP-5000'; }
+                else if (deviceName.includes('10000') || sn.includes('10000')) { model = 'BIG-IP 10000'; series = 'BIG-IP-10000'; }
+                else { model = 'F5-Other'; series = 'F5'; }
+            }
+            // Cisco Router Detection
+            else if (deviceName.toLowerCase().includes('router') || deviceName.includes('ISR') || sn.includes('ISR')) {
+                vendor = 'Cisco';
+                deviceType = 'Router';
+                if (deviceName.includes('ISR4') || sn.includes('ISR4')) { model = 'ISR-4000'; series = 'ISR-4000'; }
+                else if (deviceName.includes('ISR1') || sn.includes('ISR1')) { model = 'ISR-1000'; series = 'ISR-1000'; }
+                else if (deviceName.includes('ASR1') || sn.includes('ASR1')) { model = 'ASR-1000'; series = 'ASR-1000'; }
+                else if (deviceName.includes('ASR9') || sn.includes('ASR9')) { model = 'ASR-9000'; series = 'ASR-9000'; }
+                else { model = 'Cisco-Router'; series = 'Router'; }
+            }
+            // Cisco Switch Detection
+            else if (deviceName.toLowerCase().includes('switch') || deviceName.includes('Cat') || deviceName.includes('Nexus')) {
+                vendor = 'Cisco';
+                deviceType = 'Switch';
+                if (deviceName.includes('9300') || sn.includes('9300')) { model = 'Catalyst-9300'; series = 'Cat-9000'; }
+                else if (deviceName.includes('9500') || sn.includes('9500')) { model = 'Catalyst-9500'; series = 'Cat-9000'; }
+                else if (deviceName.includes('Nexus-9') || sn.includes('N9K')) { model = 'Nexus-9000'; series = 'Nexus-9K'; }
+                else if (deviceName.includes('Nexus-7') || sn.includes('N7K')) { model = 'Nexus-7000'; series = 'Nexus-7K'; }
+                else { model = 'Cisco-Switch'; series = 'Switch'; }
+            }
+
+            return {
+                vendor: vendor,
+                deviceType: deviceType,
+                model: model,
+                series: series,
+                siteType: siteType,
+                deviceRole: deviceRole,
+                country: location.country,
+                state: location.state,
+                city: location.city,
+                fullLocation: location.fullLocation
+            };
+        }
+
+        // Enhanced geolocation detection - US States, Cities, EU Countries/Regions
+        function detectLocation(deviceName, region) {
+            if (!deviceName) return { country: region || 'Unknown', state: null, city: null, fullLocation: region || 'Unknown' };
+
+            const name = deviceName.toUpperCase();
+            let country = region || 'US';
+            let state = null;
+            let city = null;
+
+            // US State Detection (comprehensive)
+            const usStates = {
+                'AL': 'Alabama', 'AK': 'Alaska', 'AZ': 'Arizona', 'AR': 'Arkansas', 'CA': 'California',
+                'CO': 'Colorado', 'CT': 'Connecticut', 'DE': 'Delaware', 'FL': 'Florida', 'GA': 'Georgia',
+                'HI': 'Hawaii', 'ID': 'Idaho', 'IL': 'Illinois', 'IN': 'Indiana', 'IA': 'Iowa',
+                'KS': 'Kansas', 'KY': 'Kentucky', 'LA': 'Louisiana', 'ME': 'Maine', 'MD': 'Maryland',
+                'MA': 'Massachusetts', 'MI': 'Michigan', 'MN': 'Minnesota', 'MS': 'Mississippi', 'MO': 'Missouri',
+                'MT': 'Montana', 'NE': 'Nebraska', 'NV': 'Nevada', 'NH': 'New Hampshire', 'NJ': 'New Jersey',
+                'NM': 'New Mexico', 'NY': 'New York', 'NC': 'North Carolina', 'ND': 'North Dakota', 'OH': 'Ohio',
+                'OK': 'Oklahoma', 'OR': 'Oregon', 'PA': 'Pennsylvania', 'RI': 'Rhode Island', 'SC': 'South Carolina',
+                'SD': 'South Dakota', 'TN': 'Tennessee', 'TX': 'Texas', 'UT': 'Utah', 'VT': 'Vermont',
+                'VA': 'Virginia', 'WA': 'Washington', 'WV': 'West Virginia', 'WI': 'Wisconsin', 'WY': 'Wyoming'
+            };
+
+            // City detection patterns (common city codes/abbreviations)
+            const cities = {
+                'NYC': 'New York City', 'LA': 'Los Angeles', 'CHI': 'Chicago', 'HOU': 'Houston',
+                'PHX': 'Phoenix', 'PHI': 'Philadelphia', 'SAN': 'San Antonio', 'DAL': 'Dallas',
+                'SJ': 'San Jose', 'AUS': 'Austin', 'JAX': 'Jacksonville', 'SF': 'San Francisco',
+                'IND': 'Indianapolis', 'CLB': 'Columbus', 'FW': 'Fort Worth', 'CHA': 'Charlotte',
+                'SEA': 'Seattle', 'DEN': 'Denver', 'DC': 'Washington DC', 'BOS': 'Boston',
+                'DET': 'Detroit', 'NSH': 'Nashville', 'MEM': 'Memphis', 'POR': 'Portland',
+                'OKC': 'Oklahoma City', 'LV': 'Las Vegas', 'MIL': 'Milwaukee', 'ATL': 'Atlanta',
+                'MIA': 'Miami', 'TPA': 'Tampa', 'ORL': 'Orlando', 'MIN': 'Minneapolis',
+                'CLE': 'Cleveland', 'RAL': 'Raleigh', 'STL': 'St Louis', 'PIT': 'Pittsburgh'
+            };
+
+            // EU Countries
+            const euCountries = {
+                'UK': 'United Kingdom', 'GB': 'United Kingdom', 'LONDON': 'United Kingdom',
+                'DE': 'Germany', 'BERLIN': 'Germany', 'MUNICH': 'Germany', 'FRANKFURT': 'Germany',
+                'FR': 'France', 'PARIS': 'France', 'LYON': 'France', 'MARSEILLE': 'France',
+                'IT': 'Italy', 'ROME': 'Italy', 'MILAN': 'Italy',
+                'ES': 'Spain', 'MADRID': 'Spain', 'BARCELONA': 'Spain',
+                'NL': 'Netherlands', 'AMSTERDAM': 'Netherlands', 'ROTTERDAM': 'Netherlands',
+                'BE': 'Belgium', 'BRUSSELS': 'Brussels', 'ANTWERP': 'Belgium',
+                'SE': 'Sweden', 'STOCKHOLM': 'Sweden',
+                'NO': 'Norway', 'OSLO': 'Norway',
+                'DK': 'Denmark', 'COPENHAGEN': 'Denmark',
+                'FI': 'Finland', 'HELSINKI': 'Finland',
+                'PL': 'Poland', 'WARSAW': 'Poland',
+                'CZ': 'Czech Republic', 'PRAGUE': 'Czech Republic',
+                'AT': 'Austria', 'VIENNA': 'Austria',
+                'CH': 'Switzerland', 'ZURICH': 'Switzerland', 'GENEVA': 'Switzerland'
+            };
+
+            // Detect US State from device name
+            if (region === 'US' || !region) {
+                for (const [abbr, fullName] of Object.entries(usStates)) {
+                    // Look for state abbreviation as whole word or with delimiters
+                    const pattern = new RegExp(`[^A-Z]${abbr}[^A-Z]|^${abbr}[^A-Z]|[^A-Z]${abbr}$|^${abbr}$`);
+                    if (pattern.test(name)) {
+                        state = abbr;
+                        country = 'US';
+                        break;
+                    }
+                }
+
+                // Detect city
+                for (const [abbr, fullName] of Object.entries(cities)) {
+                    if (name.includes(abbr)) {
+                        city = fullName;
+                        break;
+                    }
+                }
+            }
+
+            // Detect EU Country
+            if (region === 'EU' || region === 'UK' || region === 'DE' || region === 'FR') {
+                for (const [abbr, countryName] of Object.entries(euCountries)) {
+                    if (name.includes(abbr)) {
+                        country = countryName;
+                        break;
+                    }
+                }
+            }
+
+            // Build full location string
+            let fullLocation = '';
+            if (city) fullLocation = city;
+            if (state) fullLocation += (fullLocation ? ', ' : '') + state;
+            if (country) fullLocation += (fullLocation ? ', ' : '') + country;
+            if (!fullLocation) fullLocation = country || region || 'Unknown';
+
+            return {
+                country: country,
+                state: state,
+                city: city,
+                fullLocation: fullLocation
+            };
+        }
+
+        // Detect site type from device name
+        function detectSiteType(deviceName) {
+            if (!deviceName) return 'Unknown';
+            const name = deviceName.toUpperCase();
+
+            if (name.includes('PDC') || name.includes('PRIMARY-DC')) return 'PDC';
+            if (name.includes('BDC') || name.includes('BACKUP-DC') || name.includes('SECONDARY-DC')) return 'BDC';
+            if (name.includes('CAT') || name.includes('CATALOG')) return 'CAT';
+            if (name.includes('HQ') || name.includes('HEADQUARTER')) return 'HQ';
+            if (name.includes('BRANCH') || name.includes('BR-')) return 'Branch';
+            if (name.includes('REMOTE')) return 'Remote';
+            if (name.includes('CLOUD') || name.includes('AWS') || name.includes('AZURE') || name.includes('GCP')) return 'Cloud';
+            if (name.includes('COLO') || name.includes('COLOCATION')) return 'Colo';
+
             return 'Other';
+        }
+
+        // Detect device role from device name
+        function detectDeviceRole(deviceName) {
+            if (!deviceName) return 'Unknown';
+            const name = deviceName.toUpperCase();
+
+            if (name.includes('VPN') || name.includes('ADVPN') || name.includes('SSLVPN')) return 'VPN Gateway';
+            if (name.includes('WAN') || name.includes('EDGE')) return 'WAN Edge';
+            if (name.includes('DMZ')) return 'DMZ Firewall';
+            if (name.includes('INTERNET') || name.includes('INET')) return 'Internet Edge';
+            if (name.includes('ACCESS') || name.includes('ACC')) return 'Access';
+            if (name.includes('CORE')) return 'Core';
+            if (name.includes('DIST') || name.includes('DISTRIBUTION')) return 'Distribution';
+            if (name.includes('FW') || name.includes('FIREWALL')) return 'Firewall';
+            if (name.includes('LB') || name.includes('LOADBALANCER')) return 'Load Balancer';
+
+            return 'General Purpose';
+        }
+
+        // Legacy function for backward compatibility
+        function detectModel(sn) {
+            const device = { sn: sn, deviceName: '' };
+            return detectDeviceInfo(device).series;
         }
 
         // Load data
@@ -2290,23 +2840,36 @@
             console.log('loadData() called');
             console.log('DEVICE_DATA type:', typeof DEVICE_DATA);
 
-            if (typeof DEVICE_DATA !== 'undefined') {
+            if (typeof DEVICE_DATA !== 'undefined' && DEVICE_DATA.length > 0) {
                 console.log('DEVICE_DATA found, length:', DEVICE_DATA.length);
-                deviceData = DEVICE_DATA.map(device => ({
-                    ...device,
-                    model: detectModel(device.sn)
-                }));
-                console.log('deviceData created, length:', deviceData.length);
-                filteredData = [...deviceData];
-                console.log('filteredData created, length:', filteredData.length);
-                updateStats();
-                updateModelBreakdown();
-                renderTable();
-                console.log('All functions called, table should be rendered');
+                deviceData = DEVICE_DATA.map(device => {
+                    const deviceInfo = detectDeviceInfo(device);
+                    return {
+                        ...device,
+                        model: deviceInfo.model,
+                        series: deviceInfo.series,
+                        vendor: deviceInfo.vendor,
+                        deviceType: deviceInfo.deviceType,
+                        siteType: deviceInfo.siteType,
+                        deviceRole: deviceInfo.deviceRole,
+                        country: deviceInfo.country,
+                        state: deviceInfo.state,
+                        city: deviceInfo.city,
+                        fullLocation: deviceInfo.fullLocation
+                    };
+                });
+                console.log('deviceData created with enhanced detection, length:', deviceData.length);
             } else {
-                console.error('DEVICE_DATA is undefined!');
-                alert('Error: Device data not loaded. Please ensure device_data_combined.js is in the same directory.');
+                console.log('Starting with empty data - use Import to add devices');
+                deviceData = [];
             }
+
+            filteredData = [...deviceData];
+            console.log('filteredData created, length:', filteredData.length);
+            updateStats();
+            updateModelBreakdown();
+            renderTable();
+            console.log('All functions called, table should be rendered');
         }
 
         // Update statistics
@@ -2377,19 +2940,28 @@
             const html = filteredData.map((device, index) => `
                 <tr class="${selectedRows.has(index) ? 'selected' : ''}" data-index="${index}">
                     <td><input type="checkbox" class="row-checkbox" ${selectedRows.has(index) ? 'checked' : ''} onchange="toggleRowSelection(${index})"></td>
-                    <td><strong>${device.region === 'US' ? '🇺🇸 US' : '🇪🇺 EU'}</strong></td>
+                    <td>
+                        <div class="location-cell">
+                            <div class="location-primary">${getRegionFlag(device.region)} ${device.fullLocation || device.region || 'Unknown'}</div>
+                            ${device.city || device.state ? `<div class="location-detail">${[device.city, device.state].filter(Boolean).join(', ')}</div>` : ''}
+                        </div>
+                    </td>
                     <td>
                         <strong>${escapeHtml(device.deviceName)}</strong>
-                        <span class="device-badge ${getModelBadgeClass(device.model)}">${device.model}</span>
+                        <span class="device-badge ${getModelBadgeClass(device.series || device.model)}">${device.series || device.model || 'Unknown'}</span>
                     </td>
-                    <td>${device.model}</td>
+                    <td><span class="vendor-badge">${getVendorIcon(device.vendor)} ${device.vendor || 'Unknown'}</span></td>
+                    <td><span class="type-badge">${getDeviceTypeIcon(device.deviceType)} ${device.deviceType || 'Unknown'}</span></td>
+                    <td>${device.model || 'Unknown'}</td>
+                    <td><span class="site-badge">${getSiteTypeIcon(device.siteType)} ${device.siteType || 'Other'}</span></td>
+                    <td><span class="role-badge">${device.deviceRole || 'General Purpose'}</span></td>
                     <td>
                         ${escapeHtml(device.sn)}
                         ${device.sn ? '<button class="copy-btn" onclick="copyToClipboard(\'' + escapeHtml(device.sn) + '\')">Copy</button>' : ''}
                     </td>
                     <td>
                         <span class="ha-indicator ${device.hasHA ? 'ha-yes' : 'ha-no'}">
-                            ${device.hasHA ? '✅ HA Configured' : '⚠️ Standalone'}
+                            ${device.hasHA ? '✅ HA' : '⚠️ Standalone'}
                         </span>
                     </td>
                     <td>
@@ -2413,90 +2985,246 @@
             return div.innerHTML;
         }
 
+        // Helper functions for table rendering
+        function getRegionFlag(region) {
+            const flags = {
+                'US': '🇺🇸', 'CA': '🇨🇦', 'MX': '🇲🇽',
+                'EU': '🇪🇺', 'UK': '🇬🇧', 'DE': '🇩🇪', 'FR': '🇫🇷',
+                'APAC': '🌏', 'LATAM': '🌎', 'MEA': '🌍'
+            };
+            return flags[region] || '🌍';
+        }
+
+        function getVendorIcon(vendor) {
+            const icons = {
+                'Fortinet': '🔥',
+                'Palo Alto Networks': '🛡️',
+                'Cisco': '📡',
+                'Check Point': '✅',
+                'Juniper': '🌲',
+                'F5 Networks': '⚖️'
+            };
+            return icons[vendor] || '🏢';
+        }
+
+        function getDeviceTypeIcon(type) {
+            const icons = {
+                'Firewall': '🔥',
+                'Router': '🔀',
+                'Switch': '🔗',
+                'Load Balancer': '⚖️'
+            };
+            return icons[type] || '🔌';
+        }
+
+        function getSiteTypeIcon(siteType) {
+            const icons = {
+                'PDC': '🏢',
+                'BDC': '🏢',
+                'CAT': '📁',
+                'HQ': '🏛️',
+                'Branch': '🏪',
+                'Remote': '📡',
+                'Cloud': '☁️',
+                'Colo': '🏗️'
+            };
+            return icons[siteType] || '📍';
+        }
+
         // Filter by region
+        // Region Filter
         function filterByRegion(region) {
             currentRegion = region;
-
-            // Update active button - only for region buttons
-            const regionSection = document.querySelectorAll('.filter-section')[0];
-            const regionButtons = regionSection.querySelectorAll('.filter-btn');
-            regionButtons.forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-
+            updateActiveButton(event.target);
             applyFilters();
         }
 
-        // Filter data
-        function filterData(type) {
-            currentFilter = type;
+        // Vendor Filter
+        function filterByVendor(vendor) {
+            currentVendor = vendor;
+            updateActiveButton(event.target);
+            applyFilters();
+        }
 
-            // Update active button for config type and device series
-            // Check if it's a config type filter or device series
-            const clickedButton = event.target;
+        // Device Type Filter
+        function filterByDeviceType(deviceType) {
+            currentDeviceType = deviceType;
+            updateActiveButton(event.target);
+            applyFilters();
+        }
+
+        // Site Type Filter
+        function filterBySiteType(siteType) {
+            currentSiteType = siteType;
+            updateActiveButton(event.target);
+            applyFilters();
+        }
+
+        // Device Role Filter
+        function filterByDeviceRole(deviceRole) {
+            currentDeviceRole = deviceRole;
+            updateActiveButton(event.target);
+            applyFilters();
+        }
+
+        // Configuration Filter
+        function filterByConfig(config) {
+            currentConfig = config;
+            updateActiveButton(event.target);
+            applyFilters();
+        }
+
+        // Legacy function for backward compatibility
+        function filterData(type) {
+            filterByConfig(type);
+        }
+
+        // Helper function to update active button
+        function updateActiveButton(clickedButton) {
             const parentSection = clickedButton.closest('.filter-section');
             const buttonsInSection = parentSection.querySelectorAll('.filter-btn');
-
-            // Remove active from buttons in the same section
             buttonsInSection.forEach(btn => btn.classList.remove('active'));
             clickedButton.classList.add('active');
-
-            applyFilters();
         }
 
-        // Apply all filters
+        // Apply all filters - Multi-dimensional filtering
         function applyFilters() {
             const searchTerm = document.getElementById('searchInput').value.toLowerCase();
 
             filteredData = deviceData.filter(device => {
-                // Region filter
+                // Region filter (supports both continent and country codes)
                 let regionMatch = true;
                 if (currentRegion !== 'all') {
-                    regionMatch = device.region === currentRegion;
+                    if (currentRegion === 'EU' || currentRegion === 'APAC' || currentRegion === 'LATAM' || currentRegion === 'MEA') {
+                        // Continent-level filtering (expand as needed based on your region mapping)
+                        regionMatch = device.region === currentRegion;
+                    } else {
+                        // Country-level filtering
+                        regionMatch = device.region === currentRegion;
+                    }
                 }
 
-                // Type filter
-                let typeMatch = true;
-                switch(currentFilter.toLowerCase()) {
-                    case 'ha':
-                        typeMatch = device.hasHA;
-                        break;
-                    case 'standalone':
-                        typeMatch = !device.hasHA;
-                        break;
-                    case 'fgt60':
-                        typeMatch = device.model === 'FGT60';
-                        break;
-                    case 'fg100':
-                        typeMatch = device.model === 'FG100';
-                        break;
-                    case 'fg200':
-                        typeMatch = device.model === 'FG200';
-                        break;
-                    case 'fg500':
-                        typeMatch = device.model === 'FG500';
-                        break;
-                    case 'fgt81':
-                        typeMatch = device.model === 'FGT81';
-                        break;
-                    case 'all':
-                    default:
-                        typeMatch = true;
+                // Vendor filter
+                let vendorMatch = true;
+                if (currentVendor !== 'all') {
+                    vendorMatch = device.vendor === currentVendor;
                 }
 
-                // Search filter
+                // Device Type filter
+                let deviceTypeMatch = true;
+                if (currentDeviceType !== 'all') {
+                    deviceTypeMatch = device.deviceType === currentDeviceType;
+                }
+
+                // Site Type filter
+                let siteTypeMatch = true;
+                if (currentSiteType !== 'all') {
+                    siteTypeMatch = device.siteType === currentSiteType;
+                }
+
+                // Device Role filter
+                let deviceRoleMatch = true;
+                if (currentDeviceRole !== 'all') {
+                    deviceRoleMatch = device.deviceRole === currentDeviceRole;
+                }
+
+                // Configuration filter (HA vs Standalone)
+                let configMatch = true;
+                if (currentConfig !== 'all') {
+                    switch(currentConfig.toLowerCase()) {
+                        case 'ha':
+                            configMatch = device.hasHA;
+                            break;
+                        case 'standalone':
+                            configMatch = !device.hasHA;
+                            break;
+                        default:
+                            configMatch = true;
+                    }
+                }
+
+                // Search filter - now includes new fields
                 const searchMatch = !searchTerm ||
                     (device.deviceName && device.deviceName.toLowerCase().includes(searchTerm)) ||
                     (device.sn && device.sn.toLowerCase().includes(searchTerm)) ||
                     (device.sn_ha1 && device.sn_ha1.toLowerCase().includes(searchTerm)) ||
                     (device.sn_ha2 && device.sn_ha2.toLowerCase().includes(searchTerm)) ||
                     (device.model && device.model.toLowerCase().includes(searchTerm)) ||
+                    (device.series && device.series.toLowerCase().includes(searchTerm)) ||
+                    (device.vendor && device.vendor.toLowerCase().includes(searchTerm)) ||
+                    (device.deviceType && device.deviceType.toLowerCase().includes(searchTerm)) ||
+                    (device.siteType && device.siteType.toLowerCase().includes(searchTerm)) ||
+                    (device.deviceRole && device.deviceRole.toLowerCase().includes(searchTerm)) ||
                     (device.region && device.region.toLowerCase().includes(searchTerm));
 
-                return regionMatch && typeMatch && searchMatch;
+                return regionMatch && vendorMatch && deviceTypeMatch && siteTypeMatch && deviceRoleMatch && configMatch && searchMatch;
             });
 
             updateStats();
+            updateFilterBadges();
             renderTable();
+        }
+
+        // Update all filter badges
+        function updateFilterBadges() {
+            // Helper function to safely update badge
+            const updateBadge = (id, count) => {
+                const badge = document.getElementById(id);
+                if (badge) badge.textContent = count;
+            };
+
+            // Region badges
+            updateBadge('badge-region-all', deviceData.length);
+            updateBadge('badge-region-us', deviceData.filter(d => d.region === 'US').length);
+            updateBadge('badge-region-ca', deviceData.filter(d => d.region === 'CA').length);
+            updateBadge('badge-region-mx', deviceData.filter(d => d.region === 'MX').length);
+            updateBadge('badge-region-eu', deviceData.filter(d => d.region === 'EU').length);
+            updateBadge('badge-region-uk', deviceData.filter(d => d.region === 'UK').length);
+            updateBadge('badge-region-de', deviceData.filter(d => d.region === 'DE').length);
+            updateBadge('badge-region-fr', deviceData.filter(d => d.region === 'FR').length);
+            updateBadge('badge-region-apac', deviceData.filter(d => d.region === 'APAC').length);
+            updateBadge('badge-region-latam', deviceData.filter(d => d.region === 'LATAM').length);
+            updateBadge('badge-region-mea', deviceData.filter(d => d.region === 'MEA').length);
+
+            // Vendor badges
+            updateBadge('badge-vendor-all', deviceData.length);
+            updateBadge('badge-vendor-fortinet', deviceData.filter(d => d.vendor === 'Fortinet').length);
+            updateBadge('badge-vendor-paloalto', deviceData.filter(d => d.vendor === 'Palo Alto Networks').length);
+            updateBadge('badge-vendor-cisco', deviceData.filter(d => d.vendor === 'Cisco').length);
+            updateBadge('badge-vendor-checkpoint', deviceData.filter(d => d.vendor === 'Check Point').length);
+            updateBadge('badge-vendor-juniper', deviceData.filter(d => d.vendor === 'Juniper').length);
+            updateBadge('badge-vendor-f5', deviceData.filter(d => d.vendor === 'F5 Networks').length);
+
+            // Device Type badges
+            updateBadge('badge-type-all', deviceData.length);
+            updateBadge('badge-type-firewall', deviceData.filter(d => d.deviceType === 'Firewall').length);
+            updateBadge('badge-type-router', deviceData.filter(d => d.deviceType === 'Router').length);
+            updateBadge('badge-type-switch', deviceData.filter(d => d.deviceType === 'Switch').length);
+            updateBadge('badge-type-lb', deviceData.filter(d => d.deviceType === 'Load Balancer').length);
+
+            // Site Type badges
+            updateBadge('badge-site-all', deviceData.length);
+            updateBadge('badge-site-pdc', deviceData.filter(d => d.siteType === 'PDC').length);
+            updateBadge('badge-site-bdc', deviceData.filter(d => d.siteType === 'BDC').length);
+            updateBadge('badge-site-cat', deviceData.filter(d => d.siteType === 'CAT').length);
+            updateBadge('badge-site-hq', deviceData.filter(d => d.siteType === 'HQ').length);
+            updateBadge('badge-site-branch', deviceData.filter(d => d.siteType === 'Branch').length);
+            updateBadge('badge-site-remote', deviceData.filter(d => d.siteType === 'Remote').length);
+            updateBadge('badge-site-cloud', deviceData.filter(d => d.siteType === 'Cloud').length);
+
+            // Device Role badges
+            updateBadge('badge-role-all', deviceData.length);
+            updateBadge('badge-role-vpn', deviceData.filter(d => d.deviceRole === 'VPN Gateway').length);
+            updateBadge('badge-role-wan', deviceData.filter(d => d.deviceRole === 'WAN Edge').length);
+            updateBadge('badge-role-dmz', deviceData.filter(d => d.deviceRole === 'DMZ Firewall').length);
+            updateBadge('badge-role-internet', deviceData.filter(d => d.deviceRole === 'Internet Edge').length);
+            updateBadge('badge-role-access', deviceData.filter(d => d.deviceRole === 'Access').length);
+            updateBadge('badge-role-firewall', deviceData.filter(d => d.deviceRole === 'Firewall').length);
+
+            // Configuration badges
+            updateBadge('badge-all', deviceData.length);
+            updateBadge('badge-ha', deviceData.filter(d => d.hasHA).length);
+            updateBadge('badge-standalone', deviceData.filter(d => !d.hasHA).length);
         }
 
         // Quick filter
@@ -2623,10 +3351,10 @@
 
         // Export to CSV
         function exportToCSV() {
-            let csv = 'Region,Device Name,Model,Serial Number,HA Status,HA Serial 1,HA Serial 2\n';
+            let csv = 'Region,Device Name,Vendor,Device Type,Model,Series,Site Type,Device Role,Serial Number,HA Status,HA Serial 1,HA Serial 2\n';
 
             filteredData.forEach(device => {
-                csv += `"${device.region}","${device.deviceName}","${device.model}","${device.sn}","${device.hasHA ? 'HA Configured' : 'Standalone'}","${device.sn_ha1 || ''}","${device.sn_ha2 || ''}"\n`;
+                csv += `"${device.region || ''}","${device.deviceName || ''}","${device.vendor || ''}","${device.deviceType || ''}","${device.model || ''}","${device.series || ''}","${device.siteType || ''}","${device.deviceRole || ''}","${device.sn || ''}","${device.hasHA ? 'HA Configured' : 'Standalone'}","${device.sn_ha1 || ''}","${device.sn_ha2 || ''}"\n`;
             });
 
             const blob = new Blob([csv], { type: 'text/csv' });
@@ -3088,13 +3816,13 @@
             let md = '# NetAssets - Network Device Inventory\n\n';
             md += `**Generated:** ${new Date().toLocaleString()}\n\n`;
             md += `**Total Devices:** ${filteredData.length}\n\n`;
-            md += '| Region | Device Name | Model | Serial Number | HA Status | HA Serial 1 | HA Serial 2 |\n';
-            md += '|--------|-------------|-------|---------------|-----------|-------------|-------------|\n';
+            md += '| Region | Device Name | Vendor | Type | Model | Site | Role | SN | HA Status | HA SN 1 | HA SN 2 |\n';
+            md += '|--------|-------------|--------|------|-------|------|------|----|-----------|---------|---------|\n';
 
             filteredData.forEach(device => {
-                const region = device.region === 'US' ? '🇺🇸 US' : '🇪🇺 EU';
+                const region = getRegionFlag(device.region) + ' ' + (device.region || 'N/A');
                 const haStatus = device.hasHA ? '✅ HA' : '⚠️ Standalone';
-                md += `| ${region} | ${device.deviceName} | ${device.model} | ${device.sn} | ${haStatus} | ${device.sn_ha1 || '-'} | ${device.sn_ha2 || '-'} |\n`;
+                md += `| ${region} | ${device.deviceName || 'N/A'} | ${device.vendor || 'Unknown'} | ${device.deviceType || 'Unknown'} | ${device.model || 'Unknown'} | ${device.siteType || 'Other'} | ${device.deviceRole || 'General'} | ${device.sn || '-'} | ${haStatus} | ${device.sn_ha1 || '-'} | ${device.sn_ha2 || '-'} |\n`;
             });
 
             const blob = new Blob([md], { type: 'text/markdown' });
@@ -3244,51 +3972,105 @@
             reader.readAsText(file);
         }
 
-        // Parse CSV content
+        // Enhanced CSV Parser - Handles multiple column name variations
         function parseCSV(content) {
             const lines = content.trim().split('\n');
             if (lines.length < 2) return [];
 
-            const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
+            const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, '').toLowerCase());
             const data = [];
+
+            // Smart column mapping - handles various column name formats
+            const columnMap = {
+                region: findColumn(headers, ['region', 'location', 'country', 'geo']),
+                deviceName: findColumn(headers, ['devicename', 'device name', 'device', 'name', 'hostname', 'host']),
+                vendor: findColumn(headers, ['vendor', 'manufacturer', 'make', 'brand']),
+                deviceType: findColumn(headers, ['devicetype', 'device type', 'type', 'category']),
+                model: findColumn(headers, ['model', 'device model', 'series']),
+                siteType: findColumn(headers, ['sitetype', 'site type', 'site', 'location type']),
+                deviceRole: findColumn(headers, ['devicerole', 'device role', 'role', 'function']),
+                sn: findColumn(headers, ['sn', 'serial', 'serial number', 'serialnumber', 'primary sn', 'primary serial']),
+                hasHA: findColumn(headers, ['ha', 'ha status', 'hastatus', 'ha configured', 'high availability']),
+                sn_ha1: findColumn(headers, ['sn_ha1', 'ha serial 1', 'ha sn 1', 'ha1', 'hasn1', 'secondary sn']),
+                sn_ha2: findColumn(headers, ['sn_ha2', 'ha serial 2', 'ha sn 2', 'ha2', 'hasn2', 'tertiary sn']),
+                city: findColumn(headers, ['city', 'town', 'locality']),
+                state: findColumn(headers, ['state', 'province', 'region']),
+                country: findColumn(headers, ['country', 'nation'])
+            };
 
             for (let i = 1; i < lines.length; i++) {
                 const line = lines[i].trim();
-                if (!line) continue;
+                if (!line || line.split(',').every(v => !v.trim())) continue; // Skip empty lines
 
-                // Simple CSV parsing (handles quoted values)
-                const values = [];
-                let current = '';
-                let inQuotes = false;
+                // Enhanced CSV parsing (handles quoted values and commas inside quotes)
+                const values = parseCSVLine(line);
 
-                for (let j = 0; j < line.length; j++) {
-                    const char = line[j];
-                    if (char === '"') {
-                        inQuotes = !inQuotes;
-                    } else if (char === ',' && !inQuotes) {
-                        values.push(current.trim());
-                        current = '';
-                    } else {
-                        current += char;
-                    }
-                }
-                values.push(current.trim());
-
-                // Map to device object
+                // Build device object using smart column mapping
                 const device = {
-                    region: values[0] || '',
-                    deviceName: values[1] || '',
-                    model: values[2] || '',
-                    sn: values[3] || '',
-                    hasHA: values[4] === 'HA Configured' || values[4] === 'true',
-                    sn_ha1: values[5] || '',
-                    sn_ha2: values[6] || ''
+                    region: getValue(values, columnMap.region) || 'US',
+                    deviceName: getValue(values, columnMap.deviceName) || `Device-${i}`,
+                    vendor: getValue(values, columnMap.vendor) || '',
+                    deviceType: getValue(values, columnMap.deviceType) || '',
+                    model: getValue(values, columnMap.model) || '',
+                    series: getValue(values, columnMap.model) || '',
+                    siteType: getValue(values, columnMap.siteType) || '',
+                    deviceRole: getValue(values, columnMap.deviceRole) || '',
+                    sn: getValue(values, columnMap.sn) || '',
+                    hasHA: parseBoolean(getValue(values, columnMap.hasHA)),
+                    sn_ha1: getValue(values, columnMap.sn_ha1) || '',
+                    sn_ha2: getValue(values, columnMap.sn_ha2) || '',
+                    city: getValue(values, columnMap.city) || '',
+                    state: getValue(values, columnMap.state) || '',
+                    country: getValue(values, columnMap.country) || ''
                 };
 
                 data.push(device);
             }
 
             return data;
+        }
+
+        // Helper: Find column index by multiple possible names
+        function findColumn(headers, possibleNames) {
+            for (const name of possibleNames) {
+                const index = headers.findIndex(h => h.includes(name.toLowerCase()));
+                if (index !== -1) return index;
+            }
+            return -1;
+        }
+
+        // Helper: Get value from array by index
+        function getValue(values, index) {
+            if (index === -1 || index >= values.length) return '';
+            return values[index].trim().replace(/^"|"$/g, '');
+        }
+
+        // Helper: Parse boolean from various formats
+        function parseBoolean(value) {
+            if (!value) return false;
+            const v = value.toLowerCase().trim();
+            return v === 'true' || v === 'yes' || v === '1' || v === 'ha configured' || v === 'enabled';
+        }
+
+        // Helper: Parse a single CSV line handling quotes properly
+        function parseCSVLine(line) {
+            const values = [];
+            let current = '';
+            let inQuotes = false;
+
+            for (let j = 0; j < line.length; j++) {
+                const char = line[j];
+                if (char === '"') {
+                    inQuotes = !inQuotes;
+                } else if (char === ',' && !inQuotes) {
+                    values.push(current);
+                    current = '';
+                } else {
+                    current += char;
+                }
+            }
+            values.push(current);
+            return values;
         }
 
         // Parse JSON content
@@ -3315,13 +4097,14 @@
                 return { valid: false, error: 'No data to import' };
             }
 
-            // Check for required fields
+            // Only check that we have device names (serial numbers are optional)
+            // Device names are auto-generated if missing, so this is very permissive
             for (let i = 0; i < data.length; i++) {
                 const device = data[i];
-                if (!device.deviceName || !device.sn) {
+                if (!device.deviceName) {
                     return {
                         valid: false,
-                        error: `Row ${i + 1}: Device name and serial number are required`
+                        error: `Row ${i + 1}: Unable to identify device (no name or identifier found)`
                     };
                 }
             }
@@ -3331,7 +4114,15 @@
 
         // Show import preview
         function showImportPreview(data) {
-            // Show statistics
+            // Analyze what data is present and what will be auto-detected
+            const hasVendor = data.some(d => d.vendor);
+            const hasModel = data.some(d => d.model);
+            const hasSN = data.some(d => d.sn);
+            const hasLocation = data.some(d => d.city || d.state);
+            const hasSiteType = data.some(d => d.siteType);
+            const hasDeviceRole = data.some(d => d.deviceRole);
+
+            // Show statistics with helpful info
             const statsHtml = `
                 <div class="import-stat">
                     <div class="import-stat-value">${data.length}</div>
@@ -3350,7 +4141,26 @@
                     <div class="import-stat-label">EU Devices</div>
                 </div>
             `;
-            document.getElementById('importStats').innerHTML = statsHtml;
+
+            // Show what will be auto-detected
+            const detectionInfo = [];
+            if (!hasVendor) detectionInfo.push('vendors');
+            if (!hasModel) detectionInfo.push('models');
+            if (!hasLocation) detectionInfo.push('locations');
+            if (!hasSiteType) detectionInfo.push('site types');
+            if (!hasDeviceRole) detectionInfo.push('device roles');
+
+            let infoHtml = statsHtml;
+            if (detectionInfo.length > 0) {
+                infoHtml += `
+                    <div style="margin-top: 15px; padding: 12px; background: rgba(99, 102, 241, 0.1); border-left: 4px solid var(--primary-color); border-radius: 4px;">
+                        <div style="font-weight: 600; margin-bottom: 5px;">🔍 Smart Detection Enabled</div>
+                        <div style="font-size: 0.9em; color: #666;">Will auto-detect: ${detectionInfo.join(', ')}</div>
+                    </div>
+                `;
+            }
+
+            document.getElementById('importStats').innerHTML = infoHtml;
 
             // Show preview table (first 10 rows)
             const previewData = data.slice(0, 10);
@@ -3411,34 +4221,137 @@
                 return;
             }
 
-            if (importOption === 'replace') {
-                // Replace all data
-                deviceData = importData.map(device => ({
-                    ...device,
-                    model: device.model || detectModel(device.sn)
-                }));
-                showNotification(`✅ Imported ${deviceData.length} devices (replaced existing data)`);
-            } else {
-                // Append to existing data
-                const newDevices = importData.map(device => ({
-                    ...device,
-                    model: device.model || detectModel(device.sn)
-                }));
-                deviceData = [...deviceData, ...newDevices];
-                showNotification(`✅ Imported ${newDevices.length} devices (appended to existing ${deviceData.length - newDevices.length} devices)`);
+            // Show loading indicator
+            const confirmBtn = document.getElementById('confirmImportBtn');
+            const originalBtnText = confirmBtn.textContent;
+            confirmBtn.disabled = true;
+            confirmBtn.textContent = '⏳ Processing...';
+
+            // Use setTimeout to allow UI to update before processing
+            setTimeout(() => {
+                try {
+                    let detectedFields = {
+                        vendors: 0,
+                        models: 0,
+                        locations: 0,
+                        siteTypes: 0,
+                        deviceRoles: 0
+                    };
+
+                    if (importOption === 'replace') {
+                        // Replace all data with enhanced detection
+                        deviceData = importData.map(device => {
+                            const deviceInfo = detectDeviceInfo(device);
+
+                            // Track what was auto-detected
+                            if (!device.vendor && deviceInfo.vendor) detectedFields.vendors++;
+                            if (!device.model && deviceInfo.model) detectedFields.models++;
+                            if (!device.city && deviceInfo.city) detectedFields.locations++;
+                            if (!device.siteType && deviceInfo.siteType) detectedFields.siteTypes++;
+                            if (!device.deviceRole && deviceInfo.deviceRole) detectedFields.deviceRoles++;
+
+                            return {
+                                ...device,
+                                model: device.model || deviceInfo.model,
+                                series: device.series || deviceInfo.series,
+                                vendor: device.vendor || deviceInfo.vendor,
+                                deviceType: device.deviceType || deviceInfo.deviceType,
+                                siteType: device.siteType || deviceInfo.siteType,
+                                deviceRole: device.deviceRole || deviceInfo.deviceRole,
+                                country: device.country || deviceInfo.country,
+                                state: device.state || deviceInfo.state,
+                                city: device.city || deviceInfo.city,
+                                fullLocation: device.fullLocation || deviceInfo.fullLocation
+                            };
+                        });
+
+                        let message = `✅ Successfully imported ${deviceData.length} devices (replaced existing data)`;
+                        if (detectedFields.vendors > 0 || detectedFields.models > 0 || detectedFields.locations > 0) {
+                            message += `\n🔍 Auto-detected: ${detectedFields.vendors} vendors, ${detectedFields.models} models, ${detectedFields.locations} locations`;
+                        }
+                        showNotification(message);
+                    } else {
+                        // Append to existing data with enhanced detection
+                        const newDevices = importData.map(device => {
+                            const deviceInfo = detectDeviceInfo(device);
+
+                            // Track what was auto-detected
+                            if (!device.vendor && deviceInfo.vendor) detectedFields.vendors++;
+                            if (!device.model && deviceInfo.model) detectedFields.models++;
+                            if (!device.city && deviceInfo.city) detectedFields.locations++;
+                            if (!device.siteType && deviceInfo.siteType) detectedFields.siteTypes++;
+                            if (!device.deviceRole && deviceInfo.deviceRole) detectedFields.deviceRoles++;
+
+                            return {
+                                ...device,
+                                model: device.model || deviceInfo.model,
+                                series: device.series || deviceInfo.series,
+                                vendor: device.vendor || deviceInfo.vendor,
+                                deviceType: device.deviceType || deviceInfo.deviceType,
+                                siteType: device.siteType || deviceInfo.siteType,
+                                deviceRole: device.deviceRole || deviceInfo.deviceRole,
+                                country: device.country || deviceInfo.country,
+                                state: device.state || deviceInfo.state,
+                                city: device.city || deviceInfo.city,
+                                fullLocation: device.fullLocation || deviceInfo.fullLocation
+                            };
+                        });
+
+                        const previousCount = deviceData.length;
+                        deviceData = [...deviceData, ...newDevices];
+
+                        let message = `✅ Successfully imported ${newDevices.length} devices (now ${deviceData.length} total, previously ${previousCount})`;
+                        if (detectedFields.vendors > 0 || detectedFields.models > 0 || detectedFields.locations > 0) {
+                            message += `\n🔍 Auto-detected: ${detectedFields.vendors} vendors, ${detectedFields.models} models, ${detectedFields.locations} locations`;
+                        }
+                        showNotification(message);
+                    }
+
+                    // Update the display
+                    filteredData = [...deviceData];
+                    updateStats();
+                    updateFilterBadges();
+                    updateModelBreakdown();
+                    renderTable();
+                    if (currentView === 'card') {
+                        renderCardView();
+                    }
+
+                    // Close modal
+                    closeImportModal();
+                } catch (error) {
+                    console.error('Import error:', error);
+                    showNotification('❌ Error processing import: ' + error.message, 'error');
+                    confirmBtn.disabled = false;
+                    confirmBtn.textContent = originalBtnText;
+                }
+            }, 100);
+        }
+
+        // Clear all data function
+        function clearAllData() {
+            if (deviceData.length === 0) {
+                showNotification('ℹ️ No data to clear', 'error');
+                return;
             }
 
-            // Update the display
-            filteredData = [...deviceData];
-            updateStats();
-            updateModelBreakdown();
-            renderTable();
-            if (currentView === 'card') {
-                renderCardView();
-            }
+            const confirmed = confirm(`⚠️ Are you sure you want to clear all data?\n\nThis will remove all ${deviceData.length} devices from the dashboard.\n\nThis action cannot be undone.`);
 
-            // Close modal
-            closeImportModal();
+            if (confirmed) {
+                deviceData = [];
+                filteredData = [];
+                selectedRows.clear();
+
+                // Update the display
+                updateStats();
+                updateModelBreakdown();
+                renderTable();
+                if (currentView === 'card') {
+                    renderCardView();
+                }
+
+                showNotification('✅ All data cleared successfully');
+            }
         }
 
         // Drag and drop handlers

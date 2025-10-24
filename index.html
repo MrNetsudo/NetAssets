@@ -6658,11 +6658,18 @@
 
         // Enhanced CSV Parser - Handles multiple column name variations
         function parseCSV(content) {
-            const lines = content.trim().split('\n');
-            if (lines.length < 2) return [];
+            try {
+                // Handle different line endings (Windows \r\n, Unix \n, Mac \r)
+                const lines = content.trim().replace(/\r\n/g, '\n').replace(/\r/g, '\n').split('\n');
+                if (lines.length < 2) {
+                    console.log('CSV has less than 2 lines:', lines.length);
+                    return [];
+                }
 
-            const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, '').toLowerCase());
-            const data = [];
+                const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, '').toLowerCase());
+                console.log('CSV Headers:', headers);
+                console.log('Total lines:', lines.length);
+                const data = [];
 
             // Smart column mapping - handles various column name formats
             const columnMap = {
@@ -6737,8 +6744,13 @@
                 data.push(device);
             }
 
+            console.log('Successfully parsed', data.length, 'devices');
             return data;
+        } catch (error) {
+            console.error('Error in parseCSV:', error);
+            throw new Error('CSV parsing failed: ' + error.message);
         }
+    }
 
         // Helper: Find column index by multiple possible names
         function findColumn(headers, possibleNames) {
@@ -6770,8 +6782,16 @@
 
             for (let j = 0; j < line.length; j++) {
                 const char = line[j];
+                const nextChar = line[j + 1];
+
                 if (char === '"') {
-                    inQuotes = !inQuotes;
+                    // Handle escaped quotes ("") inside quoted fields
+                    if (inQuotes && nextChar === '"') {
+                        current += '"';
+                        j++; // Skip the next quote
+                    } else {
+                        inQuotes = !inQuotes;
+                    }
                 } else if (char === ',' && !inQuotes) {
                     values.push(current);
                     current = '';

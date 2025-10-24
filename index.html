@@ -613,54 +613,379 @@
             color: var(--dark-text);
         }
 
+        /* Premium Quick Filters - Enterprise Edition */
         .quick-filters {
-            margin-top: 20px;
-            padding: 15px;
+            margin-top: 25px;
+            padding: 0;
             background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+            overflow: hidden;
+            border: 1px solid rgba(99, 102, 241, 0.1);
         }
 
         body.dark-mode .quick-filters {
             background: var(--dark-card);
+            border-color: rgba(99, 102, 241, 0.2);
         }
 
-        body.dark-mode .quick-filters h3 {
-            color: var(--dark-text) !important;
+        .quick-filters-header {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            padding: 20px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 3px solid rgba(255,255,255,0.2);
         }
 
-        .quick-filter-chips {
+        .quick-filters-title {
+            font-size: 1.1em;
+            color: white;
+            margin: 0;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .quick-filters-actions {
             display: flex;
             gap: 10px;
-            flex-wrap: wrap;
-            margin-top: 10px;
         }
 
-        .chip {
-            padding: 6px 15px;
-            background: #e9ecef;
-            border-radius: 20px;
-            font-size: 13px;
+        .filter-action-btn {
+            padding: 8px 16px;
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 8px;
+            color: white;
+            font-size: 0.9em;
             cursor: pointer;
             transition: all 0.3s;
             display: flex;
             align-items: center;
+            gap: 6px;
+            font-weight: 600;
+        }
+
+        .filter-action-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .filter-action-btn:active {
+            transform: translateY(0);
+        }
+
+        .quick-filters-body {
+            padding: 25px;
+        }
+
+        .filter-tabs {
+            display: flex;
             gap: 5px;
+            margin-bottom: 20px;
+            background: #f8f9fa;
+            padding: 5px;
+            border-radius: 12px;
+        }
+
+        body.dark-mode .filter-tabs {
+            background: #1a2332;
+        }
+
+        .filter-tab {
+            flex: 1;
+            padding: 10px 20px;
+            background: transparent;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+            color: #64748b;
+            font-size: 0.95em;
+        }
+
+        .filter-tab:hover {
+            color: var(--primary-color);
+            background: rgba(99, 102, 241, 0.1);
+        }
+
+        .filter-tab.active {
+            background: white;
+            color: var(--primary-color);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        body.dark-mode .filter-tab.active {
+            background: var(--dark-card-hover);
+            color: var(--primary-light);
+        }
+
+        .filter-tab-content {
+            display: none;
+        }
+
+        .filter-tab-content.active {
+            display: block;
+            animation: fadeInUp 0.4s ease;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .quick-filter-chips {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .chip {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border: 2px solid transparent;
+            border-radius: 24px;
+            font-size: 0.95em;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .chip::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            transition: left 0.5s;
+        }
+
+        .chip:hover::before {
+            left: 100%;
         }
 
         body.dark-mode .chip {
-            background: #2d3748;
+            background: linear-gradient(135deg, #2d3748 0%, #1a2332 100%);
+            color: var(--dark-text);
         }
 
         .chip:hover {
-            background: var(--primary-color);
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
             color: white;
-            transform: scale(1.05);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(99, 102, 241, 0.3);
+            border-color: var(--primary-light);
         }
 
         .chip.active {
+            background: linear-gradient(135deg, var(--success-color) 0%, #059669 100%);
+            color: white;
+            border-color: #10b981;
+            box-shadow: 0 4px 16px rgba(16, 185, 129, 0.4);
+        }
+
+        .chip-badge {
+            background: rgba(255,255,255,0.3);
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 700;
+            min-width: 24px;
+            text-align: center;
+        }
+
+        .chip.active .chip-badge {
+            background: rgba(255,255,255,0.35);
+        }
+
+        .filter-combination {
+            margin-top: 20px;
+            padding: 20px;
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border-radius: 12px;
+            border-left: 4px solid var(--warning-color);
+        }
+
+        body.dark-mode .filter-combination {
+            background: linear-gradient(135deg, #78350f 0%, #92400e 100%);
+        }
+
+        .filter-combination-title {
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: #92400e;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        body.dark-mode .filter-combination-title {
+            color: #fbbf24;
+        }
+
+        .filter-combination-chips {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .filter-logic-toggle {
+            padding: 6px 12px;
+            background: white;
+            border: 2px solid var(--warning-color);
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 700;
+            color: var(--warning-color);
+            transition: all 0.3s;
+        }
+
+        .filter-logic-toggle:hover {
+            background: var(--warning-color);
+            color: white;
+        }
+
+        .saved-filters-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .saved-filter-item {
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        body.dark-mode .saved-filter-item {
+            background: #1a2332;
+        }
+
+        .saved-filter-item:hover {
+            border-color: var(--primary-color);
+            background: white;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        body.dark-mode .saved-filter-item:hover {
+            background: var(--dark-card-hover);
+        }
+
+        .saved-filter-name {
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        body.dark-mode .saved-filter-name {
+            color: var(--dark-text);
+        }
+
+        .saved-filter-meta {
+            font-size: 0.85em;
+            color: #64748b;
+            margin-top: 4px;
+        }
+
+        .saved-filter-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .saved-filter-btn {
+            padding: 6px 12px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-size: 0.85em;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .saved-filter-btn.apply {
             background: var(--success-color);
             color: white;
+        }
+
+        .saved-filter-btn.delete {
+            background: var(--danger-color);
+            color: white;
+        }
+
+        .saved-filter-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        .filter-templates {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .filter-template {
+            padding: 20px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 12px;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+
+        body.dark-mode .filter-template {
+            background: linear-gradient(135deg, #1a2332 0%, #2d3748 100%);
+        }
+
+        .filter-template:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-5px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+        }
+
+        .filter-template-icon {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .filter-template-name {
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 5px;
+        }
+
+        body.dark-mode .filter-template-name {
+            color: var(--dark-text);
+        }
+
+        .filter-template-desc {
+            font-size: 0.85em;
+            color: #64748b;
         }
 
         .table-container {
@@ -930,16 +1255,41 @@
             }
         }
 
+        /* Premium Model Distribution - Enterprise Edition */
         .model-breakdown {
-            margin-top: 20px;
-            padding: 20px;
+            margin-top: 25px;
+            padding: 0;
             background: white;
-            border-radius: 10px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+            overflow: hidden;
+            border: 1px solid rgba(139, 92, 246, 0.1);
         }
 
         body.dark-mode .model-breakdown {
             background: var(--dark-card);
+            border-color: rgba(139, 92, 246, 0.2);
+        }
+
+        .model-breakdown-header {
+            background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%);
+            padding: 20px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 3px solid rgba(255,255,255,0.2);
+        }
+
+        .model-breakdown-title {
+            font-size: 1.1em;
+            color: white;
+            margin: 0;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
         .model-breakdown h3 {
@@ -951,41 +1301,417 @@
             color: var(--dark-text);
         }
 
-        .model-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        .model-breakdown-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .model-action-btn {
+            padding: 8px 16px;
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 8px;
+            color: white;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 600;
+            border: none;
+        }
+
+        .model-action-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .model-action-btn.active {
+            background: rgba(255,255,255,0.35);
+            border-color: rgba(255,255,255,0.5);
+        }
+
+        .model-breakdown-body {
+            padding: 25px;
+        }
+
+        .model-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
             gap: 15px;
         }
 
-        .model-item {
-            padding: 15px;
+        .model-view-switcher {
+            display: flex;
+            gap: 5px;
             background: #f8f9fa;
-            border-radius: 8px;
-            text-align: center;
-            transition: all 0.3s;
-            cursor: pointer;
+            padding: 5px;
+            border-radius: 10px;
         }
 
-        body.dark-mode .model-item {
+        body.dark-mode .model-view-switcher {
             background: #1a2332;
         }
 
+        .model-view-btn {
+            padding: 8px 16px;
+            background: transparent;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+            color: #64748b;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .model-view-btn:hover {
+            color: var(--secondary-color);
+            background: rgba(139, 92, 246, 0.1);
+        }
+
+        .model-view-btn.active {
+            background: white;
+            color: var(--secondary-color);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+
+        body.dark-mode .model-view-btn.active {
+            background: var(--dark-card-hover);
+        }
+
+        .model-search {
+            flex: 1;
+            min-width: 250px;
+            position: relative;
+        }
+
+        .model-search input {
+            width: 100%;
+            padding: 10px 40px 10px 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 0.95em;
+            transition: all 0.3s;
+        }
+
+        .model-search input:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+        }
+
+        body.dark-mode .model-search input {
+            background: #1a2332;
+            border-color: #2d3748;
+            color: var(--dark-text);
+        }
+
+        .model-search-icon {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+        }
+
+        .model-stats-bar {
+            display: flex;
+            gap: 20px;
+            padding: 20px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        body.dark-mode .model-stats-bar {
+            background: linear-gradient(135deg, #1a2332 0%, #2d3748 100%);
+        }
+
+        .model-stat {
+            flex: 1;
+            min-width: 150px;
+            text-align: center;
+        }
+
+        .model-stat-label {
+            font-size: 0.85em;
+            color: #64748b;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .model-stat-value {
+            font-size: 1.5em;
+            font-weight: 700;
+            color: var(--secondary-color);
+        }
+
+        body.dark-mode .model-stat-value {
+            color: var(--primary-light);
+        }
+
+        .model-grid {
+            display: none;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 18px;
+        }
+
+        .model-grid.active {
+            display: grid;
+        }
+
+        .model-item {
+            padding: 20px;
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            border-radius: 12px;
+            text-align: center;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .model-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--secondary-color) 0%, var(--accent-color) 100%);
+            transform: scaleX(0);
+            transition: transform 0.3s;
+        }
+
+        .model-item:hover::before {
+            transform: scaleX(1);
+        }
+
+        body.dark-mode .model-item {
+            background: linear-gradient(135deg, #1a2332 0%, #2d3748 100%);
+        }
+
         .model-item:hover {
+            background: linear-gradient(135deg, var(--secondary-color) 0%, var(--accent-color) 100%);
+            color: white;
             transform: translateY(-5px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            background: var(--primary-color);
+            box-shadow: 0 12px 32px rgba(139, 92, 246, 0.3);
+            border-color: var(--secondary-color);
+        }
+
+        .model-vendor-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 0.75em;
+            padding: 4px 8px;
+            background: rgba(139, 92, 246, 0.1);
+            border-radius: 6px;
+            font-weight: 700;
+            color: var(--secondary-color);
+        }
+
+        .model-item:hover .model-vendor-badge {
+            background: rgba(255,255,255,0.25);
             color: white;
         }
 
         .model-name {
-            font-weight: bold;
-            font-size: 0.9em;
-            margin-bottom: 5px;
+            font-weight: 700;
+            font-size: 1.1em;
+            margin-bottom: 10px;
+            color: #1e293b;
+        }
+
+        body.dark-mode .model-name {
+            color: var(--dark-text);
+        }
+
+        .model-item:hover .model-name {
+            color: white;
         }
 
         .model-count {
-            font-size: 1.5em;
-            font-weight: bold;
+            font-size: 1.8em;
+            font-weight: 800;
+            color: var(--secondary-color);
+            margin-bottom: 5px;
+        }
+
+        .model-item:hover .model-count {
+            color: white;
+        }
+
+        .model-percentage {
+            font-size: 0.85em;
+            color: #64748b;
+            font-weight: 600;
+        }
+
+        .model-item:hover .model-percentage {
+            color: rgba(255,255,255,0.85);
+        }
+
+        .model-health-bar {
+            margin-top: 10px;
+            height: 6px;
+            background: rgba(0,0,0,0.1);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .model-health-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #10b981 0%, #059669 100%);
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+
+        .model-item:hover .model-health-bar {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .model-chart-container {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 12px;
+            min-height: 400px;
+            display: none;
+        }
+
+        body.dark-mode .model-chart-container {
+            background: #1a2332;
+        }
+
+        .model-chart-container.active {
+            display: block;
+            animation: fadeInUp 0.4s ease;
+        }
+
+        .model-list {
+            display: none;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .model-list.active {
+            display: flex;
+            animation: fadeInUp 0.4s ease;
+        }
+
+        .model-list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 18px 20px;
+            background: white;
+            border-radius: 10px;
+            border-left: 4px solid var(--secondary-color);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        body.dark-mode .model-list-item {
+            background: #1a2332;
+        }
+
+        .model-list-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+            background: linear-gradient(90deg, rgba(139, 92, 246, 0.05) 0%, transparent 100%);
+        }
+
+        .model-list-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex: 1;
+        }
+
+        .model-list-name {
+            font-weight: 700;
+            color: #1e293b;
+            min-width: 150px;
+        }
+
+        body.dark-mode .model-list-name {
+            color: var(--dark-text);
+        }
+
+        .model-list-bar {
+            flex: 1;
+            height: 20px;
+            background: #e2e8f0;
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        body.dark-mode .model-list-bar {
+            background: #2d3748;
+        }
+
+        .model-list-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--secondary-color) 0%, var(--accent-color) 100%);
+            border-radius: 10px;
+            transition: width 0.6s ease;
+        }
+
+        .model-list-count {
+            font-size: 1.3em;
+            font-weight: 700;
+            color: var(--secondary-color);
+            min-width: 60px;
+            text-align: right;
+        }
+
+        .model-drill-down {
+            margin-top: 20px;
+            padding: 20px;
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border-radius: 12px;
+            border-left: 4px solid #f59e0b;
+            display: none;
+        }
+
+        body.dark-mode .model-drill-down {
+            background: linear-gradient(135deg, #78350f 0%, #92400e 100%);
+        }
+
+        .model-drill-down.active {
+            display: block;
+            animation: fadeInUp 0.4s ease;
+        }
+
+        .model-drill-title {
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: #92400e;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.1em;
+        }
+
+        body.dark-mode .model-drill-title {
+            color: #fbbf24;
+        }
+
+        .model-drill-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
         }
 
         @media print {
@@ -2349,18 +3075,130 @@
                 </div>
             </div>
 
-            <!-- Quick Access Filters -->
+            <!-- Premium Quick Access Filters - Enterprise Edition -->
             <div class="quick-filters">
-                <h3 style="font-size: 0.95em; color: #2c3e50; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 700;"><span>⚡</span> Quick Access Filters</h3>
-                <div class="quick-filter-chips">
-                    <div class="chip" onclick="quickFilter('VPN')">🔐 VPN Devices</div>
-                    <div class="chip" onclick="quickFilter('FW')">🔥 Firewalls</div>
-                    <div class="chip" onclick="quickFilter('PDC')">🏢 PDC Sites</div>
-                    <div class="chip" onclick="quickFilter('BDC')">🏢 BDC Sites</div>
-                    <div class="chip" onclick="quickFilter('HA')">✅ HA Pairs</div>
-                    <div class="chip" onclick="quickFilter('Fortinet')">🔥 Fortinet</div>
-                    <div class="chip" onclick="quickFilter('Cisco')">📡 Cisco</div>
-                    <div class="chip" onclick="quickFilter('root')">👤 Root Access</div>
+                <div class="quick-filters-header">
+                    <h3 class="quick-filters-title">⚡ Quick Access Filters</h3>
+                    <div class="quick-filters-actions">
+                        <button class="filter-action-btn" onclick="saveCurrentFilter()">💾 Save Filter</button>
+                        <button class="filter-action-btn" onclick="exportFilteredData()">📥 Export Results</button>
+                        <button class="filter-action-btn" onclick="clearAllFilters()">🔄 Clear All</button>
+                    </div>
+                </div>
+                <div class="quick-filters-body">
+                    <!-- Filter Tabs -->
+                    <div class="filter-tabs">
+                        <button class="filter-tab active" onclick="switchFilterTab('quick')">⚡ Quick Filters</button>
+                        <button class="filter-tab" onclick="switchFilterTab('saved')">💾 Saved Filters</button>
+                        <button class="filter-tab" onclick="switchFilterTab('templates')">📋 Templates</button>
+                        <button class="filter-tab" onclick="switchFilterTab('advanced')">🔬 Advanced</button>
+                    </div>
+
+                    <!-- Quick Filters Tab -->
+                    <div class="filter-tab-content active" id="quickFilterTab">
+                        <div class="quick-filter-chips" id="quickFilterChips">
+                            <div class="chip" onclick="quickFilterEnhanced('VPN', event)">
+                                🔐 VPN Devices
+                                <span class="chip-badge" id="badge-vpn">0</span>
+                            </div>
+                            <div class="chip" onclick="quickFilterEnhanced('Firewall', event)">
+                                🔥 Firewalls
+                                <span class="chip-badge" id="badge-firewall">0</span>
+                            </div>
+                            <div class="chip" onclick="quickFilterEnhanced('PDC', event)">
+                                🏢 PDC Sites
+                                <span class="chip-badge" id="badge-pdc-quick">0</span>
+                            </div>
+                            <div class="chip" onclick="quickFilterEnhanced('BDC', event)">
+                                🏢 BDC Sites
+                                <span class="chip-badge" id="badge-bdc-quick">0</span>
+                            </div>
+                            <div class="chip" onclick="quickFilterEnhanced('HA', event)">
+                                ✅ HA Pairs
+                                <span class="chip-badge" id="badge-ha-quick">0</span>
+                            </div>
+                            <div class="chip" onclick="quickFilterEnhanced('Fortinet', event)">
+                                🔥 Fortinet
+                                <span class="chip-badge" id="badge-fortinet">0</span>
+                            </div>
+                            <div class="chip" onclick="quickFilterEnhanced('Cisco', event)">
+                                📡 Cisco
+                                <span class="chip-badge" id="badge-cisco">0</span>
+                            </div>
+                            <div class="chip" onclick="quickFilterEnhanced('Palo Alto', event)">
+                                🛡️ Palo Alto
+                                <span class="chip-badge" id="badge-paloalto">0</span>
+                            </div>
+                            <div class="chip" onclick="quickFilterEnhanced('root', event)">
+                                👤 Root Access
+                                <span class="chip-badge" id="badge-root">0</span>
+                            </div>
+                            <div class="chip" onclick="quickFilterEnhanced('Cloud', event)">
+                                ☁️ Cloud Sites
+                                <span class="chip-badge" id="badge-cloud-quick">0</span>
+                            </div>
+                        </div>
+
+                        <!-- Active Filter Combination -->
+                        <div class="filter-combination" id="filterCombination" style="display: none;">
+                            <div class="filter-combination-title">
+                                🎯 Active Filter Combination
+                            </div>
+                            <div class="filter-combination-chips" id="activeCombination">
+                                <button class="filter-logic-toggle" id="filterLogic" onclick="toggleFilterLogic()">AND</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Saved Filters Tab -->
+                    <div class="filter-tab-content" id="savedFilterTab">
+                        <div class="saved-filters-list" id="savedFiltersList">
+                            <p style="text-align: center; color: #64748b; padding: 20px;">No saved filters yet. Apply filters and click "Save Filter" to get started.</p>
+                        </div>
+                    </div>
+
+                    <!-- Templates Tab -->
+                    <div class="filter-tab-content" id="templatesTab">
+                        <div class="filter-templates">
+                            <div class="filter-template" onclick="applyFilterTemplate('security-audit')">
+                                <div class="filter-template-icon">🔒</div>
+                                <div class="filter-template-name">Security Audit</div>
+                                <div class="filter-template-desc">Firewalls + VPN + DMZ devices</div>
+                            </div>
+                            <div class="filter-template" onclick="applyFilterTemplate('ha-review')">
+                                <div class="filter-template-icon">✅</div>
+                                <div class="filter-template-name">HA Review</div>
+                                <div class="filter-template-desc">All HA-configured devices</div>
+                            </div>
+                            <div class="filter-template" onclick="applyFilterTemplate('vendor-fortinet')">
+                                <div class="filter-template-icon">🔥</div>
+                                <div class="filter-template-name">Fortinet Estate</div>
+                                <div class="filter-template-desc">All Fortinet devices</div>
+                            </div>
+                            <div class="filter-template" onclick="applyFilterTemplate('critical-sites')">
+                                <div class="filter-template-icon">🏢</div>
+                                <div class="filter-template-name">Critical Sites</div>
+                                <div class="filter-template-desc">PDC + BDC data centers</div>
+                            </div>
+                            <div class="filter-template" onclick="applyFilterTemplate('standalone-risk')">
+                                <div class="filter-template-icon">⚠️</div>
+                                <div class="filter-template-name">Standalone Risk</div>
+                                <div class="filter-template-desc">Non-HA critical devices</div>
+                            </div>
+                            <div class="filter-template" onclick="applyFilterTemplate('cloud-infrastructure')">
+                                <div class="filter-template-icon">☁️</div>
+                                <div class="filter-template-name">Cloud Infrastructure</div>
+                                <div class="filter-template-desc">All cloud-based devices</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Advanced Tab -->
+                    <div class="filter-tab-content" id="advancedTab">
+                        <p style="text-align: center; color: #64748b; padding: 20px;">
+                            Advanced filtering coming soon: Custom filter builder with drag-and-drop, boolean logic, and regex support.
+                        </p>
+                    </div>
                 </div>
             </div>
 
@@ -2391,9 +3229,74 @@
                 </div>
             </div>
 
+            <!-- Premium Device Model Distribution - Enterprise Edition -->
             <div class="model-breakdown">
-                <h3>📈 Device Model Distribution</h3>
-                <div class="model-grid" id="modelGrid"></div>
+                <div class="model-breakdown-header">
+                    <h3 class="model-breakdown-title">📈 Device Model Distribution</h3>
+                    <div class="model-breakdown-actions">
+                        <button class="model-action-btn active" id="modelViewGrid" onclick="switchModelView('grid')">
+                            🎯 Grid
+                        </button>
+                        <button class="model-action-btn" id="modelViewChart" onclick="switchModelView('chart')">
+                            📊 Chart
+                        </button>
+                        <button class="model-action-btn" id="modelViewList" onclick="switchModelView('list')">
+                            📋 List
+                        </button>
+                        <button class="model-action-btn" onclick="exportModelReport()">
+                            📥 Export
+                        </button>
+                    </div>
+                </div>
+                <div class="model-breakdown-body">
+                    <!-- Model Stats Bar -->
+                    <div class="model-stats-bar">
+                        <div class="model-stat">
+                            <div class="model-stat-label">Total Models</div>
+                            <div class="model-stat-value" id="totalModels">0</div>
+                        </div>
+                        <div class="model-stat">
+                            <div class="model-stat-label">Most Common</div>
+                            <div class="model-stat-value" id="mostCommonModel">-</div>
+                        </div>
+                        <div class="model-stat">
+                            <div class="model-stat-label">Unique Vendors</div>
+                            <div class="model-stat-value" id="uniqueVendors">0</div>
+                        </div>
+                        <div class="model-stat">
+                            <div class="model-stat-label">HA Coverage</div>
+                            <div class="model-stat-value" id="haCoverage">0%</div>
+                        </div>
+                    </div>
+
+                    <!-- Model Controls -->
+                    <div class="model-controls">
+                        <div class="model-search">
+                            <input type="text" id="modelSearchInput" placeholder="🔍 Search models..." oninput="filterModels()">
+                            <span class="model-search-icon">🔍</span>
+                        </div>
+                    </div>
+
+                    <!-- Grid View -->
+                    <div class="model-grid active" id="modelGrid"></div>
+
+                    <!-- Chart View -->
+                    <div class="model-chart-container" id="modelChartContainer">
+                        <canvas id="modelDistributionChart"></canvas>
+                    </div>
+
+                    <!-- List View -->
+                    <div class="model-list" id="modelList"></div>
+
+                    <!-- Drill-down Section -->
+                    <div class="model-drill-down" id="modelDrillDown">
+                        <div class="model-drill-title">
+                            <span>🔍</span>
+                            <span id="drillDownTitle">Model Details</span>
+                        </div>
+                        <div class="model-drill-content" id="drillDownContent"></div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -2897,21 +3800,597 @@
         }
 
         // Update model breakdown
+        // ============================================
+        // PREMIUM MODEL DISTRIBUTION - ENTERPRISE EDITION
+        // ============================================
+
+        let modelChartInstance = null;
+        let currentModelView = 'grid';
+        let modelSearchTerm = '';
+
         function updateModelBreakdown() {
+            updateModelStats();
+            updateModelGrid();
+            updateModelList();
+            updateModelChart();
+            updateQuickFilterBadges();
+        }
+
+        function updateModelStats() {
             const modelCounts = {};
+            const vendorSet = new Set();
+            let totalHA = 0;
+
             deviceData.forEach(device => {
                 modelCounts[device.model] = (modelCounts[device.model] || 0) + 1;
+                if (device.vendor) vendorSet.add(device.vendor);
+                if (device.hasHA) totalHA++;
             });
 
+            const sortedModels = Object.entries(modelCounts).sort((a, b) => b[1] - a[1]);
+            const totalModels = Object.keys(modelCounts).length;
+            const mostCommon = sortedModels.length > 0 ? sortedModels[0][0] : '-';
+            const haCoverage = deviceData.length > 0 ? Math.round((totalHA / deviceData.length) * 100) : 0;
+
+            document.getElementById('totalModels').textContent = totalModels;
+            document.getElementById('mostCommonModel').textContent = mostCommon;
+            document.getElementById('uniqueVendors').textContent = vendorSet.size;
+            document.getElementById('haCoverage').textContent = haCoverage + '%';
+        }
+
+        function updateModelGrid() {
+            const modelCounts = {};
+            const modelVendors = {};
+            const modelHACounts = {};
+
+            deviceData.forEach(device => {
+                modelCounts[device.model] = (modelCounts[device.model] || 0) + 1;
+                modelVendors[device.model] = device.vendor;
+                if (device.hasHA) {
+                    modelHACounts[device.model] = (modelHACounts[device.model] || 0) + 1;
+                }
+            });
+
+            const filteredModels = Object.entries(modelCounts)
+                .filter(([model]) => model.toLowerCase().includes(modelSearchTerm.toLowerCase()))
+                .sort((a, b) => b[1] - a[1]);
+
+            const totalDevices = deviceData.length;
             const modelGrid = document.getElementById('modelGrid');
-            modelGrid.innerHTML = Object.entries(modelCounts)
-                .sort((a, b) => b[1] - a[1])
-                .map(([model, count]) => `
-                    <div class="model-item" onclick="filterData('${model.toLowerCase()}')">
+
+            modelGrid.innerHTML = filteredModels.map(([model, count]) => {
+                const percentage = ((count / totalDevices) * 100).toFixed(1);
+                const vendor = modelVendors[model] || 'Unknown';
+                const haCount = modelHACounts[model] || 0;
+                const haPercentage = (haCount / count) * 100;
+
+                return `
+                    <div class="model-item" onclick="drillDownModel('${model.replace(/'/g, "\\'")}')">
+                        <div class="model-vendor-badge">${vendor}</div>
                         <div class="model-name">${model}</div>
                         <div class="model-count">${count}</div>
+                        <div class="model-percentage">${percentage}%</div>
+                        <div class="model-health-bar" title="HA Coverage: ${haPercentage.toFixed(0)}%">
+                            <div class="model-health-fill" style="width: ${haPercentage}%"></div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function updateModelList() {
+            const modelCounts = {};
+            const modelVendors = {};
+
+            deviceData.forEach(device => {
+                modelCounts[device.model] = (modelCounts[device.model] || 0) + 1;
+                modelVendors[device.model] = device.vendor;
+            });
+
+            const filteredModels = Object.entries(modelCounts)
+                .filter(([model]) => model.toLowerCase().includes(modelSearchTerm.toLowerCase()))
+                .sort((a, b) => b[1] - a[1]);
+
+            const totalDevices = deviceData.length;
+            const maxCount = filteredModels.length > 0 ? filteredModels[0][1] : 1;
+            const modelList = document.getElementById('modelList');
+
+            modelList.innerHTML = filteredModels.map(([model, count]) => {
+                const percentage = ((count / maxCount) * 100).toFixed(1);
+                const vendor = modelVendors[model] || 'Unknown';
+
+                return `
+                    <div class="model-list-item" onclick="drillDownModel('${model.replace(/'/g, "\\'")}')">
+                        <div class="model-list-info">
+                            <div class="model-list-name">${model} <small style="color: #64748b;">(${vendor})</small></div>
+                            <div class="model-list-bar">
+                                <div class="model-list-bar-fill" style="width: ${percentage}%"></div>
+                            </div>
+                        </div>
+                        <div class="model-list-count">${count}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function updateModelChart() {
+            const modelCounts = {};
+            const modelVendors = {};
+
+            deviceData.forEach(device => {
+                modelCounts[device.model] = (modelCounts[device.model] || 0) + 1;
+                modelVendors[device.model] = device.vendor;
+            });
+
+            const sortedModels = Object.entries(modelCounts)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 10); // Top 10 models
+
+            const ctx = document.getElementById('modelDistributionChart');
+            if (!ctx) return;
+
+            const labels = sortedModels.map(([model]) => model);
+            const data = sortedModels.map(([, count]) => count);
+            const colors = [
+                '#6366f1', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981',
+                '#3b82f6', '#ef4444', '#06b6d4', '#8b5cf6', '#f97316'
+            ];
+
+            if (modelChartInstance) {
+                modelChartInstance.destroy();
+            }
+
+            modelChartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: colors,
+                        borderWidth: 3,
+                        borderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: {
+                                padding: 15,
+                                font: {
+                                    size: 13,
+                                    weight: '600'
+                                },
+                                generateLabels: function(chart) {
+                                    const data = chart.data;
+                                    return data.labels.map((label, i) => {
+                                        const value = data.datasets[0].data[i];
+                                        const total = data.datasets[0].data.reduce((a, b) => a + b, 0);
+                                        const percentage = ((value / total) * 100).toFixed(1);
+                                        return {
+                                            text: `${label}: ${value} (${percentage}%)`,
+                                            fillStyle: data.datasets[0].backgroundColor[i],
+                                            hidden: false,
+                                            index: i
+                                        };
+                                    });
+                                }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.label || '';
+                                    const value = context.parsed;
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = ((value / total) * 100).toFixed(1);
+                                    return `${label}: ${value} devices (${percentage}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function switchModelView(view) {
+            currentModelView = view;
+
+            // Update button states
+            document.querySelectorAll('.model-action-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.getElementById(`modelView${view.charAt(0).toUpperCase() + view.slice(1)}`).classList.add('active');
+
+            // Show/hide views
+            document.getElementById('modelGrid').classList.remove('active');
+            document.getElementById('modelChartContainer').classList.remove('active');
+            document.getElementById('modelList').classList.remove('active');
+
+            if (view === 'grid') {
+                document.getElementById('modelGrid').classList.add('active');
+            } else if (view === 'chart') {
+                document.getElementById('modelChartContainer').classList.add('active');
+                updateModelChart();
+            } else if (view === 'list') {
+                document.getElementById('modelList').classList.add('active');
+            }
+        }
+
+        function filterModels() {
+            modelSearchTerm = document.getElementById('modelSearchInput').value;
+            updateModelGrid();
+            updateModelList();
+        }
+
+        function drillDownModel(modelName) {
+            const devices = deviceData.filter(d => d.model === modelName);
+            const drillDown = document.getElementById('modelDrillDown');
+            const drillContent = document.getElementById('drillDownContent');
+            const drillTitle = document.getElementById('drillDownTitle');
+
+            drillTitle.textContent = `${modelName} (${devices.length} devices)`;
+
+            // Group by site
+            const sites = {};
+            devices.forEach(d => {
+                const site = d.siteType || 'Unknown';
+                sites[site] = (sites[site] || 0) + 1;
+            });
+
+            drillContent.innerHTML = Object.entries(sites)
+                .sort((a, b) => b[1] - a[1])
+                .map(([site, count]) => `
+                    <div style="padding: 15px; background: white; border-radius: 8px; text-align: center; border: 2px solid #e2e8f0;">
+                        <div style="font-weight: 700; color: #1e293b; margin-bottom: 5px;">${site}</div>
+                        <div style="font-size: 1.5em; font-weight: 800; color: var(--secondary-color);">${count}</div>
                     </div>
                 `).join('');
+
+            drillDown.classList.add('active');
+            drillDown.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        function exportModelReport() {
+            const modelCounts = {};
+            const modelVendors = {};
+            const modelHACounts = {};
+
+            deviceData.forEach(device => {
+                modelCounts[device.model] = (modelCounts[device.model] || 0) + 1;
+                modelVendors[device.model] = device.vendor;
+                if (device.hasHA) {
+                    modelHACounts[device.model] = (modelHACounts[device.model] || 0) + 1;
+                }
+            });
+
+            let csv = 'Model,Vendor,Total Count,HA Count,HA Percentage\n';
+            Object.entries(modelCounts)
+                .sort((a, b) => b[1] - a[1])
+                .forEach(([model, count]) => {
+                    const vendor = modelVendors[model] || 'Unknown';
+                    const haCount = modelHACounts[model] || 0;
+                    const haPercentage = ((haCount / count) * 100).toFixed(1);
+                    csv += `"${model}","${vendor}",${count},${haCount},${haPercentage}%\n`;
+                });
+
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `model-distribution-${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+            window.URL.revokeObjectURL(url);
+
+            showNotification('📥 Model report exported successfully!');
+        }
+
+        // ============================================
+        // PREMIUM QUICK FILTERS - ENTERPRISE EDITION
+        // ============================================
+
+        let activeQuickFilters = [];
+        let filterLogicMode = 'OR'; // 'AND' or 'OR'
+        let savedFilters = JSON.parse(localStorage.getItem('netassets_saved_filters') || '[]');
+
+        function updateQuickFilterBadges() {
+            const updateBadge = (id, count) => {
+                const badge = document.getElementById(id);
+                if (badge) badge.textContent = count;
+            };
+
+            updateBadge('badge-vpn', deviceData.filter(d => d.deviceRole && d.deviceRole.includes('VPN')).length);
+            updateBadge('badge-firewall', deviceData.filter(d => d.deviceType === 'Firewall').length);
+            updateBadge('badge-pdc-quick', deviceData.filter(d => d.siteType === 'PDC').length);
+            updateBadge('badge-bdc-quick', deviceData.filter(d => d.siteType === 'BDC').length);
+            updateBadge('badge-ha-quick', deviceData.filter(d => d.hasHA).length);
+            updateBadge('badge-fortinet', deviceData.filter(d => d.vendor === 'Fortinet').length);
+            updateBadge('badge-cisco', deviceData.filter(d => d.vendor === 'Cisco').length);
+            updateBadge('badge-paloalto', deviceData.filter(d => d.vendor === 'Palo Alto Networks').length);
+            updateBadge('badge-root', deviceData.filter(d => d.username && d.username.toLowerCase().includes('root')).length);
+            updateBadge('badge-cloud-quick', deviceData.filter(d => d.siteType === 'Cloud').length);
+        }
+
+        function quickFilterEnhanced(keyword, event) {
+            if (event) {
+                const chip = event.currentTarget;
+
+                // Toggle filter
+                if (activeQuickFilters.includes(keyword)) {
+                    activeQuickFilters = activeQuickFilters.filter(f => f !== keyword);
+                    chip.classList.remove('active');
+                } else {
+                    activeQuickFilters.push(keyword);
+                    chip.classList.add('active');
+                }
+
+                // Update filter combination display
+                updateFilterCombinationDisplay();
+
+                // Apply filters
+                applyQuickFilters();
+            }
+        }
+
+        function updateFilterCombinationDisplay() {
+            const combination = document.getElementById('filterCombination');
+            const activeCombination = document.getElementById('activeCombination');
+
+            if (activeQuickFilters.length > 0) {
+                combination.style.display = 'block';
+
+                const logicButton = `<button class="filter-logic-toggle" onclick="toggleFilterLogic()">${filterLogicMode}</button>`;
+                const filterChips = activeQuickFilters.map(f =>
+                    `<span style="padding: 6px 12px; background: var(--success-color); color: white; border-radius: 16px; font-size: 0.85em; font-weight: 600;">${f}</span>`
+                ).join('');
+
+                activeCombination.innerHTML = filterChips + logicButton;
+            } else {
+                combination.style.display = 'none';
+            }
+        }
+
+        function toggleFilterLogic() {
+            filterLogicMode = filterLogicMode === 'AND' ? 'OR' : 'AND';
+            document.getElementById('filterLogic').textContent = filterLogicMode;
+            applyQuickFilters();
+        }
+
+        function applyQuickFilters() {
+            if (activeQuickFilters.length === 0) {
+                applyFilters();
+                return;
+            }
+
+            filteredData = deviceData.filter(device => {
+                const matches = activeQuickFilters.map(keyword => {
+                    const lowerKeyword = keyword.toLowerCase();
+                    return (
+                        (device.deviceRole && device.deviceRole.toLowerCase().includes(lowerKeyword)) ||
+                        (device.deviceType && device.deviceType.toLowerCase().includes(lowerKeyword)) ||
+                        (device.siteType && device.siteType.toLowerCase().includes(lowerKeyword)) ||
+                        (device.vendor && device.vendor.toLowerCase().includes(lowerKeyword)) ||
+                        (device.username && device.username.toLowerCase().includes(lowerKeyword)) ||
+                        (lowerKeyword === 'ha' && device.hasHA) ||
+                        (device.region && device.region.toLowerCase().includes(lowerKeyword))
+                    );
+                });
+
+                if (filterLogicMode === 'AND') {
+                    return matches.every(m => m);
+                } else {
+                    return matches.some(m => m);
+                }
+            });
+
+            updateStats();
+            renderTable();
+        }
+
+        function clearAllFilters() {
+            activeQuickFilters = [];
+            document.querySelectorAll('.chip').forEach(chip => chip.classList.remove('active'));
+            document.getElementById('filterCombination').style.display = 'none';
+            document.getElementById('searchInput').value = '';
+
+            // Reset all filter buttons
+            selectedRegion = 'all';
+            selectedVendor = 'all';
+            selectedDeviceType = 'all';
+            selectedSiteType = 'all';
+            selectedDeviceRole = 'all';
+            selectedConfig = 'all';
+
+            // Update UI
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.filter-btn[onclick*="\'all\'"]').forEach(btn => btn.classList.add('active'));
+
+            applyFilters();
+            showNotification('🔄 All filters cleared');
+        }
+
+        function switchFilterTab(tabName) {
+            // Update tab buttons
+            document.querySelectorAll('.filter-tab').forEach(tab => tab.classList.remove('active'));
+            event.target.classList.add('active');
+
+            // Update tab content
+            document.querySelectorAll('.filter-tab-content').forEach(content => content.classList.remove('active'));
+            document.getElementById(`${tabName}FilterTab`).classList.add('active');
+
+            // Load saved filters if switching to saved tab
+            if (tabName === 'saved') {
+                renderSavedFilters();
+            }
+        }
+
+        function saveCurrentFilter() {
+            if (activeQuickFilters.length === 0) {
+                showNotification('⚠️ No filters to save. Please select at least one filter.');
+                return;
+            }
+
+            const filterName = prompt('Enter a name for this filter:');
+            if (!filterName) return;
+
+            const filter = {
+                name: filterName,
+                filters: [...activeQuickFilters],
+                logic: filterLogicMode,
+                created: new Date().toISOString(),
+                count: filteredData.length
+            };
+
+            savedFilters.push(filter);
+            localStorage.setItem('netassets_saved_filters', JSON.stringify(savedFilters));
+
+            showNotification(`💾 Filter "${filterName}" saved successfully!`);
+        }
+
+        function renderSavedFilters() {
+            const list = document.getElementById('savedFiltersList');
+
+            if (savedFilters.length === 0) {
+                list.innerHTML = '<p style="text-align: center; color: #64748b; padding: 20px;">No saved filters yet. Apply filters and click "Save Filter" to get started.</p>';
+                return;
+            }
+
+            list.innerHTML = savedFilters.map((filter, index) => `
+                <div class="saved-filter-item">
+                    <div>
+                        <div class="saved-filter-name">${filter.name}</div>
+                        <div class="saved-filter-meta">
+                            ${filter.filters.join(` ${filter.logic} `)} • ${new Date(filter.created).toLocaleDateString()}
+                        </div>
+                    </div>
+                    <div class="saved-filter-actions">
+                        <button class="saved-filter-btn apply" onclick="applySavedFilter(${index})">Apply</button>
+                        <button class="saved-filter-btn delete" onclick="deleteSavedFilter(${index})">Delete</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function applySavedFilter(index) {
+            const filter = savedFilters[index];
+
+            // Clear current filters
+            activeQuickFilters = [];
+            document.querySelectorAll('.chip').forEach(chip => chip.classList.remove('active'));
+
+            // Apply saved filter
+            filterLogicMode = filter.logic;
+            activeQuickFilters = [...filter.filters];
+
+            // Update UI
+            activeQuickFilters.forEach(keyword => {
+                const chip = Array.from(document.querySelectorAll('.chip')).find(c =>
+                    c.textContent.toLowerCase().includes(keyword.toLowerCase())
+                );
+                if (chip) chip.classList.add('active');
+            });
+
+            updateFilterCombinationDisplay();
+            applyQuickFilters();
+
+            // Switch to quick tab
+            document.querySelectorAll('.filter-tab')[0].click();
+
+            showNotification(`✅ Filter "${filter.name}" applied`);
+        }
+
+        function deleteSavedFilter(index) {
+            const filter = savedFilters[index];
+            if (confirm(`Delete filter "${filter.name}"?`)) {
+                savedFilters.splice(index, 1);
+                localStorage.setItem('netassets_saved_filters', JSON.stringify(savedFilters));
+                renderSavedFilters();
+                showNotification(`🗑️ Filter "${filter.name}" deleted`);
+            }
+        }
+
+        function applyFilterTemplate(templateName) {
+            // Clear current filters
+            clearAllFilters();
+
+            let filters = [];
+
+            switch (templateName) {
+                case 'security-audit':
+                    filters = ['Firewall', 'VPN'];
+                    break;
+                case 'ha-review':
+                    filters = ['HA'];
+                    break;
+                case 'vendor-fortinet':
+                    filters = ['Fortinet'];
+                    break;
+                case 'critical-sites':
+                    filters = ['PDC', 'BDC'];
+                    filterLogicMode = 'OR';
+                    break;
+                case 'standalone-risk':
+                    // This would need more complex logic
+                    alert('Advanced template - filter for non-HA devices at critical sites');
+                    return;
+                case 'cloud-infrastructure':
+                    filters = ['Cloud'];
+                    break;
+            }
+
+            // Apply template filters
+            filters.forEach(keyword => {
+                const chip = Array.from(document.querySelectorAll('.chip')).find(c =>
+                    c.textContent.toLowerCase().includes(keyword.toLowerCase())
+                );
+                if (chip) {
+                    chip.classList.add('active');
+                    activeQuickFilters.push(keyword);
+                }
+            });
+
+            updateFilterCombinationDisplay();
+            applyQuickFilters();
+
+            // Switch to quick tab
+            document.querySelectorAll('.filter-tab')[0].click();
+
+            showNotification(`📋 Template "${templateName}" applied`);
+        }
+
+        function exportFilteredData() {
+            if (filteredData.length === 0) {
+                showNotification('⚠️ No data to export');
+                return;
+            }
+
+            let csv = 'Location,Device Name,Vendor,Type,Model,Site,Role,Primary SN,HA Status,HA SN 1,HA SN 2\n';
+
+            filteredData.forEach(device => {
+                csv += `"${device.fullLocation || device.region}",`;
+                csv += `"${device.deviceName}",`;
+                csv += `"${device.vendor}",`;
+                csv += `"${device.deviceType}",`;
+                csv += `"${device.model}",`;
+                csv += `"${device.siteType}",`;
+                csv += `"${device.deviceRole}",`;
+                csv += `"${device.sn}",`;
+                csv += `"${device.hasHA ? 'Yes' : 'No'}",`;
+                csv += `"${device.sn_ha1 || ''}",`;
+                csv += `"${device.sn_ha2 || ''}"\n`;
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `filtered-devices-${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+            window.URL.revokeObjectURL(url);
+
+            showNotification(`📥 Exported ${filteredData.length} devices`);
         }
 
         // Get badge class for model

@@ -386,5 +386,5 @@ For issues or questions:
 
 ---
 
-**Author:** Miguel Jimenez - Miguel@netsudo.com
-**Application:** NetAssets - Network Device Inventory Dashboard
+**Author:** Miguel Jimenez
+**Application:** NetAssets v2.0 - Network Device Inventory Dashboard

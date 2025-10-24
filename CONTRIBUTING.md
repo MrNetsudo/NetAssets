@@ -115,8 +115,8 @@ Some areas where contributions would be especially valuable:
 ## Questions?
 
 Feel free to reach out:
-- **Email**: Miguel@netsudo.com
-- **Issues**: Open a GitHub issue with the "question" label
+- **GitHub Issues**: Open an issue with the "question" label
+- **Pull Requests**: Contributions and improvements welcome
 
 ## License
 

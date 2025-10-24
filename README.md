@@ -83,8 +83,8 @@ Intelligent detection and management for:
 
 1. **Clone the repository:**
 ```bash
-git clone https://github.com/MrNetsudo/Network-Assets-Inventory.git
-cd Network-Assets-Inventory
+git clone https://github.com/MrNetsudo/NetAssets.git
+cd NetAssets
 ```
 
 2. **Deploy to web server:**

@@ -1,9 +1,9 @@
 ═══════════════════════════════════════════════════════════════
-  NETASSETS - NETWORK DEVICE INVENTORY
+  NETASSETS v2.0 - NETWORK DEVICE INVENTORY
   QUICK DEPLOYMENT GUIDE
 
-  Author: Miguel Jimenez (Miguel@netsudo.com)
-  Website: https://netsudo.com
+  Author: Miguel Jimenez
+  GitHub: https://github.com/MrNetsudo/NetAssets
 ═══════════════════════════════════════════════════════════════
 
 DEPLOY TO: Your web server (e.g., https://netassets.yourcompany.com)
@@ -20,7 +20,7 @@ DEPLOY TO: Your web server (e.g., https://netassets.yourcompany.com)
 🚀 FASTEST DEPLOYMENT METHOD:
 
 1. Clone or download from GitHub:
-   git clone https://github.com/MrNetsudo/Network-Assets-Inventory.git
+   git clone https://github.com/MrNetsudo/NetAssets.git
 
 2. Upload to your web server:
 
@@ -135,6 +135,6 @@ Problem: Charts not showing
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 Need help? Check README.md for detailed instructions!
-GitHub: https://github.com/MrNetsudo/Network-Assets-Inventory
+GitHub: https://github.com/MrNetsudo/NetAssets
 
 ═══════════════════════════════════════════════════════════════

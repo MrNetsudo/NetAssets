@@ -6,10 +6,10 @@ Complete guide for updating NetAssets on your Ubuntu web server from GitHub.
 
 ```bash
 # Copy script to server
-scp update-netassets.sh user@netassets.gtk.gtech.com:/tmp/
+scp update-netassets.sh user@your-server.com:/tmp/
 
 # SSH to server
-ssh user@netassets.gtk.gtech.com
+ssh user@your-server.com
 
 # Run update
 sudo /tmp/update-netassets.sh
@@ -29,7 +29,8 @@ Edit the configuration section in `update-netassets.sh`:
 
 ```bash
 # Web server document root where NetAssets is deployed
-WEB_ROOT="/var/www/netassets.gtk.gtech.com/html"
+# Example: /var/www/netassets.example.com/html or /var/www/html/netassets
+WEB_ROOT="/var/www/netassets/html"
 
 # GitHub repository URL
 GITHUB_REPO="https://github.com/MrNetsudo/NetAssets.git"
@@ -114,10 +115,10 @@ Automatically sets:
 ### Option 1: Manual Placement
 ```bash
 # Copy script to server
-scp update-netassets.sh user@netassets.gtk.gtech.com:/usr/local/bin/
+scp update-netassets.sh user@your-server.com:/usr/local/bin/
 
 # SSH to server
-ssh user@netassets.gtk.gtech.com
+ssh user@your-server.com
 
 # Make executable
 sudo chmod +x /usr/local/bin/update-netassets.sh
@@ -238,10 +239,10 @@ cat /var/backups/netassets/latest-backup.txt
 ### Test After Update
 ```bash
 # Check if application loads
-curl -I https://netassets.gtk.gtech.com
+curl -I https://your-netassets-domain.com
 
 # View deployed version
-curl -s https://netassets.gtk.gtech.com | grep 'meta name="version"'
+curl -s https://your-netassets-domain.com | grep 'meta name="version"'
 ```
 
 ## Rollback Procedure
@@ -358,7 +359,7 @@ sudo chmod 750 /usr/local/bin/update-netassets.sh
 sudo apt install -y gpg
 
 # Create encrypted backup
-tar -czf - /var/www/netassets.gtk.gtech.com | \
+tar -czf - /var/www/netassets | \
   gpg --symmetric --cipher-algo AES256 -o \
   /var/backups/netassets/backup-$(date +%Y%m%d).tar.gz.gpg
 ```
@@ -371,15 +372,16 @@ tar -czf - /var/www/netassets.gtk.gtech.com | \
 sudo apt install -y mailutils
 
 # Add to script or create wrapper
-echo "NetAssets updated successfully" | mail -s "NetAssets Update" admin@gtk.gtech.com
+echo "NetAssets updated successfully" | mail -s "NetAssets Update" admin@example.com
 ```
 
 **Slack Notification:**
 ```bash
-# Add webhook to script
+# Add webhook to script (configure your webhook URL)
+SLACK_WEBHOOK="https://hooks.slack.com/services/YOUR/WEBHOOK/URL"
 curl -X POST -H 'Content-type: application/json' \
   --data '{"text":"NetAssets v2.0 updated successfully"}' \
-  YOUR_SLACK_WEBHOOK_URL
+  "$SLACK_WEBHOOK"
 ```
 
 ## Version History
@@ -387,7 +389,7 @@ curl -X POST -H 'Content-type: application/json' \
 Check deployed version:
 ```bash
 # On server
-grep 'meta name="version"' /var/www/netassets.gtk.gtech.com/html/index.html
+grep 'meta name="version"' /var/www/netassets/html/index.html
 ```
 
 ## Support

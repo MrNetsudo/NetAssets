@@ -13,7 +13,8 @@ set -e  # Exit on error
 # ──────────────────────────────────────────────────────────────
 
 # Web server document root where NetAssets is deployed
-WEB_ROOT="/var/www/netassets.gtk.gtech.com/html"
+# Example: /var/www/netassets.example.com/html or /var/www/html/netassets
+WEB_ROOT="/var/www/netassets/html"
 
 # GitHub repository URL
 GITHUB_REPO="https://github.com/MrNetsudo/NetAssets.git"
@@ -303,7 +304,7 @@ print_summary() {
     echo "  Backup Location: $BACKUP_DIR"
     echo "  Log File: $LOG_FILE"
     echo ""
-    echo "  Application URL: https://netassets.gtk.gtech.com"
+    echo "  Visit your NetAssets dashboard in your web browser"
     echo ""
     echo "═══════════════════════════════════════════════════════════════"
     echo ""

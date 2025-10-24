@@ -6595,22 +6595,38 @@
         function openImportModal(fileType) {
             importFileType = fileType;
             const modal = document.getElementById('importModal');
+            if (!modal) {
+                console.error('importModal element not found');
+                return;
+            }
             modal.classList.add('show');
-            document.getElementById('importDropdown').classList.remove('show');
+
+            const dropdown = document.getElementById('importDropdown');
+            if (dropdown) dropdown.classList.remove('show');
 
             // Reset modal state
-            document.getElementById('fileInput').value = '';
-            document.getElementById('importOptionsSection').style.display = 'none';
-            document.getElementById('importPreviewSection').style.display = 'none';
-            document.getElementById('importError').style.display = 'none';
-            document.getElementById('confirmImportBtn').disabled = true;
+            const fileInput = document.getElementById('fileInput');
+            if (fileInput) fileInput.value = '';
+
+            const optionsSection = document.getElementById('importOptionsSection');
+            if (optionsSection) optionsSection.style.display = 'none';
+
+            const previewSection = document.getElementById('importPreviewSection');
+            if (previewSection) previewSection.style.display = 'none';
+
+            const errorSection = document.getElementById('importError');
+            if (errorSection) errorSection.style.display = 'none';
+
+            const confirmBtn = document.getElementById('confirmImportBtn');
+            if (confirmBtn) confirmBtn.disabled = true;
+
             importData = [];
         }
 
         // Close import modal
         function closeImportModal() {
             const modal = document.getElementById('importModal');
-            modal.classList.remove('show');
+            if (modal) modal.classList.remove('show');
         }
 
         // Handle file selection
@@ -6646,8 +6662,12 @@
                     }
 
                     showImportPreview(importData);
-                    document.getElementById('importOptionsSection').style.display = 'block';
-                    document.getElementById('confirmImportBtn').disabled = false;
+
+                    const optionsSection = document.getElementById('importOptionsSection');
+                    if (optionsSection) optionsSection.style.display = 'block';
+
+                    const confirmBtn = document.getElementById('confirmImportBtn');
+                    if (confirmBtn) confirmBtn.disabled = false;
 
                 } catch (error) {
                     showImportError('Error reading file: ' + error.message);
@@ -6890,7 +6910,13 @@
                 `;
             }
 
-            document.getElementById('importStats').innerHTML = infoHtml;
+            // Safely update import stats
+            const importStatsEl = document.getElementById('importStats');
+            if (importStatsEl) {
+                importStatsEl.innerHTML = infoHtml;
+            } else {
+                console.error('importStats element not found');
+            }
 
             // Show preview table (first 10 rows)
             const previewData = data.slice(0, 10);
@@ -6911,7 +6937,7 @@
                                 <td>${device.region || '-'}</td>
                                 <td>${escapeHtml(device.deviceName)}</td>
                                 <td>${device.model || '-'}</td>
-                                <td>${device.sn}</td>
+                                <td>${device.sn || '-'}</td>
                                 <td>${device.hasHA ? '✅ HA' : '⚠️ Standalone'}</td>
                             </tr>
                         `).join('')}
@@ -6919,20 +6945,43 @@
                 </table>
                 ${data.length > 10 ? `<p style="text-align: center; margin-top: 10px; color: #666;">Showing 10 of ${data.length} devices</p>` : ''}
             `;
-            document.getElementById('importPreview').innerHTML = tableHtml;
-            document.getElementById('importPreviewSection').style.display = 'block';
-            document.getElementById('importError').style.display = 'none';
+
+            // Safely update import preview
+            const importPreviewEl = document.getElementById('importPreview');
+            if (importPreviewEl) {
+                importPreviewEl.innerHTML = tableHtml;
+            } else {
+                console.error('importPreview element not found');
+            }
+
+            // Safely update display states
+            const previewSection = document.getElementById('importPreviewSection');
+            if (previewSection) previewSection.style.display = 'block';
+
+            const errorSection = document.getElementById('importError');
+            if (errorSection) errorSection.style.display = 'none';
         }
 
         // Show import error
         function showImportError(message) {
             const errorDiv = document.getElementById('importError');
-            errorDiv.className = 'import-error';
-            errorDiv.innerHTML = `<strong>Error:</strong> ${message}`;
-            errorDiv.style.display = 'block';
-            document.getElementById('importPreviewSection').style.display = 'none';
-            document.getElementById('importOptionsSection').style.display = 'none';
-            document.getElementById('confirmImportBtn').disabled = true;
+            if (errorDiv) {
+                errorDiv.className = 'import-error';
+                errorDiv.innerHTML = `<strong>Error:</strong> ${message}`;
+                errorDiv.style.display = 'block';
+            } else {
+                console.error('importError element not found');
+                console.error('Import error:', message);
+            }
+
+            const previewSection = document.getElementById('importPreviewSection');
+            if (previewSection) previewSection.style.display = 'none';
+
+            const optionsSection = document.getElementById('importOptionsSection');
+            if (optionsSection) optionsSection.style.display = 'none';
+
+            const confirmBtn = document.getElementById('confirmImportBtn');
+            if (confirmBtn) confirmBtn.disabled = true;
         }
 
         // Select import option
@@ -6953,6 +7002,11 @@
 
             // Show loading indicator
             const confirmBtn = document.getElementById('confirmImportBtn');
+            if (!confirmBtn) {
+                console.error('confirmImportBtn element not found');
+                return;
+            }
+
             const originalBtnText = confirmBtn.textContent;
             confirmBtn.disabled = true;
             confirmBtn.textContent = '⏳ Processing...';

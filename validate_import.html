@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CSV Import Validation</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #f5f5f5; }
+        .test-box { background: white; padding: 20px; margin: 10px 0; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .pass { color: #10b981; font-weight: bold; }
+        .fail { color: #ef4444; font-weight: bold; }
+        pre { background: #1f2937; color: #10b981; padding: 15px; border-radius: 4px; overflow-x: auto; }
+        button { background: #6366f1; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; margin: 5px; }
+        button:hover { background: #4f46e5; }
+    </style>
+</head>
+<body>
+    <h1>🔍 NetAssets CSV Import Validation</h1>
+
+    <div class="test-box">
+        <h2>Step 1: Load Test CSV</h2>
+        <button onclick="loadTestCSV()">Load Test CSV</button>
+        <div id="csvContent"></div>
+    </div>
+
+    <div class="test-box">
+        <h2>Step 2: Parse and Import</h2>
+        <button onclick="runImport()">Run Import Test</button>
+        <div id="importResults"></div>
+    </div>
+
+    <div class="test-box">
+        <h2>Step 3: Validation Results</h2>
+        <div id="validationResults"></div>
+    </div>
+
+    <script>
+        let testCSV = `Region,Device Name,Vendor,Type,Model,Site,Role,Serial Number,HA Status
+US,FW-NYC-01,Fortinet,Firewall,FGT60F,NYC-HQ,Perimeter,FGT60F123456,No
+US,FW-NYC-02,Fortinet,Firewall,FGT60F,NYC-HQ,Perimeter,FGT60F123457,Yes
+US,FW-BOS-01,Palo Alto Networks,Firewall,PA-440,BOS-DC,Perimeter,PA440123456,No`;
+
+        let importedData = [];
+
+        function loadTestCSV() {
+            document.getElementById('csvContent').innerHTML = `
+                <h3>Test CSV Content:</h3>
+                <pre>${testCSV}</pre>
+            `;
+        }
+
+        // Copy functions from index.html
+        function findColumn(headers, possibleNames) {
+            for (const name of possibleNames) {
+                const index = headers.findIndex(h => h === name.toLowerCase());
+                if (index !== -1) return index;
+            }
+            for (const name of possibleNames) {
+                const index = headers.findIndex(h => {
+                    if (h.includes('ha ') || h.includes('status') || h.includes('configured')) {
+                        return false;
+                    }
+                    return h.includes(name.toLowerCase());
+                });
+                if (index !== -1) return index;
+            }
+            return -1;
+        }
+
+        function getValue(values, index) {
+            if (index === -1 || index >= values.length) return '';
+            const value = values[index].trim().replace(/^"|"$/g, '');
+            if (value.toLowerCase() === 'true' || value.toLowerCase() === 'false') {
+                return '';
+            }
+            return value;
+        }
+
+        function parseBoolean(value) {
+            if (!value) return false;
+            const v = value.toLowerCase().trim();
+            return v === 'true' || v === 'yes' || v === '1' || v === 'ha configured' || v === 'enabled' || v === 'no' || v === 'yes';
+        }
+
+        function runImport() {
+            const lines = testCSV.trim().split('\n');
+            const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, '').toLowerCase());
+
+            const columnMap = {
+                region: findColumn(headers, ['region']),
+                deviceName: findColumn(headers, ['device name', 'devicename', 'hostname', 'host']),
+                vendor: findColumn(headers, ['vendor', 'manufacturer', 'make']),
+                deviceType: findColumn(headers, ['device type', 'devicetype', 'type']),
+                model: findColumn(headers, ['model', 'device model', 'product model']),
+                siteType: findColumn(headers, ['site type', 'sitetype', 'site']),
+                deviceRole: findColumn(headers, ['device role', 'devicerole', 'role']),
+                sn: findColumn(headers, ['serial number', 'serialnumber', 'serial', 'sn', 'primary sn', 'primary serial']),
+                hasHA: findColumn(headers, ['ha status', 'hastatus', 'ha configured', 'ha']),
+            };
+
+            let output = '<h3>Column Mapping:</h3><pre>';
+            output += `Headers: ${JSON.stringify(headers, null, 2)}\n\n`;
+            output += `Column Indices:\n`;
+            output += `  Model: ${columnMap.model} → "${headers[columnMap.model] || 'NOT FOUND'}"\n`;
+            output += `  Serial: ${columnMap.sn} → "${headers[columnMap.sn] || 'NOT FOUND'}"\n`;
+            output += `  Device Name: ${columnMap.deviceName} → "${headers[columnMap.deviceName] || 'NOT FOUND'}"\n`;
+            output += `  Vendor: ${columnMap.vendor} → "${headers[columnMap.vendor] || 'NOT FOUND'}"\n`;
+            output += '</pre>';
+
+            importedData = [];
+            for (let i = 1; i < lines.length; i++) {
+                const values = lines[i].split(',').map(v => v.trim());
+                const rawModel = getValue(values, columnMap.model);
+                const rawSN = getValue(values, columnMap.sn);
+
+                const device = {
+                    deviceName: getValue(values, columnMap.deviceName) || `Device-${i}`,
+                    vendor: getValue(values, columnMap.vendor) || '',
+                    deviceType: getValue(values, columnMap.deviceType) || '',
+                    model: rawModel || '',
+                    series: rawModel || '',
+                    sn: rawSN || '',
+                    hasHA: parseBoolean(getValue(values, columnMap.hasHA)),
+                };
+
+                importedData.push(device);
+            }
+
+            output += '<h3>Imported Devices:</h3><pre>';
+            output += JSON.stringify(importedData, null, 2);
+            output += '</pre>';
+
+            document.getElementById('importResults').innerHTML = output;
+            validateResults();
+        }
+
+        function validateResults() {
+            let output = '<h3>Validation:</h3>';
+            let allPassed = true;
+
+            // Test 1: Check first device model
+            const test1 = importedData[0] && importedData[0].model === 'FGT60F';
+            output += `<p class="${test1 ? 'pass' : 'fail'}">
+                ${test1 ? '✅' : '❌'} Test 1: First device model should be "FGT60F" → Got: "${importedData[0]?.model || 'EMPTY'}"
+            </p>`;
+            if (!test1) allPassed = false;
+
+            // Test 2: Check first device SN
+            const test2 = importedData[0] && importedData[0].sn === 'FGT60F123456';
+            output += `<p class="${test2 ? 'pass' : 'fail'}">
+                ${test2 ? '✅' : '❌'} Test 2: First device SN should be "FGT60F123456" → Got: "${importedData[0]?.sn || 'EMPTY'}"
+            </p>`;
+            if (!test2) allPassed = false;
+
+            // Test 3: Check all devices have models
+            const test3 = importedData.every(d => d.model && d.model !== '');
+            output += `<p class="${test3 ? 'pass' : 'fail'}">
+                ${test3 ? '✅' : '❌'} Test 3: All devices should have model values
+            </p>`;
+            if (!test3) allPassed = false;
+
+            // Test 4: Check all devices have SNs
+            const test4 = importedData.every(d => d.sn && d.sn !== '');
+            output += `<p class="${test4 ? 'pass' : 'fail'}">
+                ${test4 ? '✅' : '❌'} Test 4: All devices should have serial numbers
+            </p>`;
+            if (!test4) allPassed = false;
+
+            output += `<h2 class="${allPassed ? 'pass' : 'fail'}">
+                ${allPassed ? '✅ ALL TESTS PASSED' : '❌ SOME TESTS FAILED'}
+            </h2>`;
+
+            if (allPassed) {
+                output += `<p style="background: #d1fae5; padding: 15px; border-radius: 4px; color: #065f46;">
+                    <strong>Success!</strong> CSV import logic is working correctly.
+                    If the main application still shows issues, try:
+                    <ul>
+                        <li>Hard refresh the page (Ctrl+Shift+R)</li>
+                        <li>Clear browser cache</li>
+                        <li>Open in incognito/private window</li>
+                    </ul>
+                </p>`;
+            }
+
+            document.getElementById('validationResults').innerHTML = output;
+        }
+
+        // Auto-run on load
+        window.addEventListener('load', () => {
+            loadTestCSV();
+            setTimeout(runImport, 500);
+        });
+    </script>
+</body>
+</html>

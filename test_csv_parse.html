@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CSV Parse Test</title>
+</head>
+<body>
+    <h1>CSV Parse Test</h1>
+    <pre id="output"></pre>
+
+    <script>
+        // Copy of the actual functions from index.html
+        function findColumn(headers, possibleNames) {
+            // First pass: exact matches only
+            for (const name of possibleNames) {
+                const index = headers.findIndex(h => h === name.toLowerCase());
+                if (index !== -1) return index;
+            }
+            // Second pass: partial matches (contains) - but avoid matching HA-related columns for non-HA fields
+            for (const name of possibleNames) {
+                const index = headers.findIndex(h => {
+                    // Avoid matching boolean/HA columns for text fields
+                    if (h.includes('ha ') || h.includes('status') || h.includes('configured')) {
+                        return false;
+                    }
+                    return h.includes(name.toLowerCase());
+                });
+                if (index !== -1) return index;
+            }
+            return -1;
+        }
+
+        function getValue(values, index) {
+            if (index === -1 || index >= values.length) return '';
+            const value = values[index].trim().replace(/^"|"$/g, '');
+            // Filter out boolean-like values that shouldn't be in text fields
+            if (value.toLowerCase() === 'true' || value.toLowerCase() === 'false') {
+                return '';
+            }
+            return value;
+        }
+
+        // Test with actual CSV data
+        const csvContent = `Region,Device Name,Vendor,Type,Model,Site,Role,Serial Number,HA Status
+US,FW-NYC-01,Fortinet,Firewall,FGT60F,NYC-HQ,Perimeter,FGT60F123456,No
+US,FW-NYC-02,Fortinet,Firewall,FGT60F,NYC-HQ,Perimeter,FGT60F123457,Yes`;
+
+        const lines = csvContent.trim().split('\n');
+        const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, '').toLowerCase());
+
+        const columnMap = {
+            region: findColumn(headers, ['region']),
+            deviceName: findColumn(headers, ['device name', 'devicename', 'hostname', 'host']),
+            vendor: findColumn(headers, ['vendor', 'manufacturer', 'make']),
+            deviceType: findColumn(headers, ['device type', 'devicetype', 'type']),
+            model: findColumn(headers, ['model', 'device model', 'product model']),
+            siteType: findColumn(headers, ['site type', 'sitetype', 'site']),
+            deviceRole: findColumn(headers, ['device role', 'devicerole', 'role']),
+            sn: findColumn(headers, ['serial number', 'serialnumber', 'serial', 'sn', 'primary sn', 'primary serial']),
+            hasHA: findColumn(headers, ['ha status', 'hastatus', 'ha configured', 'ha']),
+        };
+
+        let output = '=== CSV HEADERS ===\n';
+        output += JSON.stringify(headers, null, 2) + '\n\n';
+
+        output += '=== COLUMN MAPPING ===\n';
+        output += JSON.stringify(columnMap, null, 2) + '\n\n';
+
+        output += '=== HEADER DETAILS ===\n';
+        output += `Model column index: ${columnMap.model}\n`;
+        output += `Model header: ${columnMap.model !== -1 ? headers[columnMap.model] : 'NOT FOUND'}\n`;
+        output += `SN column index: ${columnMap.sn}\n`;
+        output += `SN header: ${columnMap.sn !== -1 ? headers[columnMap.sn] : 'NOT FOUND'}\n\n`;
+
+        // Parse first data row
+        const values = lines[1].split(',').map(v => v.trim());
+
+        output += '=== FIRST ROW VALUES ===\n';
+        output += JSON.stringify(values, null, 2) + '\n\n';
+
+        const rawModel = getValue(values, columnMap.model);
+        const rawSN = getValue(values, columnMap.sn);
+
+        output += '=== EXTRACTED VALUES ===\n';
+        output += `Raw Model: "${rawModel}"\n`;
+        output += `Raw SN: "${rawSN}"\n`;
+
+        const device = {
+            deviceName: getValue(values, columnMap.deviceName) || 'Unknown',
+            vendor: getValue(values, columnMap.vendor) || '',
+            deviceType: getValue(values, columnMap.deviceType) || '',
+            model: rawModel || '',
+            sn: rawSN || '',
+        };
+
+        output += '\n=== FINAL DEVICE OBJECT ===\n';
+        output += JSON.stringify(device, null, 2);
+
+        document.getElementById('output').textContent = output;
+    </script>
+</body>
+</html>

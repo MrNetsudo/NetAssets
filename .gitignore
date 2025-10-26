@@ -12,18 +12,56 @@ Thumbs.db
 *.swo
 *~
 
-# Sensitive data - DO NOT COMMIT
+# ========================================
+# ZERO TOLERANCE - SENSITIVE DATA
+# Privacy is Key - Never Commit Real Data
+# ========================================
+
+# Device data and exports
 device_data_combined.js
 Chassis/
 *.csv
 *.xlsx
+*.xls
 *.json
 data/
+exports/
+imports/
 backups/
 
-# Environment and config files
+# Environment and credentials
 .env
+.env.*
 .env.local
+.env.production
 *.key
 *.pem
+*.cert
 credentials.*
+secrets.*
+config.local.*
+
+# API tokens and passwords
+*token*
+*password*
+*secret*
+*api_key*
+
+# Logs and debug files
+logs/
+*.log
+debug.log
+error.log
+npm-debug.log*
+
+# Temporary and cache files
+tmp/
+temp/
+cache/
+*.tmp
+*.cache
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3

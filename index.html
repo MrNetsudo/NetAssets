@@ -4768,6 +4768,11 @@
                         <div class="export-option-name">Markdown</div>
                         <div class="export-option-desc">Documentation format</div>
                     </div>
+                    <div class="export-option-card" onclick="selectExportFormat('asset-inventory')">
+                        <div class="export-option-icon">📋</div>
+                        <div class="export-option-name">Asset Inventory</div>
+                        <div class="export-option-desc">Editable Excel with core fields</div>
+                    </div>
                     <div class="export-option-card" onclick="selectExportFormat('powerpoint')">
                         <div class="export-option-badge">COMING SOON</div>
                         <div class="export-option-icon">📺</div>
@@ -9246,7 +9251,14 @@
             window.URL.revokeObjectURL(url);
 
             showNotification(`✅ Exported ${filteredData.length} devices to Editable Excel Format`, 'success');
-            document.getElementById('exportDropdown').classList.remove('show');
+
+            // Close both dropdown and modal if they exist
+            if (document.getElementById('exportDropdown')) {
+                document.getElementById('exportDropdown').classList.remove('show');
+            }
+            if (document.getElementById('exportModal')) {
+                document.getElementById('exportModal').style.display = 'none';
+            }
         }
 
         // Export Technical Assessment Report - Premium Detailed Analysis
@@ -9745,6 +9757,18 @@
                     });
                     break;
 
+                case 'asset-inventory':
+                    previewContent = 'ASSET INVENTORY EXCEL EXPORT PREVIEW\n';
+                    previewContent += '━━━━━━━━━━━━━━━━━━━━━━━━\n';
+                    previewContent += 'Format: Editable Excel (.xls)\n';
+                    previewContent += `Devices: ${dataToPreview.length}\n\n`;
+                    previewContent += 'Columns: # | Region | Device Name | Vendor | Type | Model | Site | Role | Serial Number\n\n';
+                    previewContent += 'Sample Data:\n';
+                    dataToPreview.slice(0, 3).forEach((d, i) => {
+                        previewContent += `${i+1}. ${d.region || 'N/A'} | ${d.deviceName} | ${d.vendor || 'Unknown'} | ${d.deviceType || 'Unknown'} | ${d.model || 'N/A'}\n`;
+                    });
+                    break;
+
                 default:
                     previewContent = 'Select a format to see preview...';
             }
@@ -9800,6 +9824,9 @@
                         break;
                     case 'markdown':
                         exportToMarkdown();
+                        break;
+                    case 'asset-inventory':
+                        exportInfrastructureAssetExcel();
                         break;
                     case 'pdf':
                         // Generate premium PDF report

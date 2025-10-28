@@ -4284,6 +4284,13 @@
                                     <div class="export-option-desc">Professional corporate format</div>
                                 </div>
                             </div>
+                            <div class="export-option" onclick="exportInfrastructureAssetExcel()">
+                                <div class="export-option-icon">📋</div>
+                                <div class="export-option-text">
+                                    <div class="export-option-title">Excel - Asset Inventory</div>
+                                    <div class="export-option-desc">Editable asset list with core fields</div>
+                                </div>
+                            </div>
                             <div class="export-option" onclick="exportTechnicalAssessment()">
                                 <div class="export-option-icon">🎯</div>
                                 <div class="export-option-text">
@@ -9104,6 +9111,141 @@
             window.URL.revokeObjectURL(url);
 
             showNotification(`✅ Exported ${filteredData.length} devices to Executive Report`);
+            document.getElementById('exportDropdown').classList.remove('show');
+        }
+
+        // Export Network Infrastructure Asset Report - Editable Excel Format
+        function exportInfrastructureAssetExcel() {
+            // Validate data first
+            if (!filteredData || filteredData.length === 0) {
+                showNotification('⚠️ No data available for export', 'error');
+                return;
+            }
+
+            const now = new Date();
+            const timestamp = now.toLocaleString();
+            const date = now.toISOString().split('T')[0];
+
+            // Generate editable Excel-compatible HTML
+            let html = `
+<html xmlns:o="urn:schemas-microsoft-com:office:office"
+      xmlns:x="urn:schemas-microsoft-com:office:excel"
+      xmlns="http://www.w3.org/TR/REC-html40">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="content-type" content="application/vnd.ms-excel; charset=UTF-8">
+    <title>Network Infrastructure Asset Report</title>
+    <style>
+        body { font-family: Calibri, Arial, sans-serif; }
+        table { border-collapse: collapse; width: 100%; }
+        th {
+            background-color: #4472C4;
+            color: white;
+            font-weight: bold;
+            padding: 8px;
+            border: 1px solid #2F5597;
+            text-align: left;
+        }
+        td {
+            padding: 6px 8px;
+            border: 1px solid #D0D0D0;
+            text-align: left;
+        }
+        tr:nth-child(even) { background-color: #F2F2F2; }
+        tr:hover { background-color: #E7E6E6; }
+        .header-section {
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #F8F9FA;
+            border-left: 4px solid #4472C4;
+        }
+        .header-section h1 {
+            color: #2F5597;
+            margin: 0 0 5px 0;
+            font-size: 18pt;
+        }
+        .header-section p {
+            margin: 3px 0;
+            color: #666;
+            font-size: 10pt;
+        }
+    </style>
+</head>
+<body>
+    <div class="header-section">
+        <h1>Network Infrastructure Asset Report</h1>
+        <p><strong>Generated:</strong> ${timestamp}</p>
+        <p><strong>Total Devices:</strong> ${filteredData.length}</p>
+        <p><strong>Report Type:</strong> Editable Asset Inventory</p>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Region</th>
+                <th>Device Name</th>
+                <th>Vendor</th>
+                <th>Type</th>
+                <th>Model</th>
+                <th>Site</th>
+                <th>Role</th>
+                <th>Serial Number</th>
+            </tr>
+        </thead>
+        <tbody>
+`;
+
+            // Add device rows
+            filteredData.forEach((device, index) => {
+                const vendor = device.vendor || detectVendorFromCSV(device) || 'Unknown';
+                const deviceType = device.deviceType || device.type || detectDeviceTypeFromCSV(device) || 'Unknown';
+                const region = device.region || 'N/A';
+                const deviceName = device.deviceName || device.name || 'Unknown';
+                const model = device.model || device.modelName || 'N/A';
+                const site = device.siteType || device.site || 'N/A';
+                const role = device.deviceRole || device.role || 'N/A';
+                const serialNumber = device.sn || device.serialNumber || 'N/A';
+
+                html += `
+            <tr>
+                <td>${index + 1}</td>
+                <td>${region}</td>
+                <td>${deviceName}</td>
+                <td>${vendor}</td>
+                <td>${deviceType}</td>
+                <td>${model}</td>
+                <td>${site}</td>
+                <td>${role}</td>
+                <td>${serialNumber}</td>
+            </tr>
+`;
+            });
+
+            html += `
+        </tbody>
+    </table>
+
+    <div style="margin-top: 20px; padding: 10px; background-color: #F8F9FA; border-top: 2px solid #4472C4; font-size: 9pt; color: #666;">
+        <p><strong>Note:</strong> This spreadsheet is fully editable in Microsoft Excel, LibreOffice Calc, or Google Sheets.</p>
+        <p>Generated by NetAssets Management System | Report Date: ${date}</p>
+    </div>
+</body>
+</html>
+`;
+
+            // Create and download the Excel file
+            const blob = new Blob([html], { type: 'application/vnd.ms-excel' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Network_Infrastructure_Asset_Report_${date}.xls`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+
+            showNotification(`✅ Exported ${filteredData.length} devices to Editable Excel Format`, 'success');
             document.getElementById('exportDropdown').classList.remove('show');
         }
 

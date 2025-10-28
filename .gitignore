@@ -12,6 +12,10 @@ Thumbs.db
 *.swo
 *~
 
+# Node modules
+node_modules/
+package-lock.json
+
 # ========================================
 # ZERO TOLERANCE - SENSITIVE DATA
 # Privacy is Key - Never Commit Real Data

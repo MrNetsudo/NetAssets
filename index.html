@@ -11560,6 +11560,11 @@
             try {
                 console.log('📊 Parsing Excel file...');
 
+                // Check if XLSX library is loaded
+                if (typeof XLSX === 'undefined') {
+                    throw new Error('Excel library not loaded. Please refresh the page and try again.');
+                }
+
                 // Read the workbook
                 const workbook = XLSX.read(arrayBuffer, { type: 'array' });
 
@@ -11609,9 +11614,15 @@
                     const headerKeys = Object.keys(jsonData[0]);
                     const getValue = (idx) => idx !== -1 ? row[headerKeys[idx]] : '';
 
-                    const vendor = getValue(columnMap.vendor) || detectVendorFromModelOrSerial(getValue(columnMap.model), getValue(columnMap.sn)) || '';
+                    // Build temporary device object for detection
+                    const tempDevice = {
+                        model: getValue(columnMap.model),
+                        sn: getValue(columnMap.sn)
+                    };
+
+                    const vendor = getValue(columnMap.vendor) || detectVendorFromCSV(tempDevice) || '';
                     const model = getValue(columnMap.model) || detectModel(getValue(columnMap.sn)) || '';
-                    const deviceType = getValue(columnMap.deviceType) || detectDeviceType(model, vendor) || '';
+                    const deviceType = getValue(columnMap.deviceType) || detectDeviceTypeFromCSV(tempDevice) || '';
 
                     return {
                         region: getValue(columnMap.region) || '',

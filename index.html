@@ -11619,44 +11619,75 @@
                     managedBy: findColumn(headers, ['managed by', 'managedby', 'manager id']),
                     tenant: findColumn(headers, ['tenant name', 'tenant', 'organization']),
                     managementIP: findColumn(headers, ['management address', 'managementaddress', 'management ip', 'ip address', 'ip']),
-                    ipAddress: findColumn(headers, ['ip address', 'ip', 'management ip', 'mgmt ip'])
+                    ipAddress: findColumn(headers, ['ip address', 'ip', 'management ip', 'mgmt ip']),
+                    deviceCategory: findColumn(headers, ['device category', 'devicecategory', 'category']),
+                    systemDescription: findColumn(headers, ['system description', 'systemdescription', 'sys description', 'sysdescr', 'description'])
                 };
 
                 // Map Excel rows to device objects
                 const devices = jsonData.map((row, index) => {
-                    const headerKeys = Object.keys(jsonData[0]);
-                    const getValue = (idx) => idx !== -1 ? row[headerKeys[idx]] : '';
+                    try {
+                        const headerKeys = Object.keys(jsonData[0]);
+                        const getValue = (idx) => idx !== -1 ? row[headerKeys[idx]] : '';
 
-                    // Build temporary device object for detection
-                    const tempDevice = {
-                        model: getValue(columnMap.model),
-                        sn: getValue(columnMap.sn)
-                    };
+                        // Build temporary device object for detection with all needed fields
+                        const tempDevice = {
+                            deviceName: getValue(columnMap.deviceName) || '',
+                            model: getValue(columnMap.model) || '',
+                            sn: getValue(columnMap.sn) || '',
+                            deviceType: getValue(columnMap.deviceType) || '',
+                            deviceCategory: getValue(columnMap.deviceCategory) || '',
+                            systemDescription: getValue(columnMap.systemDescription) || ''
+                        };
 
-                    const vendor = getValue(columnMap.vendor) || detectVendorFromCSV(tempDevice) || '';
-                    const model = getValue(columnMap.model) || detectModel(getValue(columnMap.sn)) || '';
-                    const deviceType = getValue(columnMap.deviceType) || detectDeviceTypeFromCSV(tempDevice) || '';
+                        const vendor = getValue(columnMap.vendor) || detectVendorFromCSV(tempDevice) || '';
+                        const model = getValue(columnMap.model) || detectModel(getValue(columnMap.sn)) || '';
+                        const deviceType = getValue(columnMap.deviceType) || detectDeviceTypeFromCSV(tempDevice) || '';
 
-                    return {
-                        region: getValue(columnMap.region) || '',
-                        deviceName: getValue(columnMap.deviceName) || `Device-${index + 1}`,
-                        vendor: vendor,
-                        deviceType: deviceType,
-                        model: model,
-                        siteType: getValue(columnMap.siteType) || '',
-                        deviceRole: getValue(columnMap.deviceRole) || '',
-                        sn: getValue(columnMap.sn) || '',
-                        hasHA: getValue(columnMap.hasHA) || false,
-                        sn_ha1: getValue(columnMap.sn_ha1) || '',
-                        sn_ha2: getValue(columnMap.sn_ha2) || '',
-                        city: getValue(columnMap.city) || '',
-                        state: getValue(columnMap.state) || '',
-                        country: getValue(columnMap.country) || '',
-                        managedBy: getValue(columnMap.managedBy) || '',
-                        tenant: getValue(columnMap.tenant) || 'Default Tenant',
-                        managementIP: getValue(columnMap.managementIP) || getValue(columnMap.ipAddress) || '',
-                        ipAddress: getValue(columnMap.ipAddress) || getValue(columnMap.managementIP) || ''
-                    };
+                        return {
+                            region: getValue(columnMap.region) || '',
+                            deviceName: getValue(columnMap.deviceName) || `Device-${index + 1}`,
+                            vendor: vendor,
+                            deviceType: deviceType,
+                            model: model,
+                            siteType: getValue(columnMap.siteType) || '',
+                            deviceRole: getValue(columnMap.deviceRole) || '',
+                            sn: getValue(columnMap.sn) || '',
+                            hasHA: getValue(columnMap.hasHA) || false,
+                            sn_ha1: getValue(columnMap.sn_ha1) || '',
+                            sn_ha2: getValue(columnMap.sn_ha2) || '',
+                            city: getValue(columnMap.city) || '',
+                            state: getValue(columnMap.state) || '',
+                            country: getValue(columnMap.country) || '',
+                            managedBy: getValue(columnMap.managedBy) || '',
+                            tenant: getValue(columnMap.tenant) || 'Default Tenant',
+                            managementIP: getValue(columnMap.managementIP) || getValue(columnMap.ipAddress) || '',
+                            ipAddress: getValue(columnMap.ipAddress) || getValue(columnMap.managementIP) || ''
+                        };
+                    } catch (err) {
+                        console.error(`Error processing Excel row ${index + 1}:`, err);
+                        // Return basic device info on error
+                        return {
+                            region: '',
+                            deviceName: row[Object.keys(jsonData[0])[columnMap.deviceName]] || `Device-${index + 1}`,
+                            vendor: '',
+                            deviceType: '',
+                            model: '',
+                            siteType: '',
+                            deviceRole: '',
+                            sn: '',
+                            hasHA: false,
+                            sn_ha1: '',
+                            sn_ha2: '',
+                            city: '',
+                            state: '',
+                            country: '',
+                            managedBy: '',
+                            tenant: 'Default Tenant',
+                            managementIP: '',
+                            ipAddress: ''
+                        };
+                    }
                 });
 
                 console.log(`✅ Successfully parsed ${devices.length} devices from Excel`);

@@ -17,6 +17,7 @@
     <link rel="apple-touch-icon" href="favicon-192.png">
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <style>
         :root {
             /* Premium Color Palette */
@@ -4642,7 +4643,7 @@
                             <strong>Regions:</strong> US, EU, APAC, LATAM
                         </div>
                     </div>
-                    <input type="file" id="fileInput" accept=".csv,.json" style="display: none;" onchange="handleFileSelect(event)">
+                    <input type="file" id="fileInput" accept=".csv,.json,.xlsx,.xls" style="display: none;" onchange="handleFileSelect(event)">
                 </div>
 
                 <div class="import-section">
@@ -4811,7 +4812,7 @@
     </div>
 
     <!-- Hidden file input for import -->
-    <input type="file" id="hiddenFileInput" accept=".csv,.json" style="display: none;">
+    <input type="file" id="hiddenFileInput" accept=".csv,.json,.xlsx,.xls" style="display: none;">
 
     <!-- Uncomment below to preload CSV data -->
     <!-- <script src="device_data_combined.js"></script> -->
@@ -9119,7 +9120,7 @@
             document.getElementById('exportDropdown').classList.remove('show');
         }
 
-        // Export Network Infrastructure Asset Report - Editable Excel Format
+        // Export Network Infrastructure Asset Report - Editable Excel Format with Hierarchy
         function exportInfrastructureAssetExcel() {
             // Validate data first
             if (!filteredData || filteredData.length === 0) {
@@ -9130,6 +9131,86 @@
             const now = new Date();
             const timestamp = now.toLocaleString();
             const date = now.toISOString().split('T')[0];
+
+            // 🔗 Build parent-child relationships for HA devices
+            const deviceMap = new Map();
+            const childDevices = new Set();
+
+            // First pass: index all devices by serial number
+            filteredData.forEach(device => {
+                if (device.sn) {
+                    deviceMap.set(device.sn.toLowerCase().trim(), device);
+                }
+            });
+
+            // Second pass: identify child devices (HA secondaries)
+            filteredData.forEach(device => {
+                if (device.hasHA) {
+                    // Mark HA serials as children if they exist as separate devices
+                    if (device.sn_ha1) {
+                        const haSerial = device.sn_ha1.toLowerCase().trim();
+                        if (deviceMap.has(haSerial)) {
+                            childDevices.add(haSerial);
+                        }
+                    }
+                    if (device.sn_ha2) {
+                        const haSerial = device.sn_ha2.toLowerCase().trim();
+                        if (deviceMap.has(haSerial)) {
+                            childDevices.add(haSerial);
+                        }
+                    }
+                }
+            });
+
+            // Organize devices: parents first, then their children
+            const organizedDevices = [];
+            const processedSerials = new Set();
+
+            filteredData.forEach(device => {
+                const deviceSerial = device.sn ? device.sn.toLowerCase().trim() : '';
+
+                // Skip if already processed or if it's a child device (will be added with parent)
+                if (processedSerials.has(deviceSerial) || childDevices.has(deviceSerial)) {
+                    return;
+                }
+
+                // Add parent device
+                organizedDevices.push({
+                    device: device,
+                    isChild: false,
+                    parentDevice: null
+                });
+                processedSerials.add(deviceSerial);
+
+                // Add child devices if HA configured
+                if (device.hasHA) {
+                    if (device.sn_ha1) {
+                        const ha1Serial = device.sn_ha1.toLowerCase().trim();
+                        if (deviceMap.has(ha1Serial) && !processedSerials.has(ha1Serial)) {
+                            organizedDevices.push({
+                                device: deviceMap.get(ha1Serial),
+                                isChild: true,
+                                parentDevice: device.deviceName
+                            });
+                            processedSerials.add(ha1Serial);
+                        }
+                    }
+                    if (device.sn_ha2) {
+                        const ha2Serial = device.sn_ha2.toLowerCase().trim();
+                        if (deviceMap.has(ha2Serial) && !processedSerials.has(ha2Serial)) {
+                            organizedDevices.push({
+                                device: deviceMap.get(ha2Serial),
+                                isChild: true,
+                                parentDevice: device.deviceName
+                            });
+                            processedSerials.add(ha2Serial);
+                        }
+                    }
+                }
+            });
+
+            const haDevicesCount = filteredData.filter(d => d.hasHA).length;
+            const childDevicesCount = childDevices.size;
 
             // Generate editable Excel-compatible HTML
             let html = `
@@ -9156,8 +9237,15 @@
             border: 1px solid #D0D0D0;
             text-align: left;
         }
-        tr:nth-child(even) { background-color: #F2F2F2; }
-        tr:hover { background-color: #E7E6E6; }
+        .child-row td {
+            background-color: #E7E6E6;
+            padding-left: 20px;
+        }
+        .parent-row {
+            background-color: #F2F2F2;
+            font-weight: 600;
+        }
+        tr:hover { background-color: #DDEEFF; }
         .header-section {
             margin-bottom: 20px;
             padding: 15px;
@@ -9180,8 +9268,8 @@
     <div class="header-section">
         <h1>Network Infrastructure Asset Report</h1>
         <p><strong>Generated:</strong> ${timestamp}</p>
-        <p><strong>Total Devices:</strong> ${filteredData.length}</p>
-        <p><strong>Report Type:</strong> Editable Asset Inventory</p>
+        <p><strong>Total Devices:</strong> ${filteredData.length} (${haDevicesCount} HA pairs, ${childDevicesCount} child devices)</p>
+        <p><strong>Report Type:</strong> Hierarchical Asset Inventory with Parent-Child Relationships</p>
     </div>
 
     <table>
@@ -9190,19 +9278,23 @@
                 <th>#</th>
                 <th>Region</th>
                 <th>Device Name</th>
+                <th>Parent Device</th>
                 <th>Vendor</th>
                 <th>Type</th>
                 <th>Model</th>
                 <th>Site</th>
                 <th>Role</th>
                 <th>Serial Number</th>
+                <th>Managed By</th>
+                <th>Tenant</th>
             </tr>
         </thead>
         <tbody>
 `;
 
-            // Add device rows
-            filteredData.forEach((device, index) => {
+            // Add device rows with hierarchy
+            organizedDevices.forEach((item, index) => {
+                const device = item.device;
                 const vendor = device.vendor || detectVendorFromCSV(device) || 'Unknown';
                 const deviceType = device.deviceType || device.type || detectDeviceTypeFromCSV(device) || 'Unknown';
                 const region = device.region || 'N/A';
@@ -9211,18 +9303,27 @@
                 const site = device.siteType || device.site || 'N/A';
                 const role = device.deviceRole || device.role || 'N/A';
                 const serialNumber = device.sn || device.serialNumber || 'N/A';
+                const managedBy = device.managedBy || 'N/A';
+                const tenant = device.tenant || 'N/A';
+                const parentDevice = item.isChild ? item.parentDevice : (device.hasHA ? 'HA Primary' : '');
+
+                const rowClass = item.isChild ? 'child-row' : (device.hasHA ? 'parent-row' : '');
+                const displayName = item.isChild ? `  ↳ ${deviceName}` : deviceName;
 
                 html += `
-            <tr>
+            <tr class="${rowClass}">
                 <td>${index + 1}</td>
                 <td>${region}</td>
-                <td>${deviceName}</td>
+                <td>${displayName}</td>
+                <td>${parentDevice}</td>
                 <td>${vendor}</td>
                 <td>${deviceType}</td>
                 <td>${model}</td>
                 <td>${site}</td>
                 <td>${role}</td>
                 <td>${serialNumber}</td>
+                <td>${managedBy}</td>
+                <td>${tenant}</td>
             </tr>
 `;
             });
@@ -9233,6 +9334,7 @@
 
     <div style="margin-top: 20px; padding: 10px; background-color: #F8F9FA; border-top: 2px solid #4472C4; font-size: 9pt; color: #666;">
         <p><strong>Note:</strong> This spreadsheet is fully editable in Microsoft Excel, LibreOffice Calc, or Google Sheets.</p>
+        <p><strong>Hierarchy:</strong> HA primary devices shown with bold text, child/secondary devices indented below their parent.</p>
         <p>Generated by NetAssets Management System | Report Date: ${date}</p>
     </div>
 </body>
@@ -9250,7 +9352,7 @@
             document.body.removeChild(a);
             window.URL.revokeObjectURL(url);
 
-            showNotification(`✅ Exported ${filteredData.length} devices to Editable Excel Format`, 'success');
+            showNotification(`✅ Exported ${filteredData.length} devices with hierarchy (${haDevicesCount} HA pairs)`, 'success');
 
             // Close both dropdown and modal if they exist
             if (document.getElementById('exportDropdown')) {
@@ -10476,18 +10578,22 @@
             const file = event.target.files[0];
             if (!file) return;
 
+            const fileName = file.name.toLowerCase();
+            const isExcel = fileName.endsWith('.xlsx') || fileName.endsWith('.xls');
+
             const reader = new FileReader();
             reader.onload = function(e) {
                 try {
                     const content = e.target.result;
-                    const fileName = file.name.toLowerCase();
 
                     if (fileName.endsWith('.csv')) {
                         importData = parseCSV(content);
                     } else if (fileName.endsWith('.json')) {
                         importData = parseJSON(content);
+                    } else if (isExcel) {
+                        importData = parseXLSX(content);
                     } else {
-                        showImportError('Unsupported file format. Please use CSV or JSON.');
+                        showImportError('Unsupported file format. Please use CSV, JSON, or Excel (.xlsx/.xls).');
                         return;
                     }
 
@@ -10515,7 +10621,13 @@
                     showImportError('Error reading file: ' + error.message);
                 }
             };
-            reader.readAsText(file);
+
+            // Read as binary for Excel files, text for others
+            if (isExcel) {
+                reader.readAsArrayBuffer(file);
+            } else {
+                reader.readAsText(file);
+            }
         }
 
         // Enhanced CSV Parser - Handles multiple column name variations
@@ -11443,6 +11555,95 @@
             }));
         }
 
+        // Parse Excel (XLSX/XLS) files
+        function parseXLSX(arrayBuffer) {
+            try {
+                console.log('📊 Parsing Excel file...');
+
+                // Read the workbook
+                const workbook = XLSX.read(arrayBuffer, { type: 'array' });
+
+                // Get first worksheet
+                const firstSheetName = workbook.SheetNames[0];
+                const worksheet = workbook.Sheets[firstSheetName];
+
+                console.log(`📋 Reading sheet: ${firstSheetName}`);
+
+                // Convert to JSON with header row
+                const jsonData = XLSX.utils.sheet_to_json(worksheet, { raw: false, defval: '' });
+
+                if (!jsonData || jsonData.length === 0) {
+                    throw new Error('No data found in Excel file');
+                }
+
+                console.log(`📊 Found ${jsonData.length} rows in Excel`);
+
+                // Convert Excel data to our internal format using the same column mapping as CSV
+                const headers = Object.keys(jsonData[0]).map(h => h.toLowerCase());
+                console.log('📋 Excel Headers detected:', headers);
+
+                // Use the same column mapping logic as CSV parser
+                const columnMap = {
+                    region: findColumn(headers, ['region']),
+                    deviceName: findColumn(headers, ['device name', 'devicename', 'hostname', 'host', 'name', 'system name', 'systemname']),
+                    vendor: findColumn(headers, ['vendor', 'manufacturer', 'make']),
+                    deviceType: findColumn(headers, ['device type', 'devicetype', 'type', 'model type']),
+                    model: findColumn(headers, ['model', 'device model', 'product model', 'hardware model', 'model name']),
+                    siteType: findColumn(headers, ['site type', 'sitetype', 'site']),
+                    deviceRole: findColumn(headers, ['device role', 'devicerole', 'role']),
+                    sn: findColumn(headers, ['serial number', 'serialnumber', 'serial', 'sn', 'primary sn', 'primary serial']),
+                    hasHA: findColumn(headers, ['ha status', 'hastatus', 'ha configured', 'ha']),
+                    sn_ha1: findColumn(headers, ['ha serial 1', 'sn_ha1', 'ha sn 1', 'hasn1']),
+                    sn_ha2: findColumn(headers, ['ha serial 2', 'sn_ha2', 'ha sn 2', 'hasn2']),
+                    city: findColumn(headers, ['city', 'town']),
+                    state: findColumn(headers, ['state', 'province']),
+                    country: findColumn(headers, ['country', 'nation']),
+                    managedBy: findColumn(headers, ['managed by', 'managedby', 'manager id']),
+                    tenant: findColumn(headers, ['tenant name', 'tenant', 'organization']),
+                    managementIP: findColumn(headers, ['management address', 'managementaddress', 'management ip', 'ip address', 'ip']),
+                    ipAddress: findColumn(headers, ['ip address', 'ip', 'management ip', 'mgmt ip'])
+                };
+
+                // Map Excel rows to device objects
+                const devices = jsonData.map((row, index) => {
+                    const headerKeys = Object.keys(jsonData[0]);
+                    const getValue = (idx) => idx !== -1 ? row[headerKeys[idx]] : '';
+
+                    const vendor = getValue(columnMap.vendor) || detectVendorFromModelOrSerial(getValue(columnMap.model), getValue(columnMap.sn)) || '';
+                    const model = getValue(columnMap.model) || detectModel(getValue(columnMap.sn)) || '';
+                    const deviceType = getValue(columnMap.deviceType) || detectDeviceType(model, vendor) || '';
+
+                    return {
+                        region: getValue(columnMap.region) || '',
+                        deviceName: getValue(columnMap.deviceName) || `Device-${index + 1}`,
+                        vendor: vendor,
+                        deviceType: deviceType,
+                        model: model,
+                        siteType: getValue(columnMap.siteType) || '',
+                        deviceRole: getValue(columnMap.deviceRole) || '',
+                        sn: getValue(columnMap.sn) || '',
+                        hasHA: getValue(columnMap.hasHA) || false,
+                        sn_ha1: getValue(columnMap.sn_ha1) || '',
+                        sn_ha2: getValue(columnMap.sn_ha2) || '',
+                        city: getValue(columnMap.city) || '',
+                        state: getValue(columnMap.state) || '',
+                        country: getValue(columnMap.country) || '',
+                        managedBy: getValue(columnMap.managedBy) || '',
+                        tenant: getValue(columnMap.tenant) || 'Default Tenant',
+                        managementIP: getValue(columnMap.managementIP) || getValue(columnMap.ipAddress) || '',
+                        ipAddress: getValue(columnMap.ipAddress) || getValue(columnMap.managementIP) || ''
+                    };
+                });
+
+                console.log(`✅ Successfully parsed ${devices.length} devices from Excel`);
+                return devices;
+
+            } catch (error) {
+                console.error('❌ Excel parsing error:', error);
+                throw new Error(`Failed to parse Excel file: ${error.message}`);
+            }
+        }
+
         // Validate import data
         function validateImportData(data) {
             if (!data || data.length === 0) {
@@ -11462,6 +11663,86 @@
             }
 
             return { valid: true };
+        }
+
+        // 🔍 COMPREHENSIVE DUPLICATE DETECTION
+        // Checks: Serial Number, Hostname, ManagedBy + Hostname, Tenant + Hostname
+        function detectDuplicates(importDevices, existingDevices) {
+            const duplicates = [];
+            const duplicateIndices = new Set();
+
+            console.log(`🔍 Checking ${importDevices.length} devices against ${existingDevices.length} existing devices...`);
+
+            importDevices.forEach((importDevice, index) => {
+                const matchedBy = [];
+                let existingDevice = null;
+
+                // Normalize fields for comparison (trim, lowercase)
+                const normalize = (str) => str ? String(str).trim().toLowerCase() : '';
+
+                const importSerial = normalize(importDevice.sn);
+                const importHostname = normalize(importDevice.deviceName);
+                const importManagedBy = normalize(importDevice.managedBy);
+                const importTenant = normalize(importDevice.tenant);
+
+                // Check against all existing devices
+                for (const existing of existingDevices) {
+                    const existingSerial = normalize(existing.sn);
+                    const existingHostname = normalize(existing.deviceName);
+                    const existingManagedBy = normalize(existing.managedBy);
+                    const existingTenant = normalize(existing.tenant);
+
+                    // Priority 1: Serial Number match (most reliable)
+                    if (importSerial && existingSerial && importSerial === existingSerial && importSerial !== 'n/a') {
+                        matchedBy.push('Serial Number');
+                        existingDevice = existing;
+                        break; // Serial match is definitive
+                    }
+
+                    // Priority 2: Exact Hostname match
+                    if (importHostname && existingHostname && importHostname === existingHostname) {
+                        matchedBy.push('Hostname');
+                        existingDevice = existing;
+                        // Don't break - might also match on serial
+                    }
+
+                    // Priority 3: ManagedBy + Hostname combination (for multi-tenant environments)
+                    if (importManagedBy && existingManagedBy && importHostname && existingHostname &&
+                        importManagedBy === existingManagedBy && importHostname === existingHostname) {
+                        if (!matchedBy.includes('ManagedBy + Hostname')) {
+                            matchedBy.push('ManagedBy + Hostname');
+                        }
+                        existingDevice = existing;
+                    }
+
+                    // Priority 4: Tenant + Hostname combination
+                    if (importTenant && existingTenant && importHostname && existingHostname &&
+                        importTenant === existingTenant && importHostname === existingHostname &&
+                        importTenant !== 'default tenant') {
+                        if (!matchedBy.includes('Tenant + Hostname')) {
+                            matchedBy.push('Tenant + Hostname');
+                        }
+                        existingDevice = existing;
+                    }
+                }
+
+                // If any matches found, mark as duplicate
+                if (matchedBy.length > 0 && existingDevice) {
+                    duplicates.push({
+                        importDevice: importDevice,
+                        existingDevice: existingDevice,
+                        matchedBy: matchedBy
+                    });
+                    duplicateIndices.add(index);
+                }
+            });
+
+            console.log(`✅ Duplicate check complete: ${duplicates.length} duplicates found`);
+
+            return {
+                duplicates: duplicates,
+                duplicateIndices: duplicateIndices
+            };
         }
 
         // Show import preview
@@ -11594,6 +11875,39 @@
             }
             const originalBtnText = confirmBtn.textContent;
             confirmBtn.disabled = true;
+
+            // 🔍 COMPREHENSIVE DUPLICATE DETECTION - Check multiple fields
+            const duplicateResults = detectDuplicates(importData, deviceData);
+            if (duplicateResults.duplicates.length > 0) {
+                const duplicateCount = duplicateResults.duplicates.length;
+                const totalImportCount = importData.length;
+                const newDevicesCount = totalImportCount - duplicateCount;
+
+                console.warn(`⚠️ Found ${duplicateCount} duplicate devices out of ${totalImportCount} imports`);
+
+                // Filter out duplicates, keep only new devices
+                importData = importData.filter((device, index) => !duplicateResults.duplicateIndices.has(index));
+
+                showNotification(
+                    `🔍 Duplicate Check: ${duplicateCount} duplicates removed, importing ${newDevicesCount} new devices`,
+                    'warning'
+                );
+
+                // Show detailed duplicate report in console
+                console.table(duplicateResults.duplicates.map(d => ({
+                    'Device Name': d.importDevice.deviceName,
+                    'Serial': d.importDevice.sn || 'N/A',
+                    'Matched By': d.matchedBy.join(', '),
+                    'Existing Device': d.existingDevice.deviceName
+                })));
+
+                if (importData.length === 0) {
+                    showNotification('❌ All devices in import file already exist. No new devices to import.', 'error');
+                    confirmBtn.textContent = originalBtnText;
+                    confirmBtn.disabled = false;
+                    return;
+                }
+            }
 
             // Check if this is a large dataset - optimized for 1K+ devices
             const isLargeDataset = importData.length > 100;

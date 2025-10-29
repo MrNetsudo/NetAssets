@@ -12299,7 +12299,13 @@
                         managementIP: findColumn(headers, ['management address', 'managementaddress', 'management ip', 'ip address', 'ip']),
                         ipAddress: findColumn(headers, ['ip address', 'ip', 'management ip', 'mgmt ip']),
                         deviceCategory: findColumn(headers, ['device category', 'devicecategory', 'category']),
-                        systemDescription: findColumn(headers, ['system description', 'systemdescription', 'sys description', 'sysdescr', 'description'])
+                        systemDescription: findColumn(headers, ['system description', 'systemdescription', 'sys description', 'sysdescr', 'description']),
+                        // CRITICAL ADDITIONS: Fields that were missing but exist in CSV parser
+                        deviceVendor: findColumn(headers, ['device vendor', 'devicevendor', 'vendor id']),
+                        deviceProfile: findColumn(headers, ['device profile', 'deviceprofile', 'profile']),
+                        deviceFamily: findColumn(headers, ['device family', 'devicefamily', 'family', 'product family']),
+                        firmwareVersion: findColumn(headers, ['firmware version', 'firmwareversion', 'firmware', 'fw version', 'fw ver']),
+                        softwareVersion: findColumn(headers, ['software version', 'softwareversion', 'sw version', 'os version', 'sw ver'])
                     };
 
                     // DEBUG: Log column mapping results
@@ -12338,19 +12344,52 @@
                             const headerKeys = Object.keys(jsonData[0]);
                             const getValue = (idx) => idx !== -1 ? row[headerKeys[idx]] : '';
 
-                        // Build temporary device object for detection with all needed fields
+                        // STEP 1: Extract raw values from all relevant columns
+                            const rawVendor = getValue(columnMap.vendor) || '';
+                            const rawDeviceVendor = getValue(columnMap.deviceVendor) || '';
+                            const rawModel = getValue(columnMap.model) || '';
+                            const rawDeviceProfile = getValue(columnMap.deviceProfile) || '';
+                            const rawDeviceFamily = getValue(columnMap.deviceFamily) || '';
+                            const rawSystemDescription = getValue(columnMap.systemDescription) || '';
+                            const rawFirmwareVersion = getValue(columnMap.firmwareVersion) || '';
+                            const rawSoftwareVersion = getValue(columnMap.softwareVersion) || '';
+                            const rawDeviceType = getValue(columnMap.deviceType) || '';
+                            const rawDeviceCategory = getValue(columnMap.deviceCategory) || '';
+
+                        // STEP 2: Build temporary device object for detection with all needed fields
                         const tempDevice = {
                             deviceName: getValue(columnMap.deviceName) || '',
-                            model: getValue(columnMap.model) || '',
+                            model: rawModel,
                             sn: getValue(columnMap.sn) || '',
-                            deviceType: getValue(columnMap.deviceType) || '',
-                            deviceCategory: getValue(columnMap.deviceCategory) || '',
-                            systemDescription: getValue(columnMap.systemDescription) || ''
+                            deviceType: rawDeviceType,
+                            deviceCategory: rawDeviceCategory,
+                            systemDescription: rawSystemDescription,
+                            vendor: rawVendor,
+                            deviceVendor: rawDeviceVendor,
+                            deviceProfile: rawDeviceProfile
                         };
 
-                            const vendor = getValue(columnMap.vendor) || detectVendorFromCSV(tempDevice) || '';
-                            const model = getValue(columnMap.model) || detectModel(getValue(columnMap.sn)) || '';
-                            const deviceType = getValue(columnMap.deviceType) || detectDeviceTypeFromCSV(tempDevice) || '';
+                            // STEP 3: Apply intelligent fallback logic (matching CSV parser logic)
+
+                            // Vendor: Use vendor column, fallback to deviceVendor, then detection
+                            const finalVendor = rawVendor || rawDeviceVendor || detectVendorFromCSV(tempDevice) || '';
+
+                            // Model: Use model column, fallback to deviceProfile, then detection
+                            const finalModel = rawModel || rawDeviceProfile || detectModel(getValue(columnMap.sn)) || '';
+
+                            // Device Type: Use deviceType column, fallback to detection
+                            const finalDeviceType = rawDeviceType || detectDeviceTypeFromCSV(tempDevice) || '';
+
+                            // Firmware: Use explicit firmware columns, fallback to extraction from System Description
+                            let finalFirmwareVersion = rawFirmwareVersion || rawSoftwareVersion;
+                            if (!finalFirmwareVersion && rawSystemDescription) {
+                                // Extract firmware version from System Description
+                                // Matches patterns like: "Version 16.12.3a", "Version 9.3(8)", "v10.3.5", "Ver 12.2(55)"
+                                const versionMatch = rawSystemDescription.match(/(?:Version|Ver|v)[\s:]+?([\d\.]+[a-zA-Z0-9\-\(\)]*)/i);
+                                if (versionMatch) {
+                                    finalFirmwareVersion = versionMatch[1];
+                                }
+                            }
 
                             return {
                                 // CRITICAL: Include sheet name for geographic validation
@@ -12358,9 +12397,12 @@
                                 // Use sheet name as region if not in data
                                 region: getValue(columnMap.region) || sheetRegion,
                                 deviceName: getValue(columnMap.deviceName) || `Device-${index + 1}`,
-                                vendor: vendor,
-                                deviceType: deviceType,
-                                model: model,
+
+                                // Use final values with intelligent fallbacks
+                                vendor: finalVendor,
+                                deviceType: finalDeviceType,
+                                model: finalModel,
+
                                 siteType: getValue(columnMap.siteType) || '',
                                 deviceRole: getValue(columnMap.deviceRole) || '',
                                 sn: getValue(columnMap.sn) || '',
@@ -12375,7 +12417,16 @@
                                 managementIP: getValue(columnMap.managementIP) || getValue(columnMap.ipAddress) || '',
                                 ipAddress: getValue(columnMap.ipAddress) || getValue(columnMap.managementIP) || '',
                                 // Store additional location data for validator
-                                systemLocation: getValue(columnMap.systemLocation) || ''
+                                systemLocation: getValue(columnMap.systemLocation) || '',
+
+                                // CRITICAL ADDITIONS: Fields that were missing
+                                firmwareVersion: finalFirmwareVersion || '',  // Extracted firmware
+                                softwareVersion: finalFirmwareVersion || '',   // Same as firmware
+                                deviceVendor: rawDeviceVendor,                 // Raw field for enrichment
+                                deviceProfile: rawDeviceProfile,               // Raw field for enrichment
+                                deviceFamily: rawDeviceFamily,                 // Raw field for enrichment
+                                deviceCategory: rawDeviceCategory,             // For role mapping
+                                systemDescription: rawSystemDescription        // For intelligent parsing
                             };
                         } catch (err) {
                             console.error(`Error processing Excel row ${index + 1}:`, err);
@@ -12400,7 +12451,15 @@
                                 tenant: 'Default Tenant',
                                 managementIP: '',
                                 ipAddress: '',
-                                systemLocation: ''
+                                systemLocation: '',
+                                // CRITICAL ADDITIONS: Match main return object structure
+                                firmwareVersion: '',
+                                softwareVersion: '',
+                                deviceVendor: '',
+                                deviceProfile: '',
+                                deviceFamily: '',
+                                deviceCategory: '',
+                                systemDescription: ''
                             };
                         }
                     });

@@ -6190,8 +6190,9 @@
         function updateStats() {
             const haCount = deviceData.filter(d => d.hasHA).length;
             const total = deviceData.length;
-            const usCount = deviceData.filter(d => d.region === 'US').length;
-            const euCount = deviceData.filter(d => d.region === 'EU').length;
+            // CRITICAL FIX: Check worldRegion or country, not region (region contains state names like "California", not "US")
+            const usCount = deviceData.filter(d => d.worldRegion === 'US' || d.country === 'US' || d.country === 'United States').length;
+            const euCount = deviceData.filter(d => d.worldRegion === 'EU' || ['UK', 'Germany', 'France', 'Spain', 'Italy', 'Netherlands', 'Belgium', 'Poland', 'Austria', 'Sweden', 'Denmark', 'Norway', 'Finland'].includes(d.country)).length;
 
             // Safely update stat elements with null checks
             const updateElem = (id, value) => {
@@ -6653,9 +6654,10 @@
             }
 
             const html = dataToRender.map((device, index) => {
-                // Detect vendor and type using smart detection functions
-                const detectedVendor = detectVendorFromCSV(device);
-                const detectedType = detectDeviceTypeFromCSV(device);
+                // CRITICAL FIX: Use extracted vendor/type first, fallback to detection
+                // Previous bug: Always called detectVendorFromCSV() and ignored device.vendor
+                const detectedVendor = device.vendor || detectVendorFromCSV(device);
+                const detectedType = device.deviceType || detectDeviceTypeFromCSV(device);
 
                 const firmwareShort = device.firmwareVersion ? device.firmwareVersion.substring(0, 20) : '-';
                 const ipAddress = device.managementIP || '-';
@@ -6665,13 +6667,17 @@
                 if (index < 3) {
                     console.log(`📊 Rendering device ${index + 1}:`, {
                         deviceName: device.deviceName,
-                        vendor: device.vendor,
-                        detectedVendor: detectedVendor,
-                        model: device.model,
+                        'device.vendor (extracted)': device.vendor,
+                        'detectedVendor (final)': detectedVendor,
+                        'device.model': device.model,
+                        'device.firmwareVersion': device.firmwareVersion,
+                        'device.deviceProfile': device.deviceProfile,
+                        'device.systemDescription': device.systemDescription,
                         sn: device.sn,
                         type: detectedType,
                         state: device.state,
                         region: device.region,
+                        worldRegion: device.worldRegion,
                         fullLocation: device.fullLocation
                     });
                 }
@@ -11492,10 +11498,18 @@
                     // CRITICAL FIX: Prevent "IP Discovery Time" from matching "ip address" or "ip"
                     // IP address should NEVER match timestamp/date columns
                     if (name.toLowerCase().includes('ip') || name.toLowerCase().includes('address')) {
+                        // Exclude any column with these timestamp-related terms
                         if (h.includes('modified') || h.includes('last') || h.includes('time') ||
                             h.includes('date') || h.includes('discovery') || h.includes('learned') ||
                             h.includes('first') || h.includes('updated') || h.includes('changed') ||
-                            h.includes('timestamp') || h.includes('scan')) {
+                            h.includes('timestamp') || h.includes('scan') || h.includes('added') ||
+                            h.includes('created') || h.includes('when') || h.includes('aging')) {
+                            return false;
+                        }
+                        // Also exclude if column starts with "ip" but has timestamp keywords
+                        // e.g., "IP Discovery Time", "IP Last Modified", "IP Aging Time"
+                        if (h.startsWith('ip ') && (h.includes('time') || h.includes('date') ||
+                            h.includes('modified') || h.includes('discovered') || h.includes('learned'))) {
                             return false;
                         }
                     }

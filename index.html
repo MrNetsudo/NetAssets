@@ -4969,6 +4969,18 @@
             if (name.match(/\b(srx\d+|ex\d+|mx\d+)\b/)) return 'Juniper Networks';  // Juniper SRX, EX, MX series
             if (name.match(/\bfg-?\d+/)) return 'Fortinet';  // FortiGate models
 
+            // Detect IPC/Security devices - common vendors
+            if (name.match(/^(ipc|ipg|atc|atg)-/i)) {
+                // Check for specific vendor patterns in device name or description
+                if (sysDesc.includes('axis')) return 'Axis Communications';
+                if (sysDesc.includes('hikvision') || sysDesc.includes('hik')) return 'Hikvision';
+                if (sysDesc.includes('dahua')) return 'Dahua';
+                if (sysDesc.includes('hanwha') || sysDesc.includes('samsung')) return 'Hanwha';
+                if (sysDesc.includes('bosch')) return 'Bosch';
+                if (sysDesc.includes('avigilon')) return 'Avigilon';
+                // If no vendor detected from description, mark as Unknown (vendor must be in Excel)
+            }
+
             // Log unmapped vendor IDs for debugging
             if (device.vendor && /^\d+$/.test(device.vendor.trim())) {
                 console.warn('⚠️ Unmapped vendor ID in "Vendor" column:', device.vendor, 'for device:', device.deviceName);
@@ -5010,6 +5022,18 @@
             const a10Match = name.match(/\b(THUNDER|AX)(\d+)\b/i);
             if (a10Match) {
                 return `${a10Match[1]} ${a10Match[2]}`;
+            }
+
+            // IPC/Security device models: EC-M01, M01, M02, etc.
+            const ipcMatch = name.match(/\b(EC|M|P|S)-?([A-Z]?\d+[A-Z]?)\b/i);
+            if (ipcMatch && name.match(/^(IPC|IPG|ATC|ATG)-/i)) {
+                return `${ipcMatch[1]}-${ipcMatch[2]}`.toUpperCase();
+            }
+
+            // Palo Alto models: PA-220, PA-3020, etc.
+            const paloMatch = name.match(/\bPA-(\d+[A-Z]?)\b/i);
+            if (paloMatch) {
+                return `PA-${paloMatch[1]}`;
             }
 
             // Generic number pattern (like "6513" in "AUSTXDCA6513SW2")
@@ -5101,6 +5125,43 @@
                 if (deviceType === 'SW') result.deviceRole = 'Switch';
                 else if (deviceType === 'RTR') result.deviceRole = 'Router';
                 else if (deviceType === 'FW') result.deviceRole = 'Firewall';
+
+                return result;
+            }
+
+            // PATTERN 4: IPC-{JURISDICTION}-{SITE}-{MODEL} format
+            // Industrial/IP Camera naming: IPC-RISP-EC-M01, IPC-TXSP-EC-M02
+            // Prefix-Jurisdiction-Site-Model
+            const pattern4 = name.match(/^(IPC|IPG|ATC|ATG)-([A-Z]{4})-([A-Z]+)-([A-Z0-9]+)$/i);
+            if (pattern4) {
+                const devicePrefix = pattern4[1].toUpperCase();  // IPC, IPG, ATC, ATG
+                const jurisdictionCode = pattern4[2].toUpperCase();  // RISP, TXSP, etc.
+                result.siteType = pattern4[3];  // EC, M01, etc.
+                result.model = pattern4[4];
+
+                // Jurisdiction code mapping
+                const jurisdictionMap = {
+                    'RISP': { state: 'Rhode Island', stateCode: 'RI', jurisdiction: 'RI Sports' },
+                    'TXSP': { state: 'Texas', stateCode: 'TX', jurisdiction: 'TX Sports' },
+                    'CASP': { state: 'California', stateCode: 'CA', jurisdiction: 'CA Sports' },
+                    'FLSP': { state: 'Florida', stateCode: 'FL', jurisdiction: 'FL Sports' },
+                    'NYSP': { state: 'New York', stateCode: 'NY', jurisdiction: 'NY Sports' },
+                    'NVSP': { state: 'Nevada', stateCode: 'NV', jurisdiction: 'NV Sports' },
+                    'ILSP': { state: 'Illinois', stateCode: 'IL', jurisdiction: 'IL Sports' },
+                    'COSP': { state: 'Colorado', stateCode: 'CO', jurisdiction: 'CO Sports' }
+                };
+
+                if (jurisdictionMap[jurisdictionCode]) {
+                    result.state = jurisdictionMap[jurisdictionCode].state;
+                    result.stateCode = jurisdictionMap[jurisdictionCode].stateCode;
+                }
+
+                // Device role based on prefix
+                if (devicePrefix === 'IPC' || devicePrefix === 'IPG') {
+                    result.deviceRole = 'IP Camera';
+                } else if (devicePrefix === 'ATC' || devicePrefix === 'ATG') {
+                    result.deviceRole = 'Access Control';
+                }
 
                 return result;
             }
@@ -11428,6 +11489,16 @@
                             return false;
                         }
                     }
+                    // CRITICAL FIX: Prevent "IP Discovery Time" from matching "ip address" or "ip"
+                    // IP address should NEVER match timestamp/date columns
+                    if (name.toLowerCase().includes('ip') || name.toLowerCase().includes('address')) {
+                        if (h.includes('modified') || h.includes('last') || h.includes('time') ||
+                            h.includes('date') || h.includes('discovery') || h.includes('learned') ||
+                            h.includes('first') || h.includes('updated') || h.includes('changed') ||
+                            h.includes('timestamp') || h.includes('scan')) {
+                            return false;
+                        }
+                    }
                     // For non-state fields, exclude status columns unless explicitly looking for status
                     if (h.includes('status') && !name.toLowerCase().includes('status')) {
                         return false;
@@ -12215,7 +12286,7 @@
                         model: findColumn(headers, ['model', 'device model', 'product model', 'hardware model', 'model name']),
                         siteType: findColumn(headers, ['site type', 'sitetype', 'site']),
                         deviceRole: findColumn(headers, ['device role', 'devicerole', 'role']),
-                        sn: findColumn(headers, ['serial number', 'serialnumber', 'serial', 'sn', 'primary sn', 'primary serial']),
+                        sn: findColumn(headers, ['serial number', 'serialnumber', 'serial #', 'serial#', 'serial', 'sn', 's/n', 'device serial', 'device sn', 'primary sn', 'primary serial']),
                         hasHA: findColumn(headers, ['ha status', 'hastatus', 'ha configured', 'ha']),
                         sn_ha1: findColumn(headers, ['ha serial 1', 'sn_ha1', 'ha sn 1', 'hasn1']),
                         sn_ha2: findColumn(headers, ['ha serial 2', 'sn_ha2', 'ha sn 2', 'hasn2']),
@@ -12230,6 +12301,36 @@
                         deviceCategory: findColumn(headers, ['device category', 'devicecategory', 'category']),
                         systemDescription: findColumn(headers, ['system description', 'systemdescription', 'sys description', 'sysdescr', 'description'])
                     };
+
+                    // DEBUG: Log column mapping results
+                    console.log('   🗺️ Column Mapping Results:');
+                    const mappingResults = {};
+                    for (const [field, colIndex] of Object.entries(columnMap)) {
+                        if (colIndex !== -1) {
+                            mappingResults[field] = `"${headers[colIndex]}" (column ${colIndex})`;
+                        } else {
+                            mappingResults[field] = '❌ NOT FOUND';
+                        }
+                    }
+                    console.table(mappingResults);
+
+                    // Highlight critical fields
+                    if (columnMap.ipAddress === -1 && columnMap.managementIP === -1) {
+                        console.warn('   ⚠️ WARNING: No IP address column found!');
+                    } else {
+                        const ipCol = columnMap.ipAddress !== -1 ? columnMap.ipAddress : columnMap.managementIP;
+                        console.log(`   ✅ IP Address mapped to: "${headers[ipCol]}"`);
+                    }
+                    if (columnMap.sn === -1) {
+                        console.warn('   ⚠️ WARNING: No serial number column found!');
+                    } else {
+                        console.log(`   ✅ Serial Number mapped to: "${headers[columnMap.sn]}"`);
+                    }
+                    if (columnMap.deviceName === -1) {
+                        console.warn('   ⚠️ WARNING: No device name column found!');
+                    } else {
+                        console.log(`   ✅ Device Name mapped to: "${headers[columnMap.deviceName]}"`);
+                    }
 
                     // Map Excel rows to device objects
                     const devices = jsonData.map((row, index) => {

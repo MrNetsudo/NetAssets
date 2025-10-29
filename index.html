@@ -18,6 +18,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="geographic_validator.js"></script>
     <style>
         :root {
             /* Premium Color Palette */
@@ -4292,6 +4293,7 @@
                                     <div class="export-option-desc">Editable asset list with core fields</div>
                                 </div>
                             </div>
+                            <!-- DISABLED: Health/Monitoring features removed
                             <div class="export-option" onclick="exportTechnicalAssessment()">
                                 <div class="export-option-icon">🎯</div>
                                 <div class="export-option-text">
@@ -4306,6 +4308,7 @@
                                     <div class="export-option-desc">Policy compliance audit</div>
                                 </div>
                             </div>
+                            -->
                         </div>
                     </div>
                     <button class="print-btn" onclick="preparePrint(); window.print()">🖨️ Print</button>
@@ -4314,41 +4317,23 @@
             </div>
 
             <!-- 🚨 NOC Quick Filters -->
-            <div class="filter-section">
-                <h3><span>🚨</span> NOC Quick Filters</h3>
-                <div class="filter-buttons">
-                    <button class="filter-btn active" onclick="filterByNOCStatus('all')">
-                        📊 All Devices <span class="filter-badge" id="badge-noc-all">0</span>
-                    </button>
-                    <button class="filter-btn" onclick="filterByNOCStatus('critical')">
-                        🔴 Critical Only <span class="filter-badge" id="badge-noc-critical">0</span>
-                    </button>
-                    <button class="filter-btn" onclick="filterByNOCStatus('offline')">
-                        ⚠️ Offline Only <span class="filter-badge" id="badge-noc-offline">0</span>
-                    </button>
-                    <button class="filter-btn" onclick="filterByNOCStatus('low_health')">
-                        ❤️ Low Health <span class="filter-badge" id="badge-noc-low_health">0</span>
-                    </button>
-                </div>
-            </div>
-
             <!-- Multi-Level Region Filter -->
             <div class="filter-section">
                 <h3><span>🌍</span> Geographic Regions - Global</h3>
                 <div class="filter-buttons">
-                    <button class="filter-btn active" onclick="filterByRegion('all')">
+                    <button class="filter-btn active" onclick="filterByRegion('all', this)">
                         🌍 All Regions <span class="filter-badge" id="badge-region-all">0</span>
                     </button>
-                    <button class="filter-btn" onclick="filterByRegion('US')">
+                    <button class="filter-btn" onclick="filterByRegion('US', this)">
                         🇺🇸 United States <span class="filter-badge" id="badge-region-us">0</span>
                     </button>
-                    <button class="filter-btn" onclick="filterByRegion('EU')">
+                    <button class="filter-btn" onclick="filterByRegion('EU', this)">
                         🇪🇺 Europe <span class="filter-badge" id="badge-region-eu">0</span>
                     </button>
-                    <button class="filter-btn" onclick="filterByRegion('APAC')">
+                    <button class="filter-btn" onclick="filterByRegion('APAC', this)">
                         🌏 Asia Pacific <span class="filter-badge" id="badge-region-apac">0</span>
                     </button>
-                    <button class="filter-btn" onclick="filterByRegion('LATAM')">
+                    <button class="filter-btn" onclick="filterByRegion('LATAM', this)">
                         🌎 Latin America <span class="filter-badge" id="badge-region-latam">0</span>
                     </button>
                 </div>
@@ -4364,7 +4349,7 @@
             <div class="filter-section">
                 <h3><span>🏢</span> Vendor</h3>
                 <div class="filter-buttons">
-                    <button class="filter-btn active" onclick="filterByVendor('all')">All Vendors <span class="filter-badge" id="badge-vendor-all">0</span></button>
+                    <button class="filter-btn active" onclick="filterByVendor('all', this)">All Vendors <span class="filter-badge" id="badge-vendor-all">0</span></button>
                 </div>
                 <div class="filter-buttons compact" id="vendorFiltersContainer">
                     <!-- Auto-populated from device data -->
@@ -4375,7 +4360,7 @@
             <div class="filter-section">
                 <h3><span>🔌</span> Device Type</h3>
                 <div class="filter-buttons">
-                    <button class="filter-btn active" onclick="filterByDeviceType('all')">All Types <span class="filter-badge" id="badge-type-all">0</span></button>
+                    <button class="filter-btn active" onclick="filterByDeviceType('all', this)">All Types <span class="filter-badge" id="badge-type-all">0</span></button>
                 </div>
                 <div class="filter-buttons compact" id="deviceTypeFiltersContainer">
                     <!-- Auto-populated from device data -->
@@ -4386,7 +4371,7 @@
             <div class="filter-section">
                 <h3><span>🏢</span> Site Type</h3>
                 <div class="filter-buttons">
-                    <button class="filter-btn active" onclick="filterBySiteType('all')">All Sites <span class="filter-badge" id="badge-site-all">0</span></button>
+                    <button class="filter-btn active" onclick="filterBySiteType('all', this)">All Sites <span class="filter-badge" id="badge-site-all">0</span></button>
                 </div>
                 <div class="filter-buttons compact" id="siteTypeFiltersContainer">
                     <!-- Auto-populated from device names -->
@@ -4397,20 +4382,10 @@
             <div class="filter-section">
                 <h3><span>🎯</span> Device Role</h3>
                 <div class="filter-buttons">
-                    <button class="filter-btn active" onclick="filterByDeviceRole('all')">All Roles <span class="filter-badge" id="badge-role-all">0</span></button>
+                    <button class="filter-btn active" onclick="filterByDeviceRole('all', this)">All Roles <span class="filter-badge" id="badge-role-all">0</span></button>
                 </div>
                 <div class="filter-buttons compact" id="deviceRoleFiltersContainer">
                     <!-- Auto-populated from device names -->
-                </div>
-            </div>
-
-            <!-- Configuration Type Filter -->
-            <div class="filter-section">
-                <h3><span>⚙️</span> Configuration Type</h3>
-                <div class="filter-buttons">
-                    <button class="filter-btn active" onclick="filterByConfig('all')">📊 All Devices <span class="filter-badge" id="badge-all">0</span></button>
-                    <button class="filter-btn" onclick="filterByConfig('ha')">✅ HA Configured <span class="filter-badge" id="badge-ha">0</span></button>
-                    <button class="filter-btn" onclick="filterByConfig('standalone')">⚠️ Standalone <span class="filter-badge" id="badge-standalone">0</span></button>
                 </div>
             </div>
 
@@ -4418,7 +4393,7 @@
             <div class="filter-section">
                 <h3><span>⚡</span> Quick Access</h3>
                 <div class="filter-buttons">
-                    <button class="filter-btn active" onclick="filterByQuickAccess('all')">All Devices <span class="filter-badge" id="badge-quick-all">0</span></button>
+                    <button class="filter-btn active" onclick="filterByQuickAccess('all', this)">All Devices <span class="filter-badge" id="badge-quick-all">0</span></button>
                 </div>
                 <div class="filter-buttons compact" id="quickAccessFiltersContainer">
                     <button class="filter-btn" onclick="quickFilterEnhanced('Firewall', event)">🔥 Firewalls <span class="filter-badge" id="badge-firewall">0</span></button>
@@ -4533,12 +4508,6 @@
                         <span style="background: #eff6ff; color: #1e40af; padding: 4px 12px; border-radius: 20px; font-size: 0.85em; font-weight: 600;">
                             <span id="tableRowCount">0</span> Devices
                         </span>
-                        <span style="background: #f0fdf4; color: #14532d; padding: 4px 12px; border-radius: 20px; font-size: 0.85em; font-weight: 600;" id="tableHACount">
-                            0 HA Configured
-                        </span>
-                        <span style="background: #fef3c7; color: #78350f; padding: 4px 12px; border-radius: 20px; font-size: 0.85em; font-weight: 600;" id="tableCriticalCount">
-                            0 Critical
-                        </span>
                     </div>
                 </div>
                 <div style="display: flex; gap: 10px;">
@@ -4557,37 +4526,24 @@
                             <th rowspan="2" style="width: 40px;"><input type="checkbox" id="selectAll" onchange="toggleSelectAll()"></th>
                             <!-- Identity Group -->
                             <th colspan="3" style="text-align: center; background: #0f172a; border-bottom: 3px solid #3730a3;">Identity</th>
-                            <!-- Status Group -->
-                            <th colspan="2" style="text-align: center; background: #0f172a; border-bottom: 3px solid #dc2626;">Monitoring</th>
                             <!-- Device Info Group -->
-                            <th colspan="6" style="text-align: center; background: #0f172a; border-bottom: 3px solid #0369a1;">Device Details</th>
+                            <th colspan="4" style="text-align: center; background: #0f172a; border-bottom: 3px solid #0369a1;">Device Details</th>
                             <!-- Location Group -->
                             <th colspan="2" style="text-align: center; background: #0f172a; border-bottom: 3px solid #059669;">Location</th>
-                            <!-- HA Configuration Group -->
-                            <th colspan="3" style="text-align: center; background: #0f172a; border-bottom: 3px solid #f59e0b;">High Availability</th>
                         </tr>
                         <tr>
                             <!-- Identity Group -->
                             <th onclick="sortTable(0)">Device Name</th>
                             <th onclick="sortTable(1)">IP Address</th>
                             <th onclick="sortTable(2)">Serial #</th>
-                            <!-- Status Group -->
-                            <th onclick="sortTable(3)">Status</th>
-                            <th onclick="sortTable(4)">Health</th>
                             <!-- Device Info Group -->
-                            <th onclick="sortTable(5)">Vendor</th>
-                            <th onclick="sortTable(6)">Type</th>
-                            <th onclick="sortTable(7)">Model</th>
-                            <th onclick="sortTable(8)">Firmware</th>
-                            <th onclick="sortTable(9)">Ports</th>
-                            <th onclick="sortTable(10)">Age</th>
+                            <th onclick="sortTable(3)">Vendor</th>
+                            <th onclick="sortTable(4)">Type</th>
+                            <th onclick="sortTable(5)">Model</th>
+                            <th onclick="sortTable(6)">Firmware</th>
                             <!-- Location Group -->
-                            <th onclick="sortTable(11)">Region</th>
-                            <th onclick="sortTable(12)">Site/Role</th>
-                            <!-- HA Configuration Group -->
-                            <th onclick="sortTable(13)">HA Status</th>
-                            <th onclick="sortTable(14)">HA Serial 1</th>
-                            <th onclick="sortTable(15)">HA Serial 2</th>
+                            <th onclick="sortTable(7)">Region</th>
+                            <th onclick="sortTable(8)">Site/Role</th>
                         </tr>
                     </thead>
                     <tbody id="tableBody"></tbody>
@@ -4748,6 +4704,7 @@
                         <div class="export-option-name">PDF Report</div>
                         <div class="export-option-desc">Print-ready professional report</div>
                     </div>
+                    <!-- DISABLED: Health/Monitoring features removed
                     <div class="export-option-card" onclick="selectExportFormat('executive')">
                         <div class="export-option-badge">EXECUTIVE</div>
                         <div class="export-option-icon">📊</div>
@@ -4764,6 +4721,7 @@
                         <div class="export-option-name">Compliance Report</div>
                         <div class="export-option-desc">Audit-ready documentation</div>
                     </div>
+                    -->
                     <div class="export-option-card" onclick="selectExportFormat('markdown')">
                         <div class="export-option-icon">📝</div>
                         <div class="export-option-name">Markdown</div>
@@ -4836,7 +4794,6 @@
         let currentDeviceType = 'all';
         let currentSiteType = 'all';
         let currentDeviceRole = 'all';
-        let currentConfig = 'all';
         let currentNOCStatus = 'all';  // 🚨 NOC filter
         let sortColumn = 0;
         let sortAscending = true;
@@ -4880,11 +4837,19 @@
             'Cisco': '📡',
             'Fortinet': '🔥',
             'Juniper': '🌲',
+            'Juniper Networks': '🌲',
             'Palo Alto Networks': '🛡️',
             'A10 Networks': '⚖️',
             'APC': '🔌',
+            'American Power Conversion': '🔌',
             'Check Point': '✅',
             'F5 Networks': '⚖️',
+            'Net-SNMP': '🔧',
+            'Arista Networks': '🌐',
+            'IBM': '💼',
+            'Lantronix': '🔌',
+            'Silver Peak Systems': '🏔️',
+            'VMware': '☁️',
             'Unknown': '❓'
         };
 
@@ -4929,6 +4894,27 @@
         // INTELLIGENT AUTO-DETECTION FUNCTIONS
         // ============================================
 
+        // Normalize vendor names (consolidate duplicates, filter out software)
+        function normalizeVendor(vendorName) {
+            if (!vendorName) return null;
+
+            const vendor = vendorName.trim();
+            const lowerVendor = vendor.toLowerCase();
+
+            // Filter out software/agent names (not hardware vendors)
+            const softwareVendors = ['net-snmp', 'snmp', 'linux', 'windows', 'ubuntu'];
+            if (softwareVendors.some(sw => lowerVendor === sw)) {
+                return null; // Filtered out
+            }
+
+            // Consolidate duplicate vendor names
+            if (lowerVendor === 'american power conversion') return 'APC';
+            if (lowerVendor === 'apc' || lowerVendor.includes('american power')) return 'APC';
+            if (lowerVendor === 'juniper networks' || lowerVendor === 'juniper') return 'Juniper Networks';
+
+            return vendor; // Return as-is
+        }
+
         // Detect vendor from CSV fields (Device Vendor ID + System Description fallback)
         function detectVendorFromCSV(device) {
             // Try the vendor field if it's a numeric ID in our map (most common case)
@@ -4941,9 +4927,16 @@
                 return VENDOR_ID_MAP[device.deviceVendor.trim()];
             }
 
-            // Try the vendor field if it's a non-numeric name
+            // Try the vendor field if it's a non-numeric name (with normalization)
             if (device.vendor && !/^\d+$/.test(device.vendor.trim())) {
-                return device.vendor.trim();
+                const normalized = normalizeVendor(device.vendor);
+                if (normalized) return normalized;
+            }
+
+            // Try the deviceVendor field if it's a non-numeric name (with normalization)
+            if (device.deviceVendor && !/^\d+$/.test(device.deviceVendor.trim())) {
+                const normalized = normalizeVendor(device.deviceVendor);
+                if (normalized) return normalized;
             }
 
             // Fallback to System Description field
@@ -5059,22 +5052,46 @@
         }
 
         function populateStateFilters() {
+            // Valid US state names for safety validation
+            const validUSStates = new Set([
+                'Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado',
+                'Connecticut', 'Delaware', 'Florida', 'Georgia', 'Hawaii', 'Idaho',
+                'Illinois', 'Indiana', 'Iowa', 'Kansas', 'Kentucky', 'Louisiana',
+                'Maine', 'Maryland', 'Massachusetts', 'Michigan', 'Minnesota',
+                'Mississippi', 'Missouri', 'Montana', 'Nebraska', 'Nevada',
+                'New Hampshire', 'New Jersey', 'New Mexico', 'New York',
+                'North Carolina', 'North Dakota', 'Ohio', 'Oklahoma', 'Oregon',
+                'Pennsylvania', 'Rhode Island', 'South Carolina', 'South Dakota',
+                'Tennessee', 'Texas', 'Utah', 'Vermont', 'Virginia', 'Washington',
+                'West Virginia', 'Wisconsin', 'Wyoming'
+            ]);
+
             const states = {};
             deviceData.forEach(device => {
-                const state = extractStateFromTenant(device.tenant);
-                states[state] = (states[state] || 0) + 1;
+                // Use VALIDATED state from geographic validator (device.state)
+                // This comes from analyzeGeographicLocation() with 99.9% accuracy
+                const state = device.state || '';
+
+                // STRICT VALIDATION: Only count valid US state names
+                if (state && state.trim() !== '' && state !== 'Unknown' && validUSStates.has(state)) {
+                    states[state] = (states[state] || 0) + 1;
+                }
             });
 
             const container = document.getElementById('stateFiltersContainer');
             if (!container) return;
 
-            container.innerHTML = Object.entries(states)
-                .filter(([state]) => state !== 'Unknown')
+            // Sort by state name alphabetically and FILTER OUT ZERO COUNTS
+            const stateEntries = Object.entries(states).filter(([state, count]) => count > 0);
+
+            container.innerHTML = stateEntries
                 .sort((a, b) => a[0].localeCompare(b[0]))
                 .map(([state, count]) => {
                     const id = state.toLowerCase().replace(/\s+/g, '-');
-                    return `<button class="filter-btn" onclick="filterByRegion('${state.replace(/'/g, "\\'")}')"><span>🏛️ ${state}</span><span class="filter-badge" id="badge-region-${id}">${count}</span></button>`;
+                    return `<button class="filter-btn" onclick="filterByRegion('${state.replace(/'/g, "\\'")}', this)"><span>🏛️ ${state}</span><span class="filter-badge" id="badge-region-${id}">${count}</span></button>`;
                 }).join('');
+
+            console.log(`✅ Geographic Regions populated: ${stateEntries.length} states with validated data (${Object.keys(states).length - stateEntries.length} zero-count states filtered out)`);
         }
 
         function populateVendorFilters() {
@@ -5116,7 +5133,7 @@
             const html = vendorList.map(([vendor, count]) => {
                 const icon = VENDOR_ICONS[vendor] || '❓';
                 const id = vendor.toLowerCase().replace(/\s+/g, '-');
-                return `<button class="filter-btn" onclick="filterByVendor('${vendor.replace(/'/g, "\\'")}')"><span>${icon} ${vendor}</span><span class="filter-badge" id="badge-vendor-${id}">${count}</span></button>`;
+                return `<button class="filter-btn" onclick="filterByVendor('${vendor.replace(/'/g, "\\'")}', this)"><span>${icon} ${vendor}</span><span class="filter-badge" id="badge-vendor-${id}">${count}</span></button>`;
             }).join('');
 
             container.innerHTML = html;
@@ -5161,7 +5178,7 @@
                                   type === 'Switch' ? 'Switches' :
                                   type === 'Load Balancer' ? 'Load Balancers' :
                                   type + 's';
-                    return `<button class="filter-btn" onclick="filterByDeviceType('${type.replace(/'/g, "\\'")}')"><span>${icon} ${label}</span><span class="filter-badge" id="badge-type-${id}">${count}</span></button>`;
+                    return `<button class="filter-btn" onclick="filterByDeviceType('${type.replace(/'/g, "\\'")}', this)"><span>${icon} ${label}</span><span class="filter-badge" id="badge-type-${id}">${count}</span></button>`;
                 }).join('');
         }
 
@@ -5182,7 +5199,7 @@
                 .map(([siteType, count]) => {
                     const info = SITE_TYPE_INFO[siteType] || { icon: '📍', label: siteType };
                     const id = siteType.toLowerCase().replace(/\s+/g, '-');
-                    return `<button class="filter-btn" onclick="filterBySiteType('${siteType.replace(/'/g, "\\'")}')"><span>${info.icon} ${info.label}</span><span class="filter-badge" id="badge-site-${id}">${count}</span></button>`;
+                    return `<button class="filter-btn" onclick="filterBySiteType('${siteType.replace(/'/g, "\\'")}', this)"><span>${info.icon} ${info.label}</span><span class="filter-badge" id="badge-site-${id}">${count}</span></button>`;
                 }).join('');
         }
 
@@ -5203,7 +5220,7 @@
                 .map(([role, count]) => {
                     const info = DEVICE_ROLE_INFO[role] || { icon: '📦', label: role };
                     const id = role.toLowerCase().replace(/\s+/g, '-');
-                    return `<button class="filter-btn" onclick="filterByDeviceRole('${role.replace(/'/g, "\\'")}')"><span>${info.icon} ${info.label}</span><span class="filter-badge" id="badge-role-${id}">${count}</span></button>`;
+                    return `<button class="filter-btn" onclick="filterByDeviceRole('${role.replace(/'/g, "\\'")}', this)"><span>${info.icon} ${info.label}</span><span class="filter-badge" id="badge-role-${id}">${count}</span></button>`;
                 }).join('');
         }
 
@@ -5939,19 +5956,14 @@
             updateElem('totalDevices', total);
             updateElem('usDevices', usCount);
             updateElem('euDevices', euCount);
-            updateElem('haDevices', haCount);
-            updateElem('standaloneDevices', total - haCount);
             updateElem('visibleDevices', filteredData.length);
 
             // Update filter badges
-            updateElem('badge-all', total);
-            updateElem('badge-ha', haCount);
-            updateElem('badge-standalone', total - haCount);
             updateElem('badge-region-all', total);
             updateElem('badge-region-us', usCount);
             updateElem('badge-region-eu', euCount);
 
-            console.log('✓ Stats updated - Total:', total, 'HA:', haCount, 'Visible:', filteredData.length);
+            console.log('✓ Stats updated - Total:', total, 'Visible:', filteredData.length);
         }
 
         // Update model breakdown
@@ -6039,13 +6051,14 @@
             updateBadge('badge-a10-quick', deviceData.filter(d => detectVendorFromCSV(d).toLowerCase().includes('a10')).length);
         }
 
-        function filterByQuickAccess(type) {
+        function filterByQuickAccess(type, buttonElement) {
             if (type === 'all') {
                 // Clear all quick filters
                 activeQuickFilters = [];
                 document.querySelectorAll('#quickAccessFiltersContainer .filter-btn, .filter-section .filter-btn').forEach(btn => {
                     btn.classList.remove('active');
                 });
+                if (buttonElement) buttonElement.classList.add('active');
                 applyFilters();
             }
         }
@@ -6398,13 +6411,6 @@
                 const detectedVendor = detectVendorFromCSV(device);
                 const detectedType = detectDeviceTypeFromCSV(device);
 
-                // 🚨 NOC Data Rendering
-                const statusIcon = getStatusIcon(device.status);
-                const healthScore = device.healthScore || 0;
-                const healthColor = getHealthColor(healthScore);
-                const healthIcon = getHealthIcon(healthScore);
-                const portCount = device.portCount || '-';
-                const ageDisplay = device.deviceAge ? `${device.deviceAge.ageYears}y` : '-';
                 const firmwareShort = device.firmwareVersion ? device.firmwareVersion.substring(0, 20) : '-';
                 const ipAddress = device.managementIP || '-';
                 const rowClass = device.isCritical ? 'critical-row' : (device.isOffline ? 'offline-row' : '');
@@ -6413,25 +6419,14 @@
                 if (index < 3) {
                     console.log(`📊 Rendering device ${index + 1}:`, {
                         deviceName: device.deviceName,
-                        'model (raw)': device.model,
-                        'model (type)': typeof device.model,
-                        'model (length)': device.model ? device.model.length : 0,
-                        'sn (raw)': device.sn,
-                        'sn (type)': typeof device.sn,
-                        'sn (length)': device.sn ? device.sn.length : 0,
                         vendor: device.vendor,
                         detectedVendor: detectedVendor,
-                        'NOC fields': {
-                            status: device.status,
-                            healthScore: healthScore,
-                            portCount: portCount,
-                            age: ageDisplay,
-                            firmware: firmwareShort,
-                            ip: ipAddress,
-                            isCritical: device.isCritical,
-                            isOffline: device.isOffline
-                        },
-                        'FULL DEVICE OBJECT': device
+                        model: device.model,
+                        sn: device.sn,
+                        type: detectedType,
+                        state: device.state,
+                        region: device.region,
+                        fullLocation: device.fullLocation
                     });
                 }
 
@@ -6457,17 +6452,6 @@
                             ${device.sn ? '<button class="copy-btn-inline" onclick="copyToClipboard(\'' + escapeHtml(device.sn) + '\', event)" title="Copy">📋</button>' : ''}
                         </div>
                     </td>
-                    <!-- Status Group -->
-                    <td style="text-align: center;">
-                        <span class="status-badge status-${(device.status || 'UNKNOWN').toLowerCase()}">
-                            ${statusIcon} ${device.status || 'UNKNOWN'}
-                        </span>
-                    </td>
-                    <td style="text-align: center;">
-                        <span class="health-badge" style="background-color: ${healthColor}; color: white; border-color: ${healthColor};">
-                            ${healthIcon} ${healthScore}%
-                        </span>
-                    </td>
                     <!-- Device Info Group -->
                     <td><span class="vendor-badge">${getVendorIcon(detectedVendor)} ${detectedVendor}</span></td>
                     <td><span class="type-badge">${getDeviceTypeIcon(detectedType)} ${detectedType}</span></td>
@@ -6477,8 +6461,6 @@
                     <td>
                         <span class="firmware-text" title="${escapeHtml(device.firmwareVersion || '')}" style="font-size: 0.8em; color: #64748b;">${escapeHtml(firmwareShort)}</span>
                     </td>
-                    <td style="text-align: center;"><span class="port-badge">${portCount}</span></td>
-                    <td style="text-align: center;"><span class="age-badge">${ageDisplay}</span></td>
                     <!-- Location Group -->
                     <td>
                         <div class="location-cell">
@@ -6491,18 +6473,6 @@
                             <span class="site-badge">${getSiteTypeIcon(device.siteType)} ${device.siteType || 'Other'}</span>
                             <span class="role-badge">${device.deviceRole || 'General'}</span>
                         </div>
-                    </td>
-                    <!-- HA Configuration Group -->
-                    <td style="text-align: center;">
-                        <span class="ha-indicator ${device.hasHA ? 'ha-yes' : 'ha-no'}">
-                            ${device.hasHA ? '✅ HA' : '⚠️ Single'}
-                        </span>
-                    </td>
-                    <td>
-                        ${device.sn_ha1 ? `<code style="font-size: 0.75em; background: #f1f5f9; padding: 2px 4px; border-radius: 3px;">${escapeHtml(device.sn_ha1)}</code>` : '-'}
-                    </td>
-                    <td>
-                        ${device.sn_ha2 ? `<code style="font-size: 0.75em; background: #f1f5f9; padding: 2px 4px; border-radius: 3px;">${escapeHtml(device.sn_ha2)}</code>` : '-'}
                     </td>
                 </tr>
                 `;
@@ -6522,16 +6492,10 @@
         // Update table statistics display
         function updateTableStatistics() {
             const totalDevices = filteredData.length;
-            const haDevices = filteredData.filter(d => d.hasHA).length;
-            const criticalDevices = filteredData.filter(d => d.isCritical || (d.healthScore && d.healthScore < 50)).length;
 
             const rowCountEl = document.getElementById('tableRowCount');
-            const haCountEl = document.getElementById('tableHACount');
-            const criticalCountEl = document.getElementById('tableCriticalCount');
 
             if (rowCountEl) rowCountEl.textContent = totalDevices;
-            if (haCountEl) haCountEl.textContent = `${haDevices} HA Configured`;
-            if (criticalCountEl) criticalCountEl.textContent = `${criticalDevices} Critical`;
         }
 
         // Toggle compact mode for the table - Enhanced for premium feel
@@ -6616,20 +6580,17 @@
 
         // Export visible table data
         function exportVisibleTable() {
-            const headers = ['Device Name', 'IP Address', 'Serial Number', 'Status', 'Health', 'Vendor', 'Type', 'Model', 'Firmware', 'Region', 'Site', 'HA Status'];
+            const headers = ['Device Name', 'IP Address', 'Serial Number', 'Vendor', 'Type', 'Model', 'Firmware', 'Region', 'Site'];
             const rows = filteredData.map(device => [
                 device.deviceName || '',
                 device.managementIP || '',
                 device.sn || '',
-                device.status || 'UNKNOWN',
-                device.healthScore || '0',
                 detectVendorFromCSV(device),
                 detectDeviceTypeFromCSV(device),
                 device.model || '',
                 device.firmwareVersion || '',
                 device.fullLocation || device.region || '',
-                device.siteType || '',
-                device.hasHA ? 'HA Configured' : 'Standalone'
+                device.siteType || ''
             ]);
 
             let csv = headers.join(',') + '\n';
@@ -6730,57 +6691,45 @@
 
         // Filter by region
         // Region Filter
-        function filterByRegion(region) {
+        function filterByRegion(region, buttonElement) {
             currentRegion = region;
-            updateActiveButton(event.target);
+            if (buttonElement) updateActiveButton(buttonElement);
             applyFilters();
         }
 
         // Vendor Filter
-        function filterByVendor(vendor) {
+        function filterByVendor(vendor, buttonElement) {
             currentVendor = vendor;
-            updateActiveButton(event.target);
+            if (buttonElement) updateActiveButton(buttonElement);
             applyFilters();
         }
 
         // Device Type Filter
-        function filterByDeviceType(deviceType) {
+        function filterByDeviceType(deviceType, buttonElement) {
             currentDeviceType = deviceType;
-            updateActiveButton(event.target);
+            if (buttonElement) updateActiveButton(buttonElement);
             applyFilters();
         }
 
         // Site Type Filter
-        function filterBySiteType(siteType) {
+        function filterBySiteType(siteType, buttonElement) {
             currentSiteType = siteType;
-            updateActiveButton(event.target);
+            if (buttonElement) updateActiveButton(buttonElement);
             applyFilters();
         }
 
         // Device Role Filter
-        function filterByDeviceRole(deviceRole) {
+        function filterByDeviceRole(deviceRole, buttonElement) {
             currentDeviceRole = deviceRole;
-            updateActiveButton(event.target);
-            applyFilters();
-        }
-
-        // Configuration Filter
-        function filterByConfig(config) {
-            currentConfig = config;
-            updateActiveButton(event.target);
+            if (buttonElement) updateActiveButton(buttonElement);
             applyFilters();
         }
 
         // 🚨 NOC Status Filter
-        function filterByNOCStatus(status) {
+        function filterByNOCStatus(status, buttonElement) {
             currentNOCStatus = status;
-            updateActiveButton(event.target);
+            if (buttonElement) updateActiveButton(buttonElement);
             applyFilters();
-        }
-
-        // Legacy function for backward compatibility
-        function filterData(type) {
-            filterByConfig(type);
         }
 
         // Helper function to update active button
@@ -6806,10 +6755,11 @@
             console.log('Current filters - Region:', currentRegion, 'Vendor:', currentVendor, 'Type:', currentDeviceType, 'Search:', searchTerm);
 
             filteredData = deviceData.filter(device => {
-                // Region filter - Match by state extracted from tenant
+                // Region filter - Use VALIDATED state from geographic validator
                 let regionMatch = true;
                 if (currentRegion !== 'all') {
-                    const deviceState = extractStateFromTenant(device.tenant);
+                    // Use validated device.state from analyzeGeographicLocation()
+                    const deviceState = device.state || '';
                     regionMatch = deviceState === currentRegion;
                 }
 
@@ -6839,21 +6789,6 @@
                 if (currentDeviceRole !== 'all') {
                     const detectedRole = detectDeviceRole(device.deviceName);
                     deviceRoleMatch = detectedRole === currentDeviceRole;
-                }
-
-                // Configuration filter (HA vs Standalone)
-                let configMatch = true;
-                if (currentConfig !== 'all') {
-                    switch(currentConfig.toLowerCase()) {
-                        case 'ha':
-                            configMatch = device.hasHA;
-                            break;
-                        case 'standalone':
-                            configMatch = !device.hasHA;
-                            break;
-                        default:
-                            configMatch = true;
-                    }
                 }
 
                 // 🚨 NOC Status filter
@@ -6888,7 +6823,7 @@
                     (device.deviceRole && device.deviceRole.toLowerCase().includes(searchTerm)) ||
                     (device.region && device.region.toLowerCase().includes(searchTerm));
 
-                return regionMatch && vendorMatch && deviceTypeMatch && siteTypeMatch && deviceRoleMatch && configMatch && nocStatusMatch && searchMatch;
+                return regionMatch && vendorMatch && deviceTypeMatch && siteTypeMatch && deviceRoleMatch && nocStatusMatch && searchMatch;
             });
 
             console.log('✓ applyFilters complete - filteredData.length:', filteredData.length, 'of', deviceData.length);
@@ -6904,12 +6839,6 @@
                 const badge = document.getElementById(id);
                 if (badge) badge.textContent = count;
             };
-
-            // 🚨 NOC Status badges
-            updateBadge('badge-noc-all', deviceData.length);
-            updateBadge('badge-noc-critical', deviceData.filter(d => d.isCritical === true).length);
-            updateBadge('badge-noc-offline', deviceData.filter(d => d.isOffline === true).length);
-            updateBadge('badge-noc-low_health', deviceData.filter(d => d.healthScore && d.healthScore < 70).length);
 
             // Region badges
             updateBadge('badge-region-all', deviceData.length);
@@ -6958,11 +6887,6 @@
             updateBadge('badge-role-internet', deviceData.filter(d => d.deviceRole === 'Internet Edge').length);
             updateBadge('badge-role-access', deviceData.filter(d => d.deviceRole === 'Access').length);
             updateBadge('badge-role-firewall', deviceData.filter(d => d.deviceRole === 'Firewall').length);
-
-            // Configuration badges
-            updateBadge('badge-all', deviceData.length);
-            updateBadge('badge-ha', deviceData.filter(d => d.hasHA).length);
-            updateBadge('badge-standalone', deviceData.filter(d => !d.hasHA).length);
         }
 
         // Quick filter
@@ -7126,9 +7050,6 @@
                     'Model',
                     'Serial Number',
                     'Device Type',
-                    'Status',
-                    'Health Score',
-                    'Health Grade',
                     'Risk Level',
                     'Risk Score',
                     'Compliance',
@@ -7138,13 +7059,9 @@
                     'City',
                     'Site Type',
                     'Device Role',
-                    'HA Status',
-                    'HA Serial 1',
-                    'HA Serial 2',
                     'Firmware Version',
                     'Age (Years)',
                     'Support Status',
-                    'Port Count',
                     'Last Seen',
                     'Critical Issues',
                     'Recommendations',
@@ -7177,9 +7094,6 @@
                             device.model || 'Unknown',
                             device.sn || device.serialNumber || '',
                             device.deviceType || detectDeviceTypeFromCSV(device) || 'Unknown',
-                            device.status || 'Unknown',
-                            health.score || 0,
-                            health.grade || 'N/A',
                             risk.level || 'Unknown',
                             risk.totalScore || 0,
                             compliance.status || 'Unknown',
@@ -7189,15 +7103,11 @@
                             device.city || '',
                             device.siteType || 'General',
                             device.deviceRole || 'Network',
-                            device.hasHA ? 'HA Active' : 'Standalone',
-                            device.sn_ha1 || device.secondarySN || '',
-                            device.sn_ha2 || '',
                             device.firmwareVersion || device.firmware || '',
                             device.ageYears || estimateDeviceAge(device) || 0,
                             assessVendorSupport(device) || 'Unknown',
-                            device.portCount || 0,
                             device.lastSeen || now.toISOString(),
-                            health.score < 50 || risk.level === 'Critical' ? 'YES' : 'NO',
+                            risk.level === 'Critical' ? 'YES' : 'NO',
                             getTopRecommendation(health, risk, compliance),
                             device.importDate || timestamp
                         ];
@@ -7735,31 +7645,6 @@
             try {
                 // Safe data processing with validation
                 const totalDevices = filteredData.length;
-                const assessmentData = [];
-
-                // Process each device with error handling
-                for (const device of filteredData) {
-                    try {
-                        const health = calculateDeviceHealth(device) || { score: 0, grade: 'N/A', details: [], recommendations: [] };
-                        const risk = calculateRiskScore(device) || { totalScore: 0, level: 'Unknown', factors: [], mitigation: [] };
-                        const compliance = calculateComplianceScore(device) || { score: 0, status: 'Unknown', violations: [] };
-
-                        assessmentData.push({
-                            device: device,
-                            health: health,
-                            risk: risk,
-                            compliance: compliance
-                        });
-                    } catch (err) {
-                        console.error(`Error processing device ${device.deviceName}:`, err);
-                        assessmentData.push({
-                            device: device,
-                            health: { score: 0, grade: 'ERROR', details: [], recommendations: [] },
-                            risk: { totalScore: 0, level: 'ERROR', factors: [], mitigation: [] },
-                            compliance: { score: 0, status: 'ERROR', violations: [] }
-                        });
-                    }
-                }
 
                 // Build comprehensive JSON structure with validation
                 const exportData = {
@@ -7774,40 +7659,32 @@
                 },
                 summary: {
                     statistics: {
-                        totalDevices: totalDevices,
-                        haEnabled: filteredData.filter(d => d.hasHA).length,
-                        haCoverage: ((filteredData.filter(d => d.hasHA).length / totalDevices) * 100).toFixed(1) + '%',
-                        averageHealthScore: (assessmentData.reduce((sum, a) => sum + a.health.score, 0) / totalDevices).toFixed(1),
-                        complianceRate: ((assessmentData.filter(a => a.compliance.status === 'Compliant').length / totalDevices) * 100).toFixed(1) + '%'
-                    },
-                    healthDistribution: {
-                        A: assessmentData.filter(a => a.health.grade === 'A').length,
-                        B: assessmentData.filter(a => a.health.grade === 'B').length,
-                        C: assessmentData.filter(a => a.health.grade === 'C').length,
-                        D: assessmentData.filter(a => a.health.grade === 'D').length,
-                        F: assessmentData.filter(a => a.health.grade === 'F').length
-                    },
-                    riskDistribution: {
-                        critical: assessmentData.filter(a => a.risk.level === 'Critical').length,
-                        high: assessmentData.filter(a => a.risk.level === 'High').length,
-                        medium: assessmentData.filter(a => a.risk.level === 'Medium').length,
-                        low: assessmentData.filter(a => a.risk.level === 'Low').length,
-                        minimal: assessmentData.filter(a => a.risk.level === 'Minimal').length
+                        totalDevices: totalDevices
                     },
                     vendorBreakdown: filteredData.reduce((acc, d) => {
                         const vendor = detectVendorFromCSV(d);
                         acc[vendor] = (acc[vendor] || 0) + 1;
                         return acc;
                     }, {}),
+                    deviceTypeBreakdown: filteredData.reduce((acc, d) => {
+                        const type = detectDeviceTypeFromCSV(d);
+                        acc[type] = (acc[type] || 0) + 1;
+                        return acc;
+                    }, {}),
                     siteTypeBreakdown: filteredData.reduce((acc, d) => {
                         const site = d.siteType || 'Unknown';
                         acc[site] = (acc[site] || 0) + 1;
                         return acc;
+                    }, {}),
+                    regionBreakdown: filteredData.reduce((acc, d) => {
+                        const region = d.region || 'Unknown';
+                        acc[region] = (acc[region] || 0) + 1;
+                        return acc;
                     }, {})
                 },
-                devices: assessmentData.map(({ device, health, risk, compliance }) => {
+                devices: filteredData.map(device => {
                     // Safe data extraction with defaults
-                    const safeDevice = {
+                    return {
                         identity: {
                             deviceName: device.deviceName || 'UNKNOWN',
                             serialNumber: device.sn || device.serialNumber || '',
@@ -7821,72 +7698,19 @@
                             state: device.state || '',
                             city: device.city || '',
                             siteType: device.siteType || 'General',
+                            deviceRole: device.deviceRole || 'Network',
                             fullLocation: [device.city, device.state, device.country].filter(Boolean).join(', ') || ''
                         },
                         configuration: {
-                            haStatus: device.hasHA ? 'HA Configured' : 'Standalone',
-                            haSerial1: device.sn_ha1 || device.secondarySN || '',
-                            haSerial2: device.sn_ha2 || '',
-                            deviceRole: device.deviceRole || 'Network',
                             managementIP: device.ipAddress || device.managementIP || '',
                             firmwareVersion: device.firmwareVersion || device.firmware || ''
                         },
-                        assessment: {
-                            health: {
-                                score: health.score || 0,
-                                grade: health.grade || 'N/A',
-                                issues: Array.isArray(health.details) ? health.details.map(d => ({
-                                    category: d.category || 'General',
-                                    impact: d.impact || 0,
-                                    description: d.reason || 'No description'
-                                })) : [],
-                                recommendations: Array.isArray(health.recommendations) ? health.recommendations : []
-                            },
-                            risk: {
-                                totalScore: risk.totalScore || 0,
-                                level: risk.level || 'Unknown',
-                                factors: Array.isArray(risk.factors) ? risk.factors.map(f => ({
-                                    type: f.type || 'General',
-                                    severity: f.severity || 'Low',
-                                    score: f.score || 0,
-                                    description: f.description || 'No description'
-                                })) : [],
-                                mitigationPlan: Array.isArray(risk.mitigation) ? risk.mitigation : []
-                            },
-                            compliance: {
-                                score: compliance.score || 0,
-                                status: compliance.status || 'Unknown',
-                                violations: Array.isArray(compliance.violations) ? compliance.violations : [],
-                                remediationPlan: compliance.remediationPlan || []
-                            }
-                        },
-                        lifecycle: {
-                            estimatedAge: device.ageYears || estimateDeviceAge(device) || 0,
-                            vendorSupport: assessVendorSupport(device) || 'Unknown',
-                            lastUpdated: device.lastUpdated || device.importDate || now.toISOString(),
-                            refreshRecommended: (device.ageYears || estimateDeviceAge(device) || 0) > 5
+                        metadata: {
+                            importDate: device.importDate || now.toISOString(),
+                            lastUpdated: device.lastUpdated || device.importDate || now.toISOString()
                         }
                     };
-                    return safeDevice;
-                }),
-                recommendations: {
-                    immediate: assessmentData
-                        .filter(a => a.risk.level === 'Critical')
-                        .slice(0, 5)
-                        .map(a => ({
-                            device: a.device.deviceName,
-                            action: a.risk.mitigation[0]?.action || 'Review required',
-                            priority: 'Critical'
-                        })),
-                    shortTerm: assessmentData
-                        .filter(a => a.compliance.status === 'Non-Compliant')
-                        .slice(0, 5)
-                        .map(a => ({
-                            device: a.device.deviceName,
-                            action: 'Remediate compliance violations',
-                            priority: 'High'
-                        }))
-                }
+                })
                 };
 
                 // Convert to JSON with error handling
@@ -7901,13 +7725,12 @@
                 document.body.removeChild(a);
                 window.URL.revokeObjectURL(url);
 
-                showNotification(`✅ Successfully exported ${filteredData.length} devices to JSON with complete assessment data`, 'success');
+                showNotification(`✅ Successfully exported ${filteredData.length} devices to JSON`, 'success');
 
                 // Log export analytics
                 console.log('📊 JSON Export Analytics:', {
                     devices: totalDevices,
                     fileSize: (json.length / 1024).toFixed(2) + ' KB',
-                    avgHealth: (assessmentData.reduce((sum, a) => sum + a.health.score, 0) / totalDevices).toFixed(1),
                     timestamp: now.toISOString()
                 });
 
@@ -9166,11 +8989,15 @@
             const organizedDevices = [];
             const processedSerials = new Set();
 
-            filteredData.forEach(device => {
+            filteredData.forEach((device, idx) => {
                 const deviceSerial = device.sn ? device.sn.toLowerCase().trim() : '';
 
+                // Create unique identifier: use serial if available, otherwise use device name + index
+                const uniqueId = deviceSerial || `${device.deviceName || 'unknown'}_${idx}`;
+
                 // Skip if already processed or if it's a child device (will be added with parent)
-                if (processedSerials.has(deviceSerial) || childDevices.has(deviceSerial)) {
+                // Only check childDevices if we have a valid serial number
+                if (processedSerials.has(uniqueId) || (deviceSerial && childDevices.has(deviceSerial))) {
                     return;
                 }
 
@@ -9180,7 +9007,7 @@
                     isChild: false,
                     parentDevice: null
                 });
-                processedSerials.add(deviceSerial);
+                processedSerials.add(uniqueId);
 
                 // Add child devices if HA configured
                 if (device.hasHA) {
@@ -9268,7 +9095,7 @@
     <div class="header-section">
         <h1>Network Infrastructure Asset Report</h1>
         <p><strong>Generated:</strong> ${timestamp}</p>
-        <p><strong>Total Devices:</strong> ${filteredData.length} (${haDevicesCount} HA pairs, ${childDevicesCount} child devices)</p>
+        <p><strong>Total Devices:</strong> ${filteredData.length} (${organizedDevices.length} shown in report, ${childDevicesCount} as HA children)</p>
         <p><strong>Report Type:</strong> Hierarchical Asset Inventory with Parent-Child Relationships</p>
     </div>
 
@@ -9826,9 +9653,9 @@
 
             switch (selectedExportFormat) {
                 case 'csv':
-                    previewContent = 'Device Name,Vendor,Model,Status,Health Score\n';
+                    previewContent = 'Device Name,Vendor,Model,Serial Number,Region\n';
                     dataToPreview.forEach(d => {
-                        previewContent += `${d.deviceName},${d.vendor},${d.model},${d.status || 'OK'},${d.healthScore || 'N/A'}\n`;
+                        previewContent += `${d.deviceName},${d.vendor},${d.model},${d.sn || 'N/A'},${d.region || 'Unknown'}\n`;
                     });
                     break;
 
@@ -10643,8 +10470,505 @@
             }
         }
 
+        // ═══════════════════════════════════════════════════════════════════════════════
+        // 🔧 HIERARCHICAL CSV PRE-PROCESSOR
+        // Automatically detects and flattens NMS exports with repeating headers
+        // ═══════════════════════════════════════════════════════════════════════════════
+        function preprocessHierarchicalCSV(content) {
+            const lines = content.trim().split('\n');
+            if (lines.length < 10) return content; // Too small to be hierarchical
+
+            // Detect hierarchical CSV patterns:
+            // Pattern 1: Repeating blocks (same header appears 3+ times)
+            // Pattern 2: Two-section format (device header + component header)
+
+            let deviceHeaderCount = 0;
+            let componentHeaderCount = 0;
+            let deviceHeaderLine = -1;
+            let componentHeaderLine = -1;
+
+            // Scan first 200 lines for headers (components can be far down)
+            for (let i = 0; i < Math.min(200, lines.length); i++) {
+                const line = lines[i];
+
+                // Device section header: "Status,Device Category,Name,..."
+                if (line.includes('Status,Device Category') && line.includes('Name,Hostname')) {
+                    deviceHeaderCount++;
+                    if (deviceHeaderLine === -1) {
+                        deviceHeaderLine = i;
+                    }
+                }
+
+                // Component section header: "Status,Administrative State,...,Serial Number,..."
+                if (line.includes('Status,Administrative State') && line.includes('Serial Number')) {
+                    componentHeaderCount++;
+                    if (componentHeaderLine === -1) {
+                        componentHeaderLine = i;
+                    }
+                }
+            }
+
+            // Pattern 1: Repeating blocks (same device header appears multiple times)
+            if (deviceHeaderCount > 2) {
+                console.log('🔍 Hierarchical CSV detected (repeating blocks)! Auto-flattening...');
+                return flattenHierarchicalCSV(lines);
+            }
+
+            // Pattern 2: Two-section format (one device header + one component header)
+            if (deviceHeaderLine !== -1 && componentHeaderLine !== -1 && componentHeaderLine > deviceHeaderLine) {
+                console.log(`🔍 Two-section hierarchical CSV detected! Device section at line ${deviceHeaderLine + 1}, Component section at line ${componentHeaderLine + 1}`);
+                console.log('🔄 Auto-flattening to merge device and component data...');
+                return flattenHierarchicalCSV(lines);
+            }
+
+            return content; // Return original if not hierarchical
+        }
+
+        function flattenHierarchicalCSV(lines) {
+            // This CSV has TWO sections:
+            // Section 1: Device rows (all devices together)
+            // Section 2: Component rows (all components together)
+            // Components reference their parent device via "Managed By" field (column [3])
+
+            const deviceMap = new Map(); // Map device name -> device object
+            let deviceHeader = null;
+            let componentHeader = null;
+            let state = 'INIT';
+            let deviceHeaderLine = -1;
+            let componentHeaderLine = -1;
+
+            console.log('🔍 Parsing hierarchical CSV with separated device and component sections...');
+
+            // PASS 1: Parse ALL devices and store in map
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i].trim();
+                if (!line) continue;
+
+                const cols = parseCSVLine(line);
+
+                // Device header
+                if (cols.length >= 30 && cols[0] === 'Status' && cols[1] === 'Device Category') {
+                    deviceHeader = cols;
+                    deviceHeaderLine = i;
+                    state = 'DEVICE_SECTION';
+                    console.log(`   📋 Device header found at line ${i + 1}`);
+                    continue;
+                }
+
+                // Component header - marks end of device section
+                if (cols.length >= 10 && cols[0] === 'Status' && cols[1] === 'Administrative State') {
+                    componentHeader = cols;
+                    componentHeaderLine = i;
+                    state = 'COMPONENT_SECTION';
+                    console.log(`   📋 Component header found at line ${i + 1}`);
+                    console.log(`   ✅ Parsed ${deviceMap.size} devices from device section`);
+                    break; // Stop parsing devices, will parse components in pass 2
+                }
+
+                // Device data row
+                if (state === 'DEVICE_SECTION' && cols.length >= 25) {
+                    const deviceName = cols[2] || ''; // Column [2] = Name
+                    if (deviceName && !deviceName.includes('Pseudo') && deviceName !== 'VDOM') {
+                        deviceMap.set(deviceName, {
+                            deviceRow: cols,
+                            components: []
+                        });
+                    }
+                }
+            }
+
+            // PASS 2: Parse ALL components and match to devices by "Managed By" field
+            if (componentHeaderLine !== -1) {
+                console.log('   🔗 Matching components to parent devices...');
+                let matchedComponents = 0;
+                let unmatchedComponents = 0;
+
+                for (let i = componentHeaderLine + 1; i < lines.length; i++) {
+                    const line = lines[i].trim();
+                    if (!line) continue;
+
+                    const cols = parseCSVLine(line);
+                    if (cols.length < 5) continue;
+
+                    const managedBy = cols[3] || ''; // Column [3] = "Managed By" (parent device name)
+                    const compName = cols[5] || '';  // Column [5] = Component Name
+
+                    // Skip noise
+                    if (!compName || compName.includes('Pseudo Chassis') || compName === 'VDOM') {
+                        continue;
+                    }
+
+                    // Find parent device
+                    if (deviceMap.has(managedBy)) {
+                        deviceMap.get(managedBy).components.push(cols);
+                        matchedComponents++;
+                    } else {
+                        unmatchedComponents++;
+                        if (unmatchedComponents <= 5) {
+                            console.warn(`   ⚠️ Component "${compName}" references unknown device "${managedBy}"`);
+                        }
+                    }
+                }
+
+                console.log(`   ✅ Matched ${matchedComponents} components to devices`);
+                if (unmatchedComponents > 0) {
+                    console.warn(`   ⚠️ ${unmatchedComponents} components couldn't be matched to parent devices`);
+                }
+            }
+
+            // Convert map to array
+            const devices = Array.from(deviceMap.values());
+
+            // Build flattened CSV
+            const flatLines = [];
+
+            // Combined header
+            const flatHeader = [
+                'Status', 'Device Category', 'Name', 'Hostname', 'Management Address',
+                'Tenant', 'Security Group', 'System Location', 'Device Vendor', 'Device Family',
+                'Device Profile', 'Model Name', 'Serial Number', 'Firmware Version',
+                'Hardware Version', 'Software Version', 'System Description',
+                'Node Management Mode', 'System Object ID', 'SNMP Agent', 'Protocol Version',
+                'Agent SNMP State', 'Management Address ICMP State', 'Status Last Modified',
+                'Discovery State', 'Last Completed', 'Created', 'Last Modified'
+            ];
+            flatLines.push(flatHeader.join(','));
+
+            // Device rows with merged component data
+            devices.forEach(device => {
+                const row = [];
+                const d = device.deviceRow;
+
+                // Device fields (map to output columns)
+                row[0] = d[0] || '';   // Status
+                row[1] = d[1] || '';   // Device Category
+                row[2] = d[2] || '';   // Name
+                row[3] = d[3] || '';   // Hostname
+                row[4] = d[4] || '';   // Management Address
+                row[5] = d[5] || '';   // Tenant
+                row[6] = d[6] || '';   // Security Group
+                row[7] = d[7] || '';   // System Location
+                row[8] = d[20] || '';  // Device Vendor
+                row[9] = d[21] || '';  // Device Family
+                row[10] = d[8] || '';  // Device Profile
+
+                // Find best component (skip VDOMs, prefer with serial)
+                let bestComp = null;
+                for (const comp of device.components) {
+                    if (comp[8] && comp[8].trim()) {
+                        bestComp = comp;
+                        break;
+                    }
+                    if (!bestComp) bestComp = comp;
+                }
+
+                // Component fields
+                if (bestComp) {
+                    row[11] = bestComp[6] || '';  // Model Name
+                    row[12] = bestComp[8] || '';  // Serial Number
+                    row[13] = bestComp[9] || '';  // Firmware Version
+                    row[14] = bestComp[10] || ''; // Hardware Version
+                    row[15] = bestComp[11] || ''; // Software Version
+                }
+
+                // Rest of device fields
+                row[16] = d[17] || '';  // System Description
+                row[17] = d[18] || '';  // Node Management Mode
+                row[18] = d[19] || '';  // System Object ID
+                row[19] = d[22] || '';  // SNMP Agent
+                row[20] = d[23] || '';  // Protocol Version
+                row[21] = d[24] || '';  // Agent SNMP State
+                row[22] = d[25] || '';  // Management Address ICMP State
+                row[23] = d[10] || '';  // Status Last Modified
+                row[24] = d[27] || '';  // Discovery State
+                row[25] = d[28] || '';  // Last Completed
+                row[26] = d[29] || '';  // Created
+                row[27] = d[30] || '';  // Last Modified
+
+                // CSV escape and join
+                const csvRow = row.map(cell => {
+                    if (!cell) return '';
+                    const str = String(cell);
+                    if (str.includes(',') || str.includes('"') || str.includes('\n')) {
+                        return '"' + str.replace(/"/g, '""') + '"';
+                    }
+                    return str;
+                }).join(',');
+
+                flatLines.push(csvRow);
+            });
+
+            console.log(`✅ Flattened ${devices.length} devices from hierarchical CSV`);
+            return flatLines.join('\n');
+        }
+
+        // ═══════════════════════════════════════════════════════════════════════════════
+        // 🧠 INTELLIGENT NAMING CONVENTION PARSER
+        // Extracts location, site type, device role, and HA pairing from hostnames
+        // ═══════════════════════════════════════════════════════════════════════════════
+
+        function parseHostnameIntelligent(hostname, systemLocation = '', ipAddress = '') {
+            const result = {
+                country: '', state: '', stateCode: '', city: '', jurisdiction: '',
+                siteType: '', siteName: '', pod: '', stack: '',
+                deviceRole: '', deviceFunction: '', vendor: '',
+                haGroup: '', haRole: '', isPrimary: false, haPartner: '',
+                confidence: 0
+            };
+
+            if (!hostname) return result;
+            const lower = hostname.toLowerCase();
+            let confidence = 0;
+
+            // 1. LOCATION/JURISDICTION EXTRACTION
+            // NOTE: Only match SPECIFIC multi-letter prefixes at hostname start with word boundary
+            // Avoid short 2-letter codes that match device names/chassis/models
+            const jurisdictionMap = {
+                'lil': { jurisdiction: 'Lottery IL', state: 'Illinois', stateCode: 'IL', country: 'US' },
+                'ris': { jurisdiction: 'RI Sports', state: 'Rhode Island', stateCode: 'RI', country: 'US' },
+                'risp': { jurisdiction: 'RI Sports', state: 'Rhode Island', stateCode: 'RI', country: 'US' },
+                'usvi': { jurisdiction: 'US Virgin Islands', state: 'US Virgin Islands', stateCode: 'VI', country: 'US' }
+                // Removed short codes like 'tx', 'ca', 'co', 'in' - too generic, cause false positives
+                // These match chassis names (CAT6509), model names (CO-ROUTER), etc.
+            };
+
+            // Only match if prefix is followed by non-letter (word boundary) or end of string
+            // This prevents "CATALYST" from matching "ca", "CORE" from matching "co", etc.
+            for (const [prefix, data] of Object.entries(jurisdictionMap)) {
+                const regex = new RegExp(`^${prefix}(?=[^a-z]|$)`);
+                if (regex.test(lower)) {
+                    Object.assign(result, data);
+                    confidence += 30;
+                    break;
+                }
+            }
+
+            // 2. CITY EXTRACTION
+            const locLower = systemLocation.toLowerCase();
+            if (locLower.includes('austin') || lower.includes('aust')) {
+                result.city = 'Austin';
+                if (!result.state) result.state = 'Texas';
+                confidence += 15;
+            } else if (locLower.includes('west greenwich') || locLower.includes('wg')) {
+                result.city = 'West Greenwich';
+                if (!result.state) result.state = 'Rhode Island';
+                confidence += 15;
+            } else if (locLower.includes('st.thomas') || locLower.includes('st thomas')) {
+                result.city = 'St. Thomas';
+                if (!result.state) result.state = 'US Virgin Islands';
+                confidence += 15;
+            }
+
+            // 3. SITE TYPE EXTRACTION
+            if (lower.includes('pdc') || locLower.includes('pdc')) {
+                result.siteType = 'PDC';
+                confidence += 15;
+            } else if (lower.includes('bdc') || locLower.includes('bdc')) {
+                result.siteType = 'BDC';
+                confidence += 15;
+            } else if (lower.includes('cat') || locLower.includes('cat')) {
+                result.siteType = 'CAT';
+                confidence += 15;
+            } else if (locLower.includes('hub')) {
+                result.siteType = 'Hub';
+                confidence += 15;
+            }
+
+            // 4. DEVICE ROLE EXTRACTION
+            const deviceRoleMap = {
+                'fw': { role: 'Firewall', function: 'Security', type: 'Firewall' },
+                'crsw': { role: 'Core Switch', function: 'Core Switching', type: 'Switch' },
+                'wansw': { role: 'WAN Switch', function: 'WAN Edge', type: 'Switch' },
+                'vtlb': { role: 'Virtual Load Balancer', function: 'Load Balancing', type: 'Load Balancer' },
+                'hp': { role: 'HP Server', function: 'Compute', type: 'Server', vendor: 'Hewlett Packard' },
+                'acon': { role: 'Console Server', function: 'Management', type: 'Console' },
+                'lantronix': { role: 'Console Server', function: 'Management', type: 'Console', vendor: 'Lantronix' },
+                'pix': { role: 'Firewall', function: 'Security', type: 'Firewall', vendor: 'Cisco' }
+            };
+
+            for (const [pattern, data] of Object.entries(deviceRoleMap)) {
+                if (lower.includes(pattern)) {
+                    result.deviceRole = data.role;
+                    result.deviceFunction = data.function;
+                    if (data.vendor) result.vendor = data.vendor;
+                    confidence += 25;
+                    break;
+                }
+            }
+
+            // 5. HA DETECTION
+            const siteMatch = lower.match(/s(\d+)/);
+            if (siteMatch) {
+                result.haGroup = siteMatch[1];
+                if (siteMatch[1] === '1') {
+                    result.isPrimary = true;
+                    result.haRole = 'Primary';
+                    result.haPartner = hostname.replace(/s1/, 's2');
+                } else if (siteMatch[1] === '2') {
+                    result.isPrimary = false;
+                    result.haRole = 'Secondary';
+                    result.haPartner = hostname.replace(/s2/, 's1');
+                }
+                confidence += 15;
+            }
+
+            // 6. IP ADDRESS RANGE MAPPING
+            if (ipAddress) {
+                if (ipAddress.startsWith('10.215.49.')) {
+                    if (!result.city) result.city = 'Austin';
+                    confidence += 10;
+                } else if (ipAddress.startsWith('10.215.59.')) {
+                    if (!result.city) result.city = 'West Greenwich';
+                    confidence += 10;
+                }
+            }
+
+            result.confidence = Math.min(confidence, 100);
+            return result;
+        }
+
+        /**
+         * Extract region from Tenant field (e.g., "California_Tenant" → "California")
+         */
+        function extractRegionFromTenant(tenant) {
+            if (!tenant) return '';
+
+            // Pattern: "StateName_Tenant"
+            const match = tenant.match(/^([A-Za-z\s]+)_Tenant$/);
+            if (match) {
+                return match[1].trim();
+            }
+
+            // If tenant doesn't match pattern, return as-is (might be useful)
+            return tenant;
+        }
+
+        /**
+         * Enrich device data with COMPREHENSIVE GEOGRAPHIC VALIDATION
+         * Multi-field analysis with cross-validation and confidence scoring
+         * Only populates geographic data when VALIDATED and ACCURATE
+         */
+        function enrichDeviceDataWithIntelligence(devices) {
+            console.log('\n🌍 Starting comprehensive geographic validation for all devices...');
+
+            let validatedCount = 0;
+            let rejectedCount = 0;
+            let sheetNameCount = 0;
+            const mismatches = [];
+
+            const enriched = devices.map(device => {
+                // STEP 1: Comprehensive geographic analysis (validates from multiple sources)
+                const geoResult = analyzeGeographicLocation(device);
+
+                // Track validation statistics
+                if (geoResult.validated) {
+                    validatedCount++;
+                    if (device.sheetName) sheetNameCount++;
+                } else {
+                    rejectedCount++;
+                    if (device.sheetName) {
+                        console.warn(`   ⚠️ VALIDATION FAILED despite sheet name: ${device.sheetName} - Device: ${device.deviceName}`);
+                    }
+                }
+
+                // Check for state mismatches (device from one sheet assigned to different state)
+                if (device.sheetName && geoResult.validated && geoResult.state) {
+                    const sheetNameClean = device.sheetName
+                        .replace(/_Tenant$/i, '')
+                        .replace(/^node-list-/i, '')
+                        .replace(/_/g, ' ')
+                        .trim();
+
+                    // Compare (ignoring spaces for compound names like NorthCarolina)
+                    const sheetLower = sheetNameClean.toLowerCase().replace(/\s+/g, '');
+                    const stateLower = geoResult.state.toLowerCase().replace(/\s+/g, '');
+
+                    if (sheetLower !== stateLower &&
+                        sheetNameClean !== 'Default' &&
+                        sheetNameClean !== 'DCA Hosted Services' &&
+                        sheetNameClean !== 'NRC' &&
+                        sheetNameClean !== 'Antilles') {
+                        mismatches.push({
+                            device: device.deviceName,
+                            sheet: sheetNameClean,
+                            assigned: geoResult.state
+                        });
+                    }
+                }
+
+                // STEP 2: Only parse hostname for non-geographic data (HA, site type, etc.)
+                // NEVER use hostname for geographic data
+                const parsed = parseHostnameIntelligent(
+                    device.deviceName || device.hostname,
+                    '', // Don't pass system location to avoid geographic parsing
+                    ''  // Don't pass IP to avoid geographic parsing
+                );
+
+                // STEP 3: Merge data with STRICT validation
+                return {
+                    ...device,
+                    // Geographic data: ONLY from validated analysis (never from hostname)
+                    country: geoResult.validated ? geoResult.country : '',
+                    state: geoResult.validated ? geoResult.state : '',
+                    stateCode: geoResult.validated ? geoResult.stateCode : '',
+                    city: geoResult.validated ? geoResult.city : '',
+
+                    // World Region (US/EU/AP/LA)
+                    worldRegion: geoResult.validated ? geoResult.worldRegion : '',
+
+                    // Keep original region field (from Tenant/sheet name)
+                    region: device.region || '',
+
+                    // Site type from hostname parsing (non-geographic)
+                    siteType: device.siteType || parsed.siteType,
+
+                    // Device role: Use CSV Device Category if available
+                    deviceRole: device.deviceRole || parsed.deviceRole,
+
+                    // HA data (from hostname parsing - not geographic)
+                    haGroup: parsed.haGroup,
+                    haRole: parsed.haRole,
+                    isPrimary: parsed.isPrimary,
+                    haPartner: parsed.haPartner,
+
+                    // Computed fields
+                    fullLocation: geoResult.validated ? [
+                        geoResult.city,
+                        geoResult.state,
+                        geoResult.country
+                    ].filter(x => x).join(', ') : '',
+
+                    // Validation metadata
+                    geoValidated: geoResult.validated || false,
+                    geoConfidence: geoResult.confidence || 0
+                };
+            });
+
+            // Print validation summary
+            console.log(`\n📊 Geographic Validation Summary:`);
+            console.log(`   ✅ Validated: ${validatedCount}/${devices.length} (${(validatedCount/devices.length*100).toFixed(1)}%)`);
+            console.log(`   ❌ Rejected: ${rejectedCount}/${devices.length} (${(rejectedCount/devices.length*100).toFixed(1)}%)`);
+            console.log(`   📄 From Sheet Names: ${sheetNameCount}/${validatedCount}`);
+
+            if (mismatches.length > 0) {
+                console.warn(`\n⚠️ STATE MISMATCHES DETECTED: ${mismatches.length} devices`);
+                console.warn(`   Devices from one sheet assigned to different state!`);
+                console.table(mismatches.slice(0, 20)); // Show first 20
+                if (mismatches.length > 20) {
+                    console.warn(`   ... and ${mismatches.length - 20} more mismatches`);
+                }
+            } else {
+                console.log(`   ✅ No state mismatches - all devices assigned to correct sheet states`);
+            }
+
+            return enriched;
+        }
+
         // Enhanced CSV Parser - Handles multiple column name variations
         function parseCSV(content) {
+            // Pre-process: Check if hierarchical and flatten if needed
+            content = preprocessHierarchicalCSV(content);
+
             const lines = content.trim().split('\n');
             if (lines.length < 2) return [];
 
@@ -10736,22 +11060,64 @@
                     continue; // Skip this row
                 }
 
+                // Extract all raw values first
+                const rawDeviceVendor = getValue(values, columnMap.deviceVendor) || '';
+                const rawDeviceCategory = getValue(values, columnMap.deviceCategory) || '';
+                const rawDeviceProfile = getValue(values, columnMap.deviceProfile) || '';
+                const rawVendor = getValue(values, columnMap.vendor) || '';
+                const rawDeviceType = getValue(values, columnMap.deviceType) || '';
+                const rawSystemDescription = getValue(values, columnMap.systemDescription) || '';
+                const rawFirmwareVersion = getValue(values, columnMap.firmwareVersion) || '';
+                const rawSoftwareVersion = getValue(values, columnMap.softwareVersion) || '';
+
+                // 🎯 INTELLIGENT FIELD FALLBACK LOGIC
+                // Use Device Vendor if Vendor is empty
+                const finalVendor = rawVendor || rawDeviceVendor;
+
+                // Use Device Category if Device Type is empty
+                const finalDeviceType = rawDeviceType || rawDeviceCategory;
+
+                // Use Device Profile if Model is empty (common in NMS exports)
+                const finalModel = rawModel || rawDeviceProfile;
+
+                // Extract firmware version from System Description if not explicitly provided
+                let finalFirmwareVersion = rawFirmwareVersion || rawSoftwareVersion;
+                if (!finalFirmwareVersion && rawSystemDescription) {
+                    const versionMatch = rawSystemDescription.match(/Version\s+([\d\.]+[a-zA-Z0-9\-\(\)]+)/i);
+                    if (versionMatch) {
+                        finalFirmwareVersion = versionMatch[1];
+                    }
+                }
+
+                // Map Device Category to Device Role (use CSV data FIRST)
+                const categoryToRole = {
+                    'Firewall': 'Firewall',
+                    'Router': 'Router',
+                    'Switch': 'Switch',
+                    'Switch-Router': 'Switch',
+                    'Load Balancer': 'Load Balancer',
+                    'Server': 'Server',
+                    'Computer': 'Server'
+                };
+
+                const derivedRole = categoryToRole[rawDeviceCategory] || getValue(values, columnMap.deviceRole) || '';
+
                 const device = {
-                    // Basic fields
+                    // Basic fields with intelligent fallbacks
                     region: getValue(values, columnMap.region) || 'US',
                     deviceName: getValue(values, columnMap.deviceName) || `Device-${i}`,
-                    vendor: getValue(values, columnMap.vendor) || '',
-                    deviceType: getValue(values, columnMap.deviceType) || '',
-                    model: rawModel || '',
-                    series: rawModel || '',
+                    vendor: finalVendor,
+                    deviceType: finalDeviceType,
+                    model: finalModel,
+                    series: finalModel,
                     siteType: getValue(values, columnMap.siteType) || '',
-                    deviceRole: getValue(values, columnMap.deviceRole) || '',
+                    deviceRole: derivedRole,
                     sn: rawSN || '',
                     hasHA: parseBoolean(getValue(values, columnMap.hasHA)),
                     sn_ha1: getValue(values, columnMap.sn_ha1) || '',
                     sn_ha2: getValue(values, columnMap.sn_ha2) || '',
                     city: getValue(values, columnMap.city) || '',
-                    state: getValue(values, columnMap.state) || '',
+                    state: getValue(values, columnMap.state) || '', // Column mapper now excludes timestamp columns
                     country: getValue(values, columnMap.country) || '',
 
                     // NOC-Critical Fields (for health monitoring and troubleshooting)
@@ -10761,17 +11127,17 @@
                     managedBy: getValue(values, columnMap.managedBy) || '',
                     statusLastModified: getValue(values, columnMap.statusLastModified) || '',
                     stateLastModified: getValue(values, columnMap.stateLastModified) || '',
-                    firmwareVersion: getValue(values, columnMap.firmwareVersion) || '',
+                    firmwareVersion: finalFirmwareVersion,
                     hardwareVersion: getValue(values, columnMap.hardwareVersion) || '',
-                    softwareVersion: getValue(values, columnMap.softwareVersion) || '',
+                    softwareVersion: finalFirmwareVersion, // Use extracted version as fallback
                     componentIdentifier: getValue(values, columnMap.componentIdentifier) || '',
 
                     // Advanced fields for monitoring integration (captured for intelligent parsing)
-                    deviceCategory: getValue(values, columnMap.deviceCategory) || '',
-                    deviceVendor: getValue(values, columnMap.deviceVendor) || '',
+                    deviceCategory: rawDeviceCategory,
+                    deviceVendor: rawDeviceVendor,
                     deviceFamily: getValue(values, columnMap.deviceFamily) || '',
-                    deviceProfile: getValue(values, columnMap.deviceProfile) || '',
-                    systemDescription: getValue(values, columnMap.systemDescription) || '',
+                    deviceProfile: rawDeviceProfile,
+                    systemDescription: rawSystemDescription,
                     systemObjectID: getValue(values, columnMap.systemObjectID) || '',
                     tenant: getValue(values, columnMap.tenant) || 'Default Tenant',
                     managementIP: getValue(values, columnMap.managementIP) || '',
@@ -10819,7 +11185,11 @@
                 vendor: d.vendor
             })));
 
-            return data;
+            // 🧠 Apply intelligent hostname parsing to enrich data
+            const enrichedData = enrichDeviceDataWithIntelligence(data);
+            console.log(`🧠 Intelligent parsing complete - Enriched ${enrichedData.length} devices`);
+
+            return enrichedData;
         }
 
         // ═══════════════════════════════════════════════════════════════════════════════
@@ -10834,11 +11204,24 @@
                 const index = headers.findIndex(h => h === name.toLowerCase());
                 if (index !== -1) return index;
             }
-            // Second pass: partial matches (contains) - but avoid matching HA-related columns for non-HA fields
+            // Second pass: partial matches (contains) - with strict exclusions
             for (const name of possibleNames) {
                 const index = headers.findIndex(h => {
                     // Avoid matching boolean/HA columns for text fields
-                    if (h.includes('ha ') || h.includes('status') || h.includes('configured')) {
+                    if (h.includes('ha ') || h.includes('configured')) {
+                        return false;
+                    }
+                    // CRITICAL FIX: Prevent "State Last Modified" from matching geographic "state"
+                    // Geographic state should NEVER match timestamp/status columns
+                    if (name.toLowerCase() === 'state' || name.toLowerCase() === 'province') {
+                        if (h.includes('modified') || h.includes('last') ||
+                            h.includes('admin') || h.includes('oper') || h.includes('discovery') ||
+                            h.includes('icmp') || h.includes('snmp') || h.includes('agent')) {
+                            return false;
+                        }
+                    }
+                    // For non-state fields, exclude status columns unless explicitly looking for status
+                    if (h.includes('status') && !name.toLowerCase().includes('status')) {
                         return false;
                     }
                     return h.includes(name.toLowerCase());
@@ -11581,54 +11964,70 @@
                 // Read the workbook
                 const workbook = XLSX.read(arrayBuffer, { type: 'array' });
 
-                // Get first worksheet
-                const firstSheetName = workbook.SheetNames[0];
-                const worksheet = workbook.Sheets[firstSheetName];
+                console.log(`📚 Excel file contains ${workbook.SheetNames.length} sheets:`, workbook.SheetNames.join(', '));
 
-                console.log(`📋 Reading sheet: ${firstSheetName}`);
+                // ═══════════════════════════════════════════════════════════════════════════════
+                // IMPORT ALL SHEETS - Use sheet name as region/state indicator
+                // ═══════════════════════════════════════════════════════════════════════════════
+                let allDevices = [];
+                let totalSheetsParsed = 0;
 
-                // Convert to JSON with header row
-                const jsonData = XLSX.utils.sheet_to_json(worksheet, { raw: false, defval: '' });
+                for (const sheetName of workbook.SheetNames) {
+                    console.log(`\n📋 Processing sheet: "${sheetName}"`);
 
-                if (!jsonData || jsonData.length === 0) {
-                    throw new Error('No data found in Excel file');
-                }
+                    const worksheet = workbook.Sheets[sheetName];
 
-                console.log(`📊 Found ${jsonData.length} rows in Excel`);
+                    // Convert to JSON with header row
+                    const jsonData = XLSX.utils.sheet_to_json(worksheet, { raw: false, defval: '' });
 
-                // Convert Excel data to our internal format using the same column mapping as CSV
-                const headers = Object.keys(jsonData[0]).map(h => h.toLowerCase());
-                console.log('📋 Excel Headers detected:', headers);
+                    if (!jsonData || jsonData.length === 0) {
+                        console.warn(`⚠️ Sheet "${sheetName}" is empty, skipping...`);
+                        continue;
+                    }
 
-                // Use the same column mapping logic as CSV parser
-                const columnMap = {
-                    region: findColumn(headers, ['region']),
-                    deviceName: findColumn(headers, ['device name', 'devicename', 'hostname', 'host', 'name', 'system name', 'systemname']),
-                    vendor: findColumn(headers, ['vendor', 'manufacturer', 'make']),
-                    deviceType: findColumn(headers, ['device type', 'devicetype', 'type', 'model type']),
-                    model: findColumn(headers, ['model', 'device model', 'product model', 'hardware model', 'model name']),
-                    siteType: findColumn(headers, ['site type', 'sitetype', 'site']),
-                    deviceRole: findColumn(headers, ['device role', 'devicerole', 'role']),
-                    sn: findColumn(headers, ['serial number', 'serialnumber', 'serial', 'sn', 'primary sn', 'primary serial']),
-                    hasHA: findColumn(headers, ['ha status', 'hastatus', 'ha configured', 'ha']),
-                    sn_ha1: findColumn(headers, ['ha serial 1', 'sn_ha1', 'ha sn 1', 'hasn1']),
-                    sn_ha2: findColumn(headers, ['ha serial 2', 'sn_ha2', 'ha sn 2', 'hasn2']),
-                    city: findColumn(headers, ['city', 'town']),
-                    state: findColumn(headers, ['state', 'province']),
-                    country: findColumn(headers, ['country', 'nation']),
-                    managedBy: findColumn(headers, ['managed by', 'managedby', 'manager id']),
-                    tenant: findColumn(headers, ['tenant name', 'tenant', 'organization']),
-                    managementIP: findColumn(headers, ['management address', 'managementaddress', 'management ip', 'ip address', 'ip']),
-                    ipAddress: findColumn(headers, ['ip address', 'ip', 'management ip', 'mgmt ip']),
-                    deviceCategory: findColumn(headers, ['device category', 'devicecategory', 'category']),
-                    systemDescription: findColumn(headers, ['system description', 'systemdescription', 'sys description', 'sysdescr', 'description'])
-                };
+                    console.log(`   📊 Found ${jsonData.length} rows`);
 
-                // Map Excel rows to device objects
-                const devices = jsonData.map((row, index) => {
-                    try {
-                        const headerKeys = Object.keys(jsonData[0]);
-                        const getValue = (idx) => idx !== -1 ? row[headerKeys[idx]] : '';
+                    // Extract region from sheet name
+                    // "California_Tenant" → "California"
+                    // "Florida" → "Florida"
+                    // "Default" → "Default"
+                    let sheetRegion = sheetName.replace(/_Tenant$/i, '').replace(/^node-list-/i, '').trim();
+                    console.log(`   🌎 Sheet region: "${sheetRegion}"`);
+
+                    // Convert Excel data to our internal format using the same column mapping as CSV
+                    const headers = Object.keys(jsonData[0]).map(h => h.toLowerCase());
+                    console.log(`   📋 Headers detected:`, headers.slice(0, 10).join(', '), '...');
+
+                    // Use the same column mapping logic as CSV parser
+                    const columnMap = {
+                        region: findColumn(headers, ['region']),
+                        deviceName: findColumn(headers, ['device name', 'devicename', 'hostname', 'host', 'name', 'system name', 'systemname']),
+                        vendor: findColumn(headers, ['vendor', 'manufacturer', 'make']),
+                        deviceType: findColumn(headers, ['device type', 'devicetype', 'type', 'model type']),
+                        model: findColumn(headers, ['model', 'device model', 'product model', 'hardware model', 'model name']),
+                        siteType: findColumn(headers, ['site type', 'sitetype', 'site']),
+                        deviceRole: findColumn(headers, ['device role', 'devicerole', 'role']),
+                        sn: findColumn(headers, ['serial number', 'serialnumber', 'serial', 'sn', 'primary sn', 'primary serial']),
+                        hasHA: findColumn(headers, ['ha status', 'hastatus', 'ha configured', 'ha']),
+                        sn_ha1: findColumn(headers, ['ha serial 1', 'sn_ha1', 'ha sn 1', 'hasn1']),
+                        sn_ha2: findColumn(headers, ['ha serial 2', 'sn_ha2', 'ha sn 2', 'hasn2']),
+                        city: findColumn(headers, ['city', 'town']),
+                        state: findColumn(headers, ['state', 'province']),
+                        country: findColumn(headers, ['country', 'nation']),
+                        systemLocation: findColumn(headers, ['system location', 'location', 'site location', 'physical location']),
+                        managedBy: findColumn(headers, ['managed by', 'managedby', 'manager id']),
+                        tenant: findColumn(headers, ['tenant name', 'tenant', 'organization']),
+                        managementIP: findColumn(headers, ['management address', 'managementaddress', 'management ip', 'ip address', 'ip']),
+                        ipAddress: findColumn(headers, ['ip address', 'ip', 'management ip', 'mgmt ip']),
+                        deviceCategory: findColumn(headers, ['device category', 'devicecategory', 'category']),
+                        systemDescription: findColumn(headers, ['system description', 'systemdescription', 'sys description', 'sysdescr', 'description'])
+                    };
+
+                    // Map Excel rows to device objects
+                    const devices = jsonData.map((row, index) => {
+                        try {
+                            const headerKeys = Object.keys(jsonData[0]);
+                            const getValue = (idx) => idx !== -1 ? row[headerKeys[idx]] : '';
 
                         // Build temporary device object for detection with all needed fields
                         const tempDevice = {
@@ -11640,58 +12039,76 @@
                             systemDescription: getValue(columnMap.systemDescription) || ''
                         };
 
-                        const vendor = getValue(columnMap.vendor) || detectVendorFromCSV(tempDevice) || '';
-                        const model = getValue(columnMap.model) || detectModel(getValue(columnMap.sn)) || '';
-                        const deviceType = getValue(columnMap.deviceType) || detectDeviceTypeFromCSV(tempDevice) || '';
+                            const vendor = getValue(columnMap.vendor) || detectVendorFromCSV(tempDevice) || '';
+                            const model = getValue(columnMap.model) || detectModel(getValue(columnMap.sn)) || '';
+                            const deviceType = getValue(columnMap.deviceType) || detectDeviceTypeFromCSV(tempDevice) || '';
 
-                        return {
-                            region: getValue(columnMap.region) || '',
-                            deviceName: getValue(columnMap.deviceName) || `Device-${index + 1}`,
-                            vendor: vendor,
-                            deviceType: deviceType,
-                            model: model,
-                            siteType: getValue(columnMap.siteType) || '',
-                            deviceRole: getValue(columnMap.deviceRole) || '',
-                            sn: getValue(columnMap.sn) || '',
-                            hasHA: getValue(columnMap.hasHA) || false,
-                            sn_ha1: getValue(columnMap.sn_ha1) || '',
-                            sn_ha2: getValue(columnMap.sn_ha2) || '',
-                            city: getValue(columnMap.city) || '',
-                            state: getValue(columnMap.state) || '',
-                            country: getValue(columnMap.country) || '',
-                            managedBy: getValue(columnMap.managedBy) || '',
-                            tenant: getValue(columnMap.tenant) || 'Default Tenant',
-                            managementIP: getValue(columnMap.managementIP) || getValue(columnMap.ipAddress) || '',
-                            ipAddress: getValue(columnMap.ipAddress) || getValue(columnMap.managementIP) || ''
-                        };
-                    } catch (err) {
-                        console.error(`Error processing Excel row ${index + 1}:`, err);
-                        // Return basic device info on error
-                        return {
-                            region: '',
-                            deviceName: row[Object.keys(jsonData[0])[columnMap.deviceName]] || `Device-${index + 1}`,
-                            vendor: '',
-                            deviceType: '',
-                            model: '',
-                            siteType: '',
-                            deviceRole: '',
-                            sn: '',
-                            hasHA: false,
-                            sn_ha1: '',
-                            sn_ha2: '',
-                            city: '',
-                            state: '',
-                            country: '',
-                            managedBy: '',
-                            tenant: 'Default Tenant',
-                            managementIP: '',
-                            ipAddress: ''
-                        };
-                    }
-                });
+                            return {
+                                // CRITICAL: Include sheet name for geographic validation
+                                sheetName: sheetName,
+                                // Use sheet name as region if not in data
+                                region: getValue(columnMap.region) || sheetRegion,
+                                deviceName: getValue(columnMap.deviceName) || `Device-${index + 1}`,
+                                vendor: vendor,
+                                deviceType: deviceType,
+                                model: model,
+                                siteType: getValue(columnMap.siteType) || '',
+                                deviceRole: getValue(columnMap.deviceRole) || '',
+                                sn: getValue(columnMap.sn) || '',
+                                hasHA: getValue(columnMap.hasHA) || false,
+                                sn_ha1: getValue(columnMap.sn_ha1) || '',
+                                sn_ha2: getValue(columnMap.sn_ha2) || '',
+                                city: getValue(columnMap.city) || '',
+                                state: getValue(columnMap.state) || '', // Column mapper now excludes timestamp columns
+                                country: getValue(columnMap.country) || '',
+                                managedBy: getValue(columnMap.managedBy) || '',
+                                tenant: getValue(columnMap.tenant) || 'Default Tenant',
+                                managementIP: getValue(columnMap.managementIP) || getValue(columnMap.ipAddress) || '',
+                                ipAddress: getValue(columnMap.ipAddress) || getValue(columnMap.managementIP) || '',
+                                // Store additional location data for validator
+                                systemLocation: getValue(columnMap.systemLocation) || ''
+                            };
+                        } catch (err) {
+                            console.error(`Error processing Excel row ${index + 1}:`, err);
+                            // Return basic device info on error
+                            return {
+                                sheetName: sheetName,
+                                region: sheetRegion,
+                                deviceName: row[Object.keys(jsonData[0])[columnMap.deviceName]] || `Device-${index + 1}`,
+                                vendor: '',
+                                deviceType: '',
+                                model: '',
+                                siteType: '',
+                                deviceRole: '',
+                                sn: '',
+                                hasHA: false,
+                                sn_ha1: '',
+                                sn_ha2: '',
+                                city: '',
+                                state: '',
+                                country: '',
+                                managedBy: '',
+                                tenant: 'Default Tenant',
+                                managementIP: '',
+                                ipAddress: '',
+                                systemLocation: ''
+                            };
+                        }
+                    });
 
-                console.log(`✅ Successfully parsed ${devices.length} devices from Excel`);
-                return devices;
+                    console.log(`   ✅ Parsed ${devices.length} devices from "${sheetName}"`);
+
+                    // Add devices from this sheet to the combined array
+                    allDevices = allDevices.concat(devices);
+                    totalSheetsParsed++;
+                }
+
+                // Done processing all sheets
+                console.log(`\n🎉 Successfully imported ${workbook.SheetNames.length} sheets!`);
+                console.log(`📊 Total devices from all sheets: ${allDevices.length}`);
+                console.log(`📋 Sheets processed: ${totalSheetsParsed}`);
+
+                return allDevices;
 
             } catch (error) {
                 console.error('❌ Excel parsing error:', error);
@@ -12152,8 +12569,13 @@
                         sn: d.sn
                     })));
 
+                    // 🌍 CRITICAL: Apply geographic validation and intelligence enrichment
+                    console.log('\n🧠 Applying geographic validation and intelligence enrichment...');
+                    const enrichedDevices = enrichDeviceDataWithIntelligence(processedDevices);
+                    console.log(`✅ Enrichment complete - ${enrichedDevices.length} devices processed`);
+
                     if (importOption === 'replace') {
-                        deviceData = processedDevices;
+                        deviceData = enrichedDevices;
                         let message = `✅ Successfully imported ${deviceData.length} devices (replaced existing data)`;
                         if (detectedFields.vendors > 0 || detectedFields.models > 0 || detectedFields.locations > 0) {
                             message += ` - Auto-detected: ${detectedFields.vendors} vendors, ${detectedFields.models} models, ${detectedFields.locations} locations`;
@@ -12162,26 +12584,29 @@
                     } else {
                         const previousCount = deviceData.length;
                         // Add unique IDs to prevent duplicate key issues
-                        const newDevices = processedDevices.map((device, idx) => ({
+                        const newDevices = enrichedDevices.map((device, idx) => ({
                             ...device,
                             _importId: `import_${Date.now()}_${idx}`,
                             _importIndex: previousCount + idx
                         }));
                         // Create new array to ensure proper update
                         deviceData = [...deviceData, ...newDevices];
-                        let message = `✅ Successfully imported ${processedDevices.length} devices (now ${deviceData.length} total, previously ${previousCount})`;
+                        let message = `✅ Successfully imported ${enrichedDevices.length} devices (now ${deviceData.length} total, previously ${previousCount})`;
                         if (detectedFields.vendors > 0 || detectedFields.models > 0 || detectedFields.locations > 0) {
                             message += ` - Auto-detected: ${detectedFields.vendors} vendors, ${detectedFields.models} models, ${detectedFields.locations} locations`;
                         }
                         showNotification(message);
                     }
 
-                    // Debug: Verify deviceData after assignment
+                    // Debug: Verify deviceData after assignment (including geographic data)
                     console.log('💾 deviceData after import - First 3:', deviceData.slice(0, 3).map(d => ({
                         deviceName: d.deviceName,
                         model: d.model,
                         sn: d.sn,
-                        vendor: d.vendor
+                        vendor: d.vendor,
+                        state: d.state || '(empty)',
+                        geoValidated: d.geoValidated || false,
+                        sheetName: d.sheetName || '(none)'
                     })));
 
                     // Update the display

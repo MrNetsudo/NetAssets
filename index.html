@@ -4959,6 +4959,16 @@
             if (name.includes('a10')) return 'A10 Networks';
             if (name.includes('apc') || name.includes('ups')) return 'APC';
 
+            // ENHANCED: Detect Cisco from model numbers in device name
+            // Common Cisco model patterns: 2960, 3560, 3750, 4500, 6500, 6513, ASA, ISR
+            if (name.match(/\b(29\d{2}|35\d{2}|37\d{2}|45\d{2}|65\d{2}|asa|isr|cat|catalyst)\b/)) {
+                return 'Cisco';
+            }
+
+            // Detect from other common model patterns
+            if (name.match(/\b(srx\d+|ex\d+|mx\d+)\b/)) return 'Juniper Networks';  // Juniper SRX, EX, MX series
+            if (name.match(/\bfg-?\d+/)) return 'Fortinet';  // FortiGate models
+
             // Log unmapped vendor IDs for debugging
             if (device.vendor && /^\d+$/.test(device.vendor.trim())) {
                 console.warn('⚠️ Unmapped vendor ID in "Vendor" column:', device.vendor, 'for device:', device.deviceName);
@@ -4968,6 +4978,181 @@
             }
 
             return 'Unknown';
+        }
+
+        // ==================================================================================
+        // ENHANCED MODEL NUMBER EXTRACTION FROM DEVICE NAME
+        // ==================================================================================
+        function extractModelFromDeviceName(deviceName) {
+            if (!deviceName) return 'Unknown';
+
+            const name = deviceName.toUpperCase();
+
+            // Cisco Catalyst models: 2960, 3560, 3750, 4500, 6500, 6513, etc.
+            const ciscoMatch = name.match(/\b(CATALYST\s*)?(\d{4})\b/);
+            if (ciscoMatch) {
+                return `Catalyst ${ciscoMatch[2]}`;
+            }
+
+            // Juniper models: SRX, EX, MX series
+            const juniperMatch = name.match(/\b(SRX|EX|MX)(\d+)\b/i);
+            if (juniperMatch) {
+                return `${juniperMatch[1].toUpperCase()}${juniperMatch[2]}`;
+            }
+
+            // FortiGate models
+            const fortiMatch = name.match(/\bFG-?(\d+[A-Z]?)\b/i);
+            if (fortiMatch) {
+                return `FortiGate-${fortiMatch[1]}`;
+            }
+
+            // A10 Thunder models
+            const a10Match = name.match(/\b(THUNDER|AX)(\d+)\b/i);
+            if (a10Match) {
+                return `${a10Match[1]} ${a10Match[2]}`;
+            }
+
+            // Generic number pattern (like "6513" in "AUSTXDCA6513SW2")
+            const genericMatch = name.match(/\b(\d{4})\b/);
+            if (genericMatch) {
+                return genericMatch[1];
+            }
+
+            return 'Unknown';
+        }
+
+        // ==================================================================================
+        // COMPREHENSIVE DEVICE NAME PARSER
+        // Extracts: Location (City/State), Site Type, Model, Device Role
+        // ==================================================================================
+        function parseDeviceNameComprehensive(deviceName) {
+            const result = {
+                city: '',
+                state: '',
+                stateCode: '',
+                siteType: '',
+                model: '',
+                deviceRole: '',
+                deviceNumber: ''
+            };
+
+            if (!deviceName) return result;
+
+            const name = deviceName.toUpperCase();
+            const nameLower = deviceName.toLowerCase();
+
+            // PATTERN 1: AUSTXDCA6513SW2 format
+            // City(3-4 chars) + State(2 chars) + Site + Model + Type + Number
+            const pattern1 = name.match(/^([A-Z]{3,4})(TX|CA|NY|FL|RI|NV|IL|CO|GA|TN|KY|MI|IN|WI|MN|OH|NC|SC|VA|MD|PA|NJ|MA|CT)([A-Z]+)(\d{4})([A-Z]+)(\d+)$/);
+            if (pattern1) {
+                const cityCode = pattern1[1];
+                result.stateCode = pattern1[2];
+                result.siteType = pattern1[3];
+                result.model = pattern1[4];
+                const deviceType = pattern1[5];
+                result.deviceNumber = pattern1[6];
+
+                // Map city codes
+                const cityMap = {
+                    'AUST': 'Austin', 'AUS': 'Austin',
+                    'HOUS': 'Houston', 'HOU': 'Houston',
+                    'DALL': 'Dallas', 'DAL': 'Dallas',
+                    'GERM': 'Germantown',
+                    'PROV': 'Providence',
+                    'WGWI': 'West Greenwich',
+                    'CHAR': 'Charlotte',
+                    'ATLA': 'Atlanta', 'ATL': 'Atlanta'
+                };
+                result.city = cityMap[cityCode] || '';
+
+                // Map state codes
+                const stateMap = {
+                    'TX': 'Texas', 'CA': 'California', 'NY': 'New York', 'FL': 'Florida',
+                    'RI': 'Rhode Island', 'NV': 'Nevada', 'IL': 'Illinois', 'CO': 'Colorado',
+                    'GA': 'Georgia', 'TN': 'Tennessee', 'KY': 'Kentucky', 'MI': 'Michigan'
+                };
+                result.state = stateMap[result.stateCode] || result.stateCode;
+
+                // Map device type codes
+                if (deviceType === 'SW') result.deviceRole = 'Switch';
+                else if (deviceType === 'RTR') result.deviceRole = 'Router';
+                else if (deviceType === 'FW') result.deviceRole = 'Firewall';
+
+                return result;
+            }
+
+            // PATTERN 2: RI-NMS-2960-Sw4 format
+            // State-Site-Model-Type+Number
+            const pattern2 = name.match(/^([A-Z]{2})-([A-Z]+)-(\d{4})-(SW|RTR|FW)(\d+)$/i);
+            if (pattern2) {
+                result.stateCode = pattern2[1];
+                result.siteType = pattern2[2];
+                result.model = pattern2[3];
+                const deviceType = pattern2[4].toUpperCase();
+                result.deviceNumber = pattern2[5];
+
+                const stateMap = {
+                    'TX': 'Texas', 'CA': 'California', 'NY': 'New York', 'FL': 'Florida',
+                    'RI': 'Rhode Island', 'NV': 'Nevada', 'IL': 'Illinois', 'CO': 'Colorado',
+                    'GA': 'Georgia', 'TN': 'Tennessee', 'KY': 'Kentucky', 'MI': 'Michigan'
+                };
+                result.state = stateMap[result.stateCode] || result.stateCode;
+
+                if (deviceType === 'SW') result.deviceRole = 'Switch';
+                else if (deviceType === 'RTR') result.deviceRole = 'Router';
+                else if (deviceType === 'FW') result.deviceRole = 'Firewall';
+
+                return result;
+            }
+
+            // PATTERN 3: NEW-NLV-HNS-HUB-SW1 format
+            // State-City-Site-Type-Device
+            if (name.includes('-')) {
+                const parts = name.split('-');
+
+                // Check for state codes
+                const stateMap = {
+                    'NEW': 'Nevada', 'NV': 'Nevada',
+                    'TX': 'Texas', 'TN': 'Tennessee',
+                    'RI': 'Rhode Island', 'CA': 'California'
+                };
+
+                // Check for city codes
+                const cityMap = {
+                    'NLV': 'North Las Vegas', 'LV': 'Las Vegas',
+                    'AUS': 'Austin', 'AUST': 'Austin'
+                };
+
+                // Parse parts
+                if (parts[0] && stateMap[parts[0]]) {
+                    result.state = stateMap[parts[0]];
+                    result.stateCode = parts[0].length === 2 ? parts[0] : '';
+                }
+                if (parts[1] && cityMap[parts[1]]) {
+                    result.city = cityMap[parts[1]];
+                }
+
+                // Check for site types (HNS, HUB, DCA, NOC, etc.)
+                for (const part of parts) {
+                    if (['HNS', 'HUB', 'DCA', 'NOC', 'PDC', 'BDC'].includes(part)) {
+                        result.siteType = part;
+                        break;
+                    }
+                }
+
+                // Check for device type in last part
+                const lastPart = parts[parts.length - 1];
+                if (lastPart.match(/SW\d+/i)) result.deviceRole = 'Switch';
+                else if (lastPart.match(/RTR\d+/i)) result.deviceRole = 'Router';
+                else if (lastPart.match(/FW\d+/i)) result.deviceRole = 'Firewall';
+            }
+
+            // Extract model if not already found
+            if (!result.model) {
+                result.model = extractModelFromDeviceName(deviceName);
+            }
+
+            return result;
         }
 
         // Detect device type from Device Category
@@ -10904,26 +11089,45 @@
                     ''  // Don't pass IP to avoid geographic parsing
                 );
 
+                // STEP 2.5: Comprehensive device name parsing for model, location, site enrichment
+                const comprehensive = parseDeviceNameComprehensive(device.deviceName || device.hostname || '');
+
+                // STEP 2.6: Extract model number if not already populated
+                const extractedModel = comprehensive.model || extractModelFromDeviceName(device.deviceName || '');
+
+                // STEP 2.7: Build display region (use validated state, fallback to comprehensive parsing)
+                let displayRegion = '';
+                if (geoResult.validated && geoResult.state) {
+                    // Use validated state for display
+                    displayRegion = geoResult.city ? `${geoResult.city}, ${geoResult.state}` : geoResult.state;
+                } else if (comprehensive.state) {
+                    // Fallback to comprehensive parsing
+                    displayRegion = comprehensive.city ? `${comprehensive.city}, ${comprehensive.state}` : comprehensive.state;
+                }
+
                 // STEP 3: Merge data with STRICT validation
                 return {
                     ...device,
                     // Geographic data: ONLY from validated analysis (never from hostname)
-                    country: geoResult.validated ? geoResult.country : '',
-                    state: geoResult.validated ? geoResult.state : '',
-                    stateCode: geoResult.validated ? geoResult.stateCode : '',
-                    city: geoResult.validated ? geoResult.city : '',
+                    country: geoResult.validated ? geoResult.country : (comprehensive.state ? 'US' : ''),
+                    state: geoResult.validated ? geoResult.state : comprehensive.state,
+                    stateCode: geoResult.validated ? geoResult.stateCode : comprehensive.stateCode,
+                    city: geoResult.validated ? geoResult.city : comprehensive.city,
 
                     // World Region (US/EU/AP/LA)
                     worldRegion: geoResult.validated ? geoResult.worldRegion : '',
 
-                    // Keep original region field (from Tenant/sheet name)
-                    region: device.region || '',
+                    // Region field for display (replaces "Default")
+                    region: displayRegion || device.region || '',
 
-                    // Site type from hostname parsing (non-geographic)
-                    siteType: device.siteType || parsed.siteType,
+                    // Site type from comprehensive parsing (priority) or hostname parsing
+                    siteType: comprehensive.siteType || device.siteType || parsed.siteType,
 
-                    // Device role: Use CSV Device Category if available
-                    deviceRole: device.deviceRole || parsed.deviceRole,
+                    // Device role: comprehensive parsing (priority), then CSV, then parsed
+                    deviceRole: comprehensive.deviceRole || device.deviceRole || parsed.deviceRole,
+
+                    // Model: Use existing model, or extracted model, or comprehensive parsing
+                    model: device.model || extractedModel || 'Unknown',
 
                     // HA data (from hostname parsing - not geographic)
                     haGroup: parsed.haGroup,
@@ -10936,7 +11140,11 @@
                         geoResult.city,
                         geoResult.state,
                         geoResult.country
-                    ].filter(x => x).join(', ') : '',
+                    ].filter(x => x).join(', ') : (comprehensive.city || comprehensive.state ? [
+                        comprehensive.city,
+                        comprehensive.state,
+                        'US'
+                    ].filter(x => x).join(', ') : ''),
 
                     // Validation metadata
                     geoValidated: geoResult.validated || false,

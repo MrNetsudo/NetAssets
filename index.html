@@ -6837,8 +6837,9 @@
                 device.deviceName || '',
                 device.managementIP || '',
                 device.sn || '',
-                detectVendorFromCSV(device),
-                detectDeviceTypeFromCSV(device),
+                // CRITICAL FIX: Use extracted vendor/type first, fallback to detection (matches display logic)
+                device.vendor || detectVendorFromCSV(device),
+                device.deviceType || detectDeviceTypeFromCSV(device),
                 device.model || '',
                 device.firmwareVersion || '',
                 device.fullLocation || device.region || '',
@@ -12419,7 +12420,14 @@
 
                                 siteType: getValue(columnMap.siteType) || '',
                                 deviceRole: getValue(columnMap.deviceRole) || '',
-                                sn: getValue(columnMap.sn) || '',
+                                // CRITICAL FIX: Sanitize serial number - filter boolean TRUE/FALSE values
+                                sn: (() => {
+                                    const rawSn = getValue(columnMap.sn);
+                                    // Filter out boolean values and non-string values
+                                    if (typeof rawSn === 'boolean') return '';
+                                    if (rawSn === 'TRUE' || rawSn === 'FALSE' || rawSn === 'True' || rawSn === 'False') return '';
+                                    return rawSn || '';
+                                })(),
                                 hasHA: getValue(columnMap.hasHA) || false,
                                 sn_ha1: getValue(columnMap.sn_ha1) || '',
                                 sn_ha2: getValue(columnMap.sn_ha2) || '',

@@ -65,7 +65,24 @@ cache/
 *.tmp
 *.cache
 
+# Lock files
+.~lock.*#
+~$*.tmp
+
+# Screenshots and temporary images
+*.png
+Geo*.png
+screenshot*.png
+
 # Database files
 *.db
 *.sqlite
 *.sqlite3
+
+# Session documentation (auto-generated during development)
+*_COMPLETE*.md
+*_FIX*.md
+*_FIXES*.md
+*_ANALYSIS*.md
+SESSION_*.md
+GEO*_*.md

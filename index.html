@@ -11416,7 +11416,11 @@
                     systemDescription: rawSystemDescription,
                     systemObjectID: getValue(values, columnMap.systemObjectID) || '',
                     tenant: getValue(values, columnMap.tenant) || 'Default Tenant',
-                    managementIP: getValue(values, columnMap.managementIP) || '',
+                    // CRITICAL FIX: Sanitize IP address to reject timestamps and invalid data
+                    managementIP: sanitizeIPAddress(
+                        getValue(values, columnMap.managementIP),
+                        columnMap.managementIP !== -1 ? headers[columnMap.managementIP] : ''
+                    ),
                     snmpState: getValue(values, columnMap.snmpState) || 'UNKNOWN',
                     icmpState: getValue(values, columnMap.icmpState) || 'UNKNOWN',
                     managementMode: getValue(values, columnMap.managementMode) || 'UNKNOWN',
@@ -11480,7 +11484,9 @@
                 const index = headers.findIndex(h => h === name.toLowerCase());
                 if (index !== -1) return index;
             }
-            // Second pass: partial matches (contains) - with strict exclusions
+            // Second pass: word-boundary partial matches - with strict exclusions
+            // CRITICAL FIX: Use word boundaries to prevent substring false matches
+            // Example: "sn" should NOT match "snmp", "ip" should NOT match "icmp"
             for (const name of possibleNames) {
                 const index = headers.findIndex(h => {
                     // Avoid matching boolean/HA columns for text fields
@@ -11488,11 +11494,13 @@
                         return false;
                     }
                     // CRITICAL FIX: Prevent "State Last Modified" from matching geographic "state"
-                    // Geographic state should NEVER match timestamp/status columns
+                    // Geographic state should NEVER match timestamp/status columns or device state columns
                     if (name.toLowerCase() === 'state' || name.toLowerCase() === 'province') {
                         if (h.includes('modified') || h.includes('last') ||
                             h.includes('admin') || h.includes('oper') || h.includes('discovery') ||
-                            h.includes('icmp') || h.includes('snmp') || h.includes('agent')) {
+                            h.includes('icmp') || h.includes('snmp') || h.includes('agent') ||
+                            h.includes('power') || h.includes('link') || h.includes('port') ||
+                            h.includes('device') || h.includes('interface') || h.includes('connection')) {
                             return false;
                         }
                     }
@@ -11504,13 +11512,16 @@
                             h.includes('date') || h.includes('discovery') || h.includes('learned') ||
                             h.includes('first') || h.includes('updated') || h.includes('changed') ||
                             h.includes('timestamp') || h.includes('scan') || h.includes('added') ||
-                            h.includes('created') || h.includes('when') || h.includes('aging')) {
+                            h.includes('created') || h.includes('when') || h.includes('aging') ||
+                            h.includes('completed') || h.includes('polled') || h.includes('polling') ||
+                            h.includes('seen') || h.includes('checked') || h.includes('monitored')) {
                             return false;
                         }
                         // Also exclude if column starts with "ip" but has timestamp keywords
                         // e.g., "IP Discovery Time", "IP Last Modified", "IP Aging Time"
                         if (h.startsWith('ip ') && (h.includes('time') || h.includes('date') ||
-                            h.includes('modified') || h.includes('discovered') || h.includes('learned'))) {
+                            h.includes('modified') || h.includes('discovered') || h.includes('learned') ||
+                            h.includes('completed') || h.includes('polled') || h.includes('seen'))) {
                             return false;
                         }
                     }
@@ -11518,11 +11529,127 @@
                     if (h.includes('status') && !name.toLowerCase().includes('status')) {
                         return false;
                     }
-                    return h.includes(name.toLowerCase());
+
+                    // CRITICAL FIX: Additional exclusions for short abbreviations that might cause false matches
+                    // Prevent "sn" from matching "snmp agent enabled", "snmp", "agent", etc.
+                    if (name.toLowerCase() === 'sn' || name.toLowerCase() === 's/n') {
+                        if (h.includes('snmp') || h.includes('agent') || h.includes('enabled') ||
+                            h.includes('protocol') || h.includes('version') || h.includes('monitoring')) {
+                            return false;
+                        }
+                    }
+
+                    // Prevent "ip" from matching "icmp", "description", "snmp", etc.
+                    if (name.toLowerCase() === 'ip') {
+                        if (h.includes('icmp') || h.includes('snmp') || h.includes('description') ||
+                            h.includes('script') || h.includes('chip') || h.includes('equip')) {
+                            return false;
+                        }
+                    }
+
+                    // CRITICAL FIX: Use word boundaries to match whole words only
+                    // This prevents "sn" from matching "snmp", "ip" from matching "icmp", etc.
+                    // Create regex with word boundaries: \b ensures we match complete words
+                    const searchTerm = name.toLowerCase().replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // Escape special chars
+                    const wordBoundaryPattern = new RegExp(`\\b${searchTerm}\\b`);
+                    return wordBoundaryPattern.test(h);
                 });
                 if (index !== -1) return index;
             }
             return -1;
+        }
+
+        // ═══════════════════════════════════════════════════════════════════════════════
+        // 🛡️ DATA VALIDATION FUNCTIONS
+        // ═══════════════════════════════════════════════════════════════════════════════
+
+        /**
+         * Validates if a value looks like it could be a timestamp/date serial number
+         * Excel date serials are numbers like 44323.50486111111 (days since 1900)
+         * @param {string|number} value - The value to check
+         * @returns {boolean} - True if value looks like a timestamp
+         */
+        function looksLikeTimestamp(value) {
+            if (!value) return false;
+
+            // Convert to string for checking
+            const str = String(value).trim();
+
+            // Check if it's a large number (Excel date serials are typically > 40000)
+            if (/^\d{5,}\.?\d*$/.test(str)) {
+                const num = parseFloat(str);
+                // Excel date serials for recent dates are in range 40000-50000
+                // Unix timestamps are much larger (> 1000000000)
+                if (num > 30000 && num < 100000) {
+                    return true; // Excel date serial
+                }
+                if (num > 1000000000) {
+                    return true; // Unix timestamp
+                }
+            }
+
+            return false;
+        }
+
+        /**
+         * Validates if a value looks like a valid IP address
+         * @param {string} value - The value to check
+         * @returns {boolean} - True if value looks like a valid IP
+         */
+        function looksLikeIPAddress(value) {
+            if (!value) return false;
+
+            const str = String(value).trim();
+
+            // IPv4 pattern: 0-255.0-255.0-255.0-255
+            const ipv4Pattern = /^(\d{1,3}\.){3}\d{1,3}$/;
+            if (ipv4Pattern.test(str)) {
+                // Verify each octet is 0-255
+                const octets = str.split('.');
+                return octets.every(octet => {
+                    const num = parseInt(octet, 10);
+                    return num >= 0 && num <= 255;
+                });
+            }
+
+            // IPv6 pattern (basic check)
+            const ipv6Pattern = /^([0-9a-fA-F]{0,4}:){2,7}[0-9a-fA-F]{0,4}$/;
+            if (ipv6Pattern.test(str)) {
+                return true;
+            }
+
+            return false;
+        }
+
+        /**
+         * Sanitizes an IP address value by rejecting timestamps and invalid data
+         * @param {string} value - The raw value from import
+         * @param {string} columnName - The source column name (for logging)
+         * @returns {string} - Clean IP address or empty string if invalid
+         */
+        function sanitizeIPAddress(value, columnName = '') {
+            if (!value) return '';
+
+            const str = String(value).trim();
+
+            // Reject if it looks like a timestamp
+            if (looksLikeTimestamp(str)) {
+                console.warn(`⚠️ Rejected timestamp-like value in IP field: "${str}" from column "${columnName}"`);
+                return '';
+            }
+
+            // Accept if it looks like a valid IP
+            if (looksLikeIPAddress(str)) {
+                return str;
+            }
+
+            // For other values, log warning and accept (might be hostname, etc.)
+            if (str.length > 0 && !str.includes('@') && str.length < 100) {
+                return str; // Might be hostname or FQDN
+            }
+
+            console.warn(`⚠️ Suspicious value in IP field: "${str}" from column "${columnName}"`);
+            return '';
         }
 
         // ═══════════════════════════════════════════════════════════════════════════════
@@ -12237,7 +12364,8 @@
             return json.map(item => ({
                 region: item.region || item.Region || '',
                 deviceName: item.deviceName || item['Device Name'] || item.device_name || '',
-                model: item.model || item.Model || detectModel(item.sn || item.serialNumber),
+                // CRITICAL FIX: Removed detectModel(serial) - was causing serial numbers to appear in model field
+                model: item.model || item.Model || '',
                 sn: item.sn || item.serialNumber || item['Serial Number'] || '',
                 hasHA: item.hasHA || item.haConfigured || item['HA Status'] === 'HA Configured' || false,
                 sn_ha1: item.sn_ha1 || item.haSerial1 || item['HA Serial 1'] || '',
@@ -12311,8 +12439,11 @@
                         systemLocation: findColumn(headers, ['system location', 'location', 'site location', 'physical location']),
                         managedBy: findColumn(headers, ['managed by', 'managedby', 'manager id']),
                         tenant: findColumn(headers, ['tenant name', 'tenant', 'organization']),
-                        managementIP: findColumn(headers, ['management address', 'managementaddress', 'management ip', 'ip address', 'ip']),
-                        ipAddress: findColumn(headers, ['ip address', 'ip', 'management ip', 'mgmt ip']),
+                        // CRITICAL FIX: Non-overlapping IP field mappings to prevent duplicate/conflicting matches
+                        // managementIP gets priority for specific "management" columns
+                        managementIP: findColumn(headers, ['management address', 'managementaddress', 'management ip', 'mgmt ip', 'mgmt address']),
+                        // ipAddress searches for generic IP columns (with strong timestamp exclusions)
+                        ipAddress: findColumn(headers, ['ip address', 'ipaddress', 'ip addr', 'device ip', 'host ip']),
                         deviceCategory: findColumn(headers, ['device category', 'devicecategory', 'category']),
                         systemDescription: findColumn(headers, ['system description', 'systemdescription', 'sys description', 'sysdescr', 'description']),
                         // CRITICAL ADDITIONS: Fields that were missing but exist in CSV parser
@@ -12389,8 +12520,10 @@
                             // Vendor: Use vendor column, fallback to deviceVendor, then detection
                             const finalVendor = rawVendor || rawDeviceVendor || detectVendorFromCSV(tempDevice) || '';
 
-                            // Model: Use model column, fallback to deviceProfile, then detection
-                            const finalModel = rawModel || rawDeviceProfile || detectModel(getValue(columnMap.sn)) || '';
+                            // Model: Use model column, fallback to deviceProfile
+                            // CRITICAL FIX: Removed detectModel(serial) - was causing serial numbers to appear in model field
+                            // Post-processing intelligent detection (line 12827) will handle missing models properly
+                            const finalModel = rawModel || rawDeviceProfile || '';
 
                             // Device Type: Use deviceType column, fallback to detection
                             const finalDeviceType = rawDeviceType || detectDeviceTypeFromCSV(tempDevice) || '';
@@ -12436,8 +12569,19 @@
                                 country: getValue(columnMap.country) || '',
                                 managedBy: getValue(columnMap.managedBy) || '',
                                 tenant: getValue(columnMap.tenant) || 'Default Tenant',
-                                managementIP: getValue(columnMap.managementIP) || getValue(columnMap.ipAddress) || '',
-                                ipAddress: getValue(columnMap.ipAddress) || getValue(columnMap.managementIP) || '',
+                                // CRITICAL FIX: Sanitize IP addresses to reject timestamps and invalid data
+                                managementIP: (() => {
+                                    const rawValue = getValue(columnMap.managementIP) || getValue(columnMap.ipAddress);
+                                    const colName = columnMap.managementIP !== -1 ? headers[columnMap.managementIP] :
+                                                   (columnMap.ipAddress !== -1 ? headers[columnMap.ipAddress] : '');
+                                    return sanitizeIPAddress(rawValue, colName);
+                                })(),
+                                ipAddress: (() => {
+                                    const rawValue = getValue(columnMap.ipAddress) || getValue(columnMap.managementIP);
+                                    const colName = columnMap.ipAddress !== -1 ? headers[columnMap.ipAddress] :
+                                                   (columnMap.managementIP !== -1 ? headers[columnMap.managementIP] : '');
+                                    return sanitizeIPAddress(rawValue, colName);
+                                })(),
                                 // Store additional location data for validator
                                 systemLocation: getValue(columnMap.systemLocation) || '',
 

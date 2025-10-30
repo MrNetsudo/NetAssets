@@ -12656,23 +12656,75 @@
                     const looksLikeData = /^(normal|warning|critical|down|up|\d+\.\d+\.\d+\.\d+)$/i.test(firstHeader);
 
                     if (looksLikeData) {
-                        console.error('❌ CRITICAL: Headers appear to be data values, not column names!');
-                        console.error(`   First header detected: "${firstHeader}"`);
-                        console.error(`   This usually means the header row is missing or Excel misread the file.`);
-                        console.error(`   Expected headers like: "Status", "Device Category", "Name", etc.`);
-                        console.error(`   Got instead: ${headers.slice(0, 5).join(', ')}`);
+                        console.warn('⚠️ DETECTED: Headers appear to be data values - auto-fixing...');
+                        console.warn(`   First header detected: "${firstHeader}"`);
+                        console.warn(`   Attempting to recover by applying standard NMS export column names...`);
 
+                        // 🔧 AUTO-FIX: Re-read sheet in array mode to get raw data
+                        const arrayData = XLSX.utils.sheet_to_json(worksheet, {
+                            header: 1,  // Return arrays instead of objects
+                            raw: false,
+                            defval: ''
+                        });
+
+                        if (!arrayData || arrayData.length === 0) {
+                            throw new Error('Excel file is empty or corrupted.');
+                        }
+
+                        const columnCount = arrayData[0].length;
+                        console.log(`   📊 Detected ${columnCount} columns in data`);
+
+                        // Standard NMS/SolarWinds export format (31 columns)
+                        const standardHeaders = [
+                            'Status', 'Device Category', 'Name', 'Hostname', 'Management Address',
+                            'Tenant', 'Security Group', 'System Location', 'Device Profile',
+                            'SNMP Agent Enabled', 'Status Last Modified', 'Notes', 'Power State',
+                            'State Last Modified', 'Hosted On', 'System Name', 'System Contact',
+                            'System Description', 'Node Management Mode', 'System Object ID',
+                            'Device Vendor', 'Device Family', 'SNMP Agent', 'Protocol Version',
+                            'Agent SNMP State', 'Management Address ICMP State', 'State Last Modified2',
+                            'Discovery State', 'Last Completed', 'Created', 'Last Modified'
+                        ];
+
+                        // Use standard headers if column count matches
+                        let finalHeaders;
+                        if (columnCount === 31) {
+                            finalHeaders = standardHeaders;
+                            console.log('   ✅ Applied standard 31-column NMS export headers');
+                        } else if (columnCount === standardHeaders.length) {
+                            finalHeaders = standardHeaders.slice(0, columnCount);
+                            console.log(`   ✅ Applied ${columnCount} standard headers`);
+                        } else {
+                            // Generate generic headers
+                            finalHeaders = Array.from({ length: columnCount }, (_, i) => `Column${i + 1}`);
+                            console.warn(`   ⚠️ Column count (${columnCount}) doesn't match standard format (31)`);
+                            console.warn(`   Using generic headers: Column1, Column2, etc.`);
+                        }
+
+                        // Convert array data back to object format with correct headers
+                        const fixedJsonData = arrayData.map(row => {
+                            const obj = {};
+                            finalHeaders.forEach((header, index) => {
+                                obj[header] = row[index] || '';
+                            });
+                            return obj;
+                        });
+
+                        // Replace jsonData with fixed version
+                        jsonData.length = 0;
+                        jsonData.push(...fixedJsonData);
+
+                        // Update headers to use the corrected ones
+                        headers.length = 0;
+                        headers.push(...finalHeaders.map(h => h.toLowerCase()));
+
+                        console.log('   ✅ AUTO-FIX COMPLETE - proceeding with import');
                         showNotification(
-                            `❌ Import Failed: Excel file has no header row!\n\n` +
-                            `The file appears to be missing column headers.\n` +
-                            `First row contains data: "${firstHeader}", not a column name.\n\n` +
-                            `SOLUTION:\n` +
-                            `1. If you saved a CSV as Excel: Use "Import Data" and select the original .CSV file directly instead\n` +
-                            `2. If using Excel file: Open it and ensure Row 1 has column names like "Name", "Device Vendor", "Device Family"\n` +
-                            `3. Re-save the file and try importing again`,
-                            'error'
+                            `⚠️ Auto-Fixed: Excel file was missing header row\n\n` +
+                            `Applied standard column names automatically.\n` +
+                            `Importing ${jsonData.length} devices...`,
+                            'info'
                         );
-                        throw new Error('Excel file has no header row or headers were misdetected.');
                     }
                     console.log(`   📋 Headers detected:`, headers.slice(0, 10).join(', '), '...');
 

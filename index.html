@@ -11467,6 +11467,7 @@
                 const rawDeviceVendor = getValue(values, columnMap.deviceVendor) || '';
                 const rawDeviceCategory = getValue(values, columnMap.deviceCategory) || '';
                 const rawDeviceProfile = getValue(values, columnMap.deviceProfile) || '';
+                const rawDeviceFamily = getValue(values, columnMap.deviceFamily) || '';
                 const rawVendor = getValue(values, columnMap.vendor) || '';
                 const rawDeviceType = getValue(values, columnMap.deviceType) || '';
                 const rawSystemDescription = getValue(values, columnMap.systemDescription) || '';
@@ -11480,15 +11481,29 @@
                 // Use Device Category if Device Type is empty
                 const finalDeviceType = rawDeviceType || rawDeviceCategory;
 
-                // Use Device Profile if Model is empty (common in NMS exports)
-                const finalModel = rawModel || rawDeviceProfile;
+                // IMPROVED: Prioritize Device Family over Device Profile for model
+                // Device Family often contains better model information (e.g., "Cisco Catalyst 3850")
+                // Device Profile is often software/agent info (e.g., "net-SNMPAgent5.1")
+                const finalModel = rawModel || rawDeviceFamily || rawDeviceProfile;
 
                 // Extract firmware version from System Description if not explicitly provided
                 let finalFirmwareVersion = rawFirmwareVersion || rawSoftwareVersion;
                 if (!finalFirmwareVersion && rawSystemDescription) {
-                    const versionMatch = rawSystemDescription.match(/Version\s+([\d\.]+[a-zA-Z0-9\-\(\)]+)/i);
-                    if (versionMatch) {
-                        finalFirmwareVersion = versionMatch[1];
+                    // Try multiple version patterns to handle different formats
+                    const versionPatterns = [
+                        /Version[:\s]+([\d\.]+[a-zA-Z0-9\-\(\)]*)/i,  // "Version 16.12.3a" or "Version: 9.3(8)"
+                        /\bv([\d\.]+[a-zA-Z0-9\-]*)\b/i,               // "v10.3.5"
+                        /Ver[:\s]+([\d\.]+[a-zA-Z0-9\-\(\)]*)/i,       // "Ver 12.2(55)"
+                        /Linux\s+\S+\s+([\d\.\-]+\S*)/i,               // Linux kernel: "Linux hostname 3.10.0-1160.el7.x86_64"
+                        /\b([\d]+\.[\d]+\.[\d]+[a-zA-Z0-9\-\._]*)\b/   // Generic version numbers: "16.12.3", "3.10.0-1160"
+                    ];
+
+                    for (const pattern of versionPatterns) {
+                        const match = rawSystemDescription.match(pattern);
+                        if (match && match[1]) {
+                            finalFirmwareVersion = match[1];
+                            break; // Use first match
+                        }
                     }
                 }
 
@@ -11505,9 +11520,22 @@
 
                 const derivedRole = categoryToRole[rawDeviceCategory] || getValue(values, columnMap.deviceRole) || '';
 
+                // IMPROVED: Extract region from tenant name (e.g., "Florida_Tenant" → "Florida")
+                const rawRegion = getValue(values, columnMap.region) || '';
+                const rawTenant = getValue(values, columnMap.tenant) || 'Default Tenant';
+                let derivedRegion = rawRegion;
+                if (!derivedRegion && rawTenant) {
+                    // Extract state name from "StateName_Tenant" format
+                    const tenantMatch = rawTenant.match(/^([A-Za-z\s]+)_Tenant$/);
+                    if (tenantMatch) {
+                        derivedRegion = tenantMatch[1].trim();
+                    }
+                }
+                if (!derivedRegion) derivedRegion = 'US'; // Final fallback
+
                 const device = {
                     // Basic fields with intelligent fallbacks
-                    region: getValue(values, columnMap.region) || 'US',
+                    region: derivedRegion,
                     deviceName: getValue(values, columnMap.deviceName) || `Device-${i}`,
                     vendor: finalVendor,
                     deviceType: finalDeviceType,
@@ -11538,11 +11566,11 @@
                     // Advanced fields for monitoring integration (captured for intelligent parsing)
                     deviceCategory: rawDeviceCategory,
                     deviceVendor: rawDeviceVendor,
-                    deviceFamily: getValue(values, columnMap.deviceFamily) || '',
+                    deviceFamily: rawDeviceFamily,
                     deviceProfile: rawDeviceProfile,
                     systemDescription: rawSystemDescription,
                     systemObjectID: getValue(values, columnMap.systemObjectID) || '',
-                    tenant: getValue(values, columnMap.tenant) || 'Default Tenant',
+                    tenant: rawTenant,
                     // CRITICAL FIX: Sanitize IP address to reject timestamps and invalid data
                     managementIP: sanitizeIPAddress(
                         getValue(values, columnMap.managementIP),

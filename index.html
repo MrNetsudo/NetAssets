@@ -9325,7 +9325,8 @@
                 // IMPROVED: Use serial OR device name (not name + index) for unique identification
                 // This ensures proper duplicate detection even for devices without serial numbers
                 const deviceName = device.deviceName ? device.deviceName.toLowerCase().trim() : '';
-                const uniqueId = deviceSerial || deviceName || `unknown_${idx}`;
+                // CRITICAL FIX: Use device_${idx} to match deduplication logic (line 9263)
+                const uniqueId = deviceSerial || deviceName || `device_${idx}`;
 
                 // Skip if already processed or if it's a child device (will be added with parent)
                 // Only check childDevices if we have a valid serial number
@@ -12750,6 +12751,105 @@
                         );
                     }
                     console.log(`   📋 Headers detected:`, headers.slice(0, 10).join(', '), '...');
+
+                    // 🔍 CRITICAL FIX: Check for hierarchical NMS data and flatten if needed
+                    // Excel imports need the same hierarchical processing as CSV imports
+                    if (jsonData.length > 10) {
+                        console.log('🔍 Checking for hierarchical data structure...');
+
+                        // Convert JSON objects back to CSV format for hierarchical processing
+                        const csvLines = [];
+
+                        // Add header row
+                        const originalHeaders = Object.keys(jsonData[0]);
+                        csvLines.push(originalHeaders.join(','));
+
+                        // Add data rows
+                        jsonData.forEach(row => {
+                            const values = originalHeaders.map(header => {
+                                const val = String(row[header] || '');
+                                // Escape values containing commas, quotes, or newlines
+                                if (val.includes(',') || val.includes('"') || val.includes('\n')) {
+                                    return `"${val.replace(/"/g, '""')}"`;
+                                }
+                                return val;
+                            });
+                            csvLines.push(values.join(','));
+                        });
+
+                        const csvContent = csvLines.join('\n');
+                        const flattenedCSV = preprocessHierarchicalCSV(csvContent);
+
+                        // If flattening occurred, re-parse the CSV
+                        if (flattenedCSV !== csvContent) {
+                            console.log('   ✅ Hierarchical data detected and flattened!');
+                            console.log(`   📊 Before: ${jsonData.length} rows → After flattening...`);
+
+                            // Parse the flattened CSV
+                            const flattenedLines = flattenedCSV.split('\n').filter(line => line.trim());
+                            const flattenedHeaders = parseCSVLine(flattenedLines[0]);
+                            const flattenedData = [];
+
+                            for (let i = 1; i < flattenedLines.length; i++) {
+                                const values = parseCSVLine(flattenedLines[i]);
+                                const rowObj = {};
+                                flattenedHeaders.forEach((header, idx) => {
+                                    rowObj[header] = values[idx] || '';
+                                });
+                                flattenedData.push(rowObj);
+                            }
+
+                            // Replace jsonData with flattened version
+                            jsonData.length = 0;
+                            jsonData.push(...flattenedData);
+
+                            // Update headers to match flattened data
+                            headers.length = 0;
+                            headers.push(...flattenedHeaders.map(h => h.toLowerCase()));
+
+                            console.log(`   ✅ Flattening complete: ${flattenedData.length} devices (merged from components)`);
+                        } else {
+                            console.log('   ℹ️ No hierarchical structure detected - proceeding normally');
+                        }
+                    }
+
+                    // 🛡️ DEFENSIVE FIX: Filter out pseudo chassis, VDOM, and other virtual/placeholder entries
+                    const beforeFilterCount = jsonData.length;
+                    const validData = jsonData.filter(row => {
+                        const name = (row.Name || row.name || row['Device Name'] || row.deviceName || '').toLowerCase();
+                        const model = (row.Model || row.model || row['Model Name'] || row.modelName || '').toLowerCase();
+                        const deviceCategory = (row['Device Category'] || row.deviceCategory || '').toLowerCase();
+
+                        // Filter out pseudo chassis entries
+                        if (name.includes('pseudo') || name.includes('chassis') && name.includes('pseudo')) {
+                            console.log(`   🛡️ Filtered: Pseudo chassis - "${row.Name || row.name}"`);
+                            return false;
+                        }
+
+                        // Filter out VDOM (FortiGate virtual domains)
+                        if (model === 'vdom' || name === 'vdom' || deviceCategory === 'vdom') {
+                            console.log(`   🛡️ Filtered: VDOM virtual entry - "${row.Name || row.name}"`);
+                            return false;
+                        }
+
+                        // Filter out placeholder entries with ID "-1"
+                        if (name === '-1' || name === 'unknown' || name === 'n/a') {
+                            console.log(`   🛡️ Filtered: Placeholder entry - "${row.Name || row.name}"`);
+                            return false;
+                        }
+
+                        return true;
+                    });
+
+                    if (validData.length < beforeFilterCount) {
+                        const filtered = beforeFilterCount - validData.length;
+                        console.log(`   🛡️ Filtered out ${filtered} pseudo/virtual entries`);
+                        console.log(`   📊 Valid devices: ${validData.length}`);
+
+                        // Replace jsonData with filtered version
+                        jsonData.length = 0;
+                        jsonData.push(...validData);
+                    }
 
                     // Use the same column mapping logic as CSV parser
                     const columnMap = {

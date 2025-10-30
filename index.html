@@ -12399,7 +12399,15 @@
             // Priority 7: Serial number analysis
             if (device.sn && device.sn.length >= 8) {
                 const snAnalysis = detectDeviceInfo({ sn: device.sn });
-                if (snAnalysis.model && snAnalysis.model !== 'Unknown') {
+                // CRITICAL FIX: Validate that the returned model is NOT the serial number itself
+                // This prevents serial numbers from appearing in the model field
+                const serialNormalized = device.sn.trim().toLowerCase();
+                const modelNormalized = snAnalysis.model ? snAnalysis.model.trim().toLowerCase() : '';
+
+                if (snAnalysis.model &&
+                    snAnalysis.model !== 'Unknown' &&
+                    modelNormalized !== serialNormalized &&
+                    !modelNormalized.includes(serialNormalized)) {
                     return {
                         model: snAnalysis.model,
                         series: snAnalysis.series,
@@ -13671,8 +13679,16 @@
                 if (!device.model && device.sn) {
                     const detected = detectModelIntelligent(device);
                     if (detected && detected.model !== 'Unknown') {
-                        device.model = detected.model;
-                        updated++;
+                        // CRITICAL FIX: Additional safety check - never assign serial number as model
+                        const serialNormalized = device.sn.trim().toLowerCase();
+                        const detectedModelNormalized = detected.model.trim().toLowerCase();
+
+                        if (detectedModelNormalized !== serialNormalized && !detectedModelNormalized.includes(serialNormalized)) {
+                            device.model = detected.model;
+                            updated++;
+                        } else {
+                            console.warn(`⚠️ Rejected model detection for ${device.deviceName || 'unknown'}: detected model "${detected.model}" matches/contains serial "${device.sn}"`);
+                        }
                     }
                 }
 

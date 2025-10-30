@@ -9471,6 +9471,19 @@
             organizedDevices.forEach((item, index) => {
                 const device = item.device;
 
+                // 🔍 DIAGNOSTIC: Log first 3 devices to verify data is present
+                if (index < 3) {
+                    console.log(`📊 Export Device ${index + 1}:`, {
+                        name: device.deviceName,
+                        vendor: device.vendor,
+                        deviceVendor: device.deviceVendor,
+                        model: device.model,
+                        deviceFamily: device.deviceFamily,
+                        type: device.deviceType,
+                        sn: device.sn
+                    });
+                }
+
                 // Clean and accurate data extraction
                 const vendor = device.vendor || detectVendorFromCSV(device) || '';
                 const deviceType = device.deviceType || device.type || detectDeviceTypeFromCSV(device) || '';
@@ -13124,11 +13137,12 @@
 
                     const processed = {
                         ...device,
-                        // 🏆 Use intelligent detection with confidence scoring
-                        vendor: intelligentVendor.vendor,
-                        model: intelligentModel.model,
-                        series: intelligentModel.series,
-                        sn: intelligentSerial.serial || device.sn,
+                        // 🏆 CRITICAL FIX: Preserve CSV values, only use intelligent detection as fallback
+                        // This prevents "Unknown" from overwriting valid CSV data like "Fortinet", "Cisco", etc.
+                        vendor: device.vendor || intelligentVendor.vendor,
+                        model: device.model || intelligentModel.model,
+                        series: device.series || intelligentModel.series,
+                        sn: device.sn || intelligentSerial.serial,
                         // Use legacy detection for other fields
                         deviceType: device.deviceType || deviceInfo.deviceType,
                         siteType: device.siteType || deviceInfo.siteType,
@@ -13317,9 +13331,11 @@
                         tbody.style.transition = 'none';
                     }
 
+                    // CRITICAL FIX: Sync filteredData immediately so exports use fresh data
+                    filteredData = [...deviceData];
+
                     // Defer UI updates slightly to show progress
                     setTimeout(() => {
-                        filteredData = [...deviceData];
 
                         // For very large datasets, update UI in stages
                         if (deviceData.length > 1000) {

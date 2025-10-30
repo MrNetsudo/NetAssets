@@ -9208,6 +9208,46 @@
             const timestamp = now.toLocaleString();
             const date = now.toISOString().split('T')[0];
 
+            // 🔍 DIAGNOSTIC: Check for duplicates in source data
+            console.log('═══════════════════════════════════════════════════════════');
+            console.log('📊 EXPORT DIAGNOSTICS - Asset Inventory Editable Report');
+            console.log('═══════════════════════════════════════════════════════════');
+            console.log(`Input: ${filteredData.length} devices in filteredData`);
+
+            // Check for duplicate serial numbers
+            const serialCounts = new Map();
+            const nameCounts = new Map();
+            filteredData.forEach(device => {
+                const serial = device.sn || '';
+                const name = device.deviceName || '';
+                if (serial) {
+                    serialCounts.set(serial, (serialCounts.get(serial) || 0) + 1);
+                }
+                if (name) {
+                    nameCounts.set(name, (nameCounts.get(name) || 0) + 1);
+                }
+            });
+
+            const duplicateSerials = Array.from(serialCounts.entries()).filter(([k, v]) => v > 1);
+            const duplicateNames = Array.from(nameCounts.entries()).filter(([k, v]) => v > 1);
+
+            if (duplicateSerials.length > 0) {
+                console.warn('⚠️ DUPLICATE SERIAL NUMBERS DETECTED:');
+                duplicateSerials.forEach(([serial, count]) => {
+                    console.warn(`  Serial "${serial}" appears ${count} times`);
+                });
+            }
+
+            if (duplicateNames.length > 0) {
+                console.log('ℹ️ Duplicate device names (might be HA pairs or multi-site):');
+                duplicateNames.slice(0, 5).forEach(([name, count]) => {
+                    console.log(`  Device "${name}" appears ${count} times`);
+                });
+                if (duplicateNames.length > 5) {
+                    console.log(`  ... and ${duplicateNames.length - 5} more`);
+                }
+            }
+
             // 🔗 Build parent-child relationships for HA devices
             const deviceMap = new Map();
             const childDevices = new Set();
@@ -9291,6 +9331,22 @@
 
             const haDevicesCount = filteredData.filter(d => d.hasHA).length;
             const childDevicesCount = childDevices.size;
+
+            // 🔍 DIAGNOSTIC: Validate organization results
+            console.log('───────────────────────────────────────────────────────────');
+            console.log(`Output: ${organizedDevices.length} rows in report`);
+            console.log(`  ├─ HA Primary devices: ${haDevicesCount}`);
+            console.log(`  ├─ HA Child devices: ${childDevicesCount}`);
+            console.log(`  └─ Standalone devices: ${organizedDevices.length - haDevicesCount - childDevicesCount}`);
+
+            if (organizedDevices.length !== filteredData.length) {
+                console.warn(`⚠️ WARNING: Row count mismatch!`);
+                console.warn(`  Expected: ${filteredData.length} (input)`);
+                console.warn(`  Got: ${organizedDevices.length} (output)`);
+            } else {
+                console.log('✅ Row count matches input data');
+            }
+            console.log('═══════════════════════════════════════════════════════════\n');
 
             // Generate editable Excel-compatible HTML
             let html = `

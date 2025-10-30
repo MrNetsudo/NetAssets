@@ -9248,19 +9248,49 @@
                 }
             }
 
+            // 🛡️ DEFENSIVE FIX: Deduplicate filtered data to prevent duplicate rows in export
+            // Use serial number as primary key, device name as fallback
+            const deduplicationMap = new Map();
+            let duplicatesRemoved = 0;
+
+            filteredData.forEach(device => {
+                // Create unique key: prioritize serial number, fall back to device name
+                const deviceSerial = (device.sn || '').toLowerCase().trim();
+                const deviceName = (device.deviceName || '').toLowerCase().trim();
+                const uniqueKey = deviceSerial || deviceName || `unknown_${Math.random()}`;
+
+                // Only add if not already present (keep first occurrence)
+                if (!deduplicationMap.has(uniqueKey)) {
+                    deduplicationMap.set(uniqueKey, device);
+                } else {
+                    duplicatesRemoved++;
+                    console.warn(`  ⚠️ Duplicate removed: ${device.deviceName || 'Unknown'} (${deviceSerial || 'no serial'})`);
+                }
+            });
+
+            // Use deduplicated data for export
+            const deduplicatedData = Array.from(deduplicationMap.values());
+
+            if (duplicatesRemoved > 0) {
+                console.warn(`🛡️ Deduplication: Removed ${duplicatesRemoved} duplicate device(s)`);
+                console.log(`   Before: ${filteredData.length} devices → After: ${deduplicatedData.length} devices`);
+            } else {
+                console.log('✅ No duplicates found - proceeding with all devices');
+            }
+
             // 🔗 Build parent-child relationships for HA devices
             const deviceMap = new Map();
             const childDevices = new Set();
 
             // First pass: index all devices by serial number
-            filteredData.forEach(device => {
+            deduplicatedData.forEach(device => {
                 if (device.sn) {
                     deviceMap.set(device.sn.toLowerCase().trim(), device);
                 }
             });
 
             // Second pass: identify child devices (HA secondaries)
-            filteredData.forEach(device => {
+            deduplicatedData.forEach(device => {
                 if (device.hasHA) {
                     // Mark HA serials as children if they exist as separate devices
                     if (device.sn_ha1) {
@@ -9282,11 +9312,13 @@
             const organizedDevices = [];
             const processedSerials = new Set();
 
-            filteredData.forEach((device, idx) => {
+            deduplicatedData.forEach((device, idx) => {
                 const deviceSerial = device.sn ? device.sn.toLowerCase().trim() : '';
 
-                // Create unique identifier: use serial if available, otherwise use device name + index
-                const uniqueId = deviceSerial || `${device.deviceName || 'unknown'}_${idx}`;
+                // IMPROVED: Use serial OR device name (not name + index) for unique identification
+                // This ensures proper duplicate detection even for devices without serial numbers
+                const deviceName = device.deviceName ? device.deviceName.toLowerCase().trim() : '';
+                const uniqueId = deviceSerial || deviceName || `unknown_${idx}`;
 
                 // Skip if already processed or if it's a child device (will be added with parent)
                 // Only check childDevices if we have a valid serial number
@@ -9329,7 +9361,7 @@
                 }
             });
 
-            const haDevicesCount = filteredData.filter(d => d.hasHA).length;
+            const haDevicesCount = deduplicatedData.filter(d => d.hasHA).length;
             const childDevicesCount = childDevices.size;
 
             // 🔍 DIAGNOSTIC: Validate organization results
@@ -9339,12 +9371,12 @@
             console.log(`  ├─ HA Child devices: ${childDevicesCount}`);
             console.log(`  └─ Standalone devices: ${organizedDevices.length - haDevicesCount - childDevicesCount}`);
 
-            if (organizedDevices.length !== filteredData.length) {
+            if (organizedDevices.length !== deduplicatedData.length) {
                 console.warn(`⚠️ WARNING: Row count mismatch!`);
-                console.warn(`  Expected: ${filteredData.length} (input)`);
+                console.warn(`  Expected: ${deduplicatedData.length} (deduplicated input)`);
                 console.warn(`  Got: ${organizedDevices.length} (output)`);
             } else {
-                console.log('✅ Row count matches input data');
+                console.log('✅ Row count matches deduplicated input data');
             }
             console.log('═══════════════════════════════════════════════════════════\n');
 
@@ -9412,7 +9444,7 @@
     <div class="header-section">
         <h1>Network Infrastructure Asset Report</h1>
         <p><strong>Generated:</strong> ${timestamp}</p>
-        <p><strong>Total Devices:</strong> ${filteredData.length} (${organizedDevices.length} shown in report, ${childDevicesCount} as HA children)</p>
+        <p><strong>Total Devices:</strong> ${deduplicatedData.length} (${organizedDevices.length} shown in report, ${childDevicesCount} as HA children)</p>
         <p><strong>Report Type:</strong> Hierarchical Asset Inventory with Parent-Child Relationships</p>
     </div>
 
@@ -9530,7 +9562,10 @@
             document.body.removeChild(a);
             window.URL.revokeObjectURL(url);
 
-            showNotification(`✅ Exported ${filteredData.length} devices with hierarchy (${haDevicesCount} HA pairs)`, 'success');
+            const exportMessage = duplicatesRemoved > 0
+                ? `✅ Exported ${deduplicatedData.length} devices (removed ${duplicatesRemoved} duplicates, ${haDevicesCount} HA pairs)`
+                : `✅ Exported ${deduplicatedData.length} devices with hierarchy (${haDevicesCount} HA pairs)`;
+            showNotification(exportMessage, 'success');
 
             // Close both dropdown and modal if they exist
             if (document.getElementById('exportDropdown')) {

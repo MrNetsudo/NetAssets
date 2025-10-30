@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Intelligent Parser Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        h1 {
+            color: #333;
+        }
+        .test-result {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .device-name {
+            font-weight: bold;
+            color: #2563eb;
+            font-size: 1.1em;
+        }
+        .extracted {
+            margin-top: 10px;
+            display: grid;
+            grid-template-columns: 150px 1fr;
+            gap: 5px;
+        }
+        .label {
+            font-weight: bold;
+            color: #666;
+        }
+        .value {
+            color: #333;
+        }
+        .confidence {
+            margin-top: 10px;
+            padding: 5px 10px;
+            background: #10b981;
+            color: white;
+            border-radius: 4px;
+            display: inline-block;
+        }
+        .confidence.medium {
+            background: #f59e0b;
+        }
+        .confidence.low {
+            background: #ef4444;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧠 Intelligent Hostname Parser Test</h1>
+    <div id="results"></div>
+
+    <script src="intelligent_parser.js"></script>
+    <script>
+        // Test devices from your actual data
+        const testDevices = [
+            { hostname: 'lilp1s1fw01', systemLocation: 'Austin, TX', ipAddress: '10.215.49.7' },
+            { hostname: 'lilp1s2fw03', systemLocation: 'West Greenwich, RI', ipAddress: '10.215.59.7' },
+            { hostname: 'USVI-LOTTERY-FW', systemLocation: 'St.Thomas', ipAddress: '100.65.0.18' },
+            { hostname: 'lilp1s1crsw01', systemLocation: 'Austin, TX', ipAddress: '10.215.49.25' },
+            { hostname: 'lilp1s1vtlb01', systemLocation: 'lil-pdc', ipAddress: '10.215.49.245' },
+            { hostname: 'lilp1s1hp01.gtk.gtech.com', systemLocation: 'Unknown', ipAddress: '10.215.49.44' },
+            { hostname: 'lilp1s1acon01', systemLocation: 'Unknown', ipAddress: '10.215.49.61' },
+            { hostname: 'lilp1s1lantronix01', systemLocation: 'Austin, TX', ipAddress: '10.215.49.253' },
+            { hostname: 'lilp1s1wansw01', systemLocation: 'Austin_TX', ipAddress: '10.215.49.5' },
+            { hostname: 'CRB-PDC-ICSPIX', systemLocation: '', ipAddress: '10.4.96.225' },
+            { hostname: 'antdcahp01.gtk.gtech.com', systemLocation: 'Unknown', ipAddress: '10.5.25.42' },
+            { hostname: 'txanthp01.gtk.gtech.com', systemLocation: 'TX_DCA_NOC_NMS_Rack-esxi', ipAddress: '10.5.25.50' }
+        ];
+
+        const resultsDiv = document.getElementById('results');
+
+        testDevices.forEach(device => {
+            const parsed = parseHostnameIntelligent(device.hostname, device.systemLocation, device.ipAddress);
+
+            const confidenceClass = parsed.confidence >= 70 ? '' : (parsed.confidence >= 40 ? 'medium' : 'low');
+
+            const html = `
+                <div class="test-result">
+                    <div class="device-name">${device.hostname}</div>
+                    <div class="extracted">
+                        <div class="label">Country:</div>
+                        <div class="value">${parsed.country || '❌ Not detected'}</div>
+
+                        <div class="label">State:</div>
+                        <div class="value">${parsed.state || '❌ Not detected'}</div>
+
+                        <div class="label">State Code:</div>
+                        <div class="value">${parsed.stateCode || '❌ Not detected'}</div>
+
+                        <div class="label">City:</div>
+                        <div class="value">${parsed.city || '❌ Not detected'}</div>
+
+                        <div class="label">Jurisdiction:</div>
+                        <div class="value">${parsed.jurisdiction || '❌ Not detected'}</div>
+
+                        <div class="label">Site Type:</div>
+                        <div class="value">${parsed.siteType || '❌ Not detected'}</div>
+
+                        <div class="label">Device Role:</div>
+                        <div class="value">${parsed.deviceRole || '❌ Not detected'}</div>
+
+                        <div class="label">Device Function:</div>
+                        <div class="value">${parsed.deviceFunction || '❌ Not detected'}</div>
+
+                        <div class="label">Vendor (parsed):</div>
+                        <div class="value">${parsed.vendor || '❌ Not detected'}</div>
+
+                        <div class="label">HA Role:</div>
+                        <div class="value">${parsed.haRole || '❌ Not detected'}</div>
+
+                        <div class="label">HA Partner:</div>
+                        <div class="value">${parsed.haPartner || '❌ Not detected'}</div>
+                    </div>
+                    <div class="confidence ${confidenceClass}">
+                        Confidence: ${parsed.confidence}%
+                    </div>
+                </div>
+            `;
+
+            resultsDiv.innerHTML += html;
+        });
+    </script>
+</body>
+</html>

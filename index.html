@@ -9253,18 +9253,21 @@
             const deduplicationMap = new Map();
             let duplicatesRemoved = 0;
 
-            filteredData.forEach(device => {
+            filteredData.forEach((device, idx) => {
                 // Create unique key: prioritize serial number, fall back to device name
                 const deviceSerial = (device.sn || '').toLowerCase().trim();
                 const deviceName = (device.deviceName || '').toLowerCase().trim();
-                const uniqueKey = deviceSerial || deviceName || `unknown_${Math.random()}`;
+
+                // 🔍 CRITICAL FIX: Use index-based fallback to prevent empty serial/name conflicts
+                // Empty serials/names would all get same key "" which causes massive deduplication
+                const uniqueKey = deviceSerial || deviceName || `device_${idx}`;
 
                 // Only add if not already present (keep first occurrence)
                 if (!deduplicationMap.has(uniqueKey)) {
                     deduplicationMap.set(uniqueKey, device);
                 } else {
                     duplicatesRemoved++;
-                    console.warn(`  ⚠️ Duplicate removed: ${device.deviceName || 'Unknown'} (${deviceSerial || 'no serial'})`);
+                    console.warn(`  ⚠️ Duplicate removed: ${device.deviceName || 'Unknown'} (${deviceSerial || 'no serial'}) - key: "${uniqueKey}"`);
                 }
             });
 
@@ -9312,6 +9315,10 @@
             const organizedDevices = [];
             const processedSerials = new Set();
 
+            // 🔍 DIAGNOSTIC: Track skipped devices
+            let skippedAlreadyProcessed = 0;
+            let skippedAsHAChild = 0;
+
             deduplicatedData.forEach((device, idx) => {
                 const deviceSerial = device.sn ? device.sn.toLowerCase().trim() : '';
 
@@ -9322,7 +9329,14 @@
 
                 // Skip if already processed or if it's a child device (will be added with parent)
                 // Only check childDevices if we have a valid serial number
-                if (processedSerials.has(uniqueId) || (deviceSerial && childDevices.has(deviceSerial))) {
+                if (processedSerials.has(uniqueId)) {
+                    skippedAlreadyProcessed++;
+                    console.warn(`  ⚠️ Skipped (already processed): ${device.deviceName || 'Unknown'} - uniqueId: "${uniqueId}"`);
+                    return;
+                }
+                if (deviceSerial && childDevices.has(deviceSerial)) {
+                    skippedAsHAChild++;
+                    console.warn(`  ⚠️ Skipped (HA child): ${device.deviceName || 'Unknown'} - serial: "${deviceSerial}"`);
                     return;
                 }
 
@@ -9370,13 +9384,22 @@
             console.log(`  ├─ HA Primary devices: ${haDevicesCount}`);
             console.log(`  ├─ HA Child devices: ${childDevicesCount}`);
             console.log(`  └─ Standalone devices: ${organizedDevices.length - haDevicesCount - childDevicesCount}`);
+            console.log('');
+            console.log('🔍 Skipped devices during organization:');
+            console.log(`  ├─ Already processed: ${skippedAlreadyProcessed}`);
+            console.log(`  └─ HA children: ${skippedAsHAChild}`);
 
-            if (organizedDevices.length !== deduplicatedData.length) {
-                console.warn(`⚠️ WARNING: Row count mismatch!`);
-                console.warn(`  Expected: ${deduplicatedData.length} (deduplicated input)`);
-                console.warn(`  Got: ${organizedDevices.length} (output)`);
+            const expectedOutput = deduplicatedData.length - skippedAsHAChild;
+            if (organizedDevices.length !== expectedOutput) {
+                console.error(`❌ CRITICAL: Row count mismatch!`);
+                console.error(`  Deduplicated input: ${deduplicatedData.length} devices`);
+                console.error(`  Skipped as HA children: ${skippedAsHAChild} devices`);
+                console.error(`  Skipped as duplicates: ${skippedAlreadyProcessed} devices`);
+                console.error(`  Expected output: ${expectedOutput} devices`);
+                console.error(`  Actual output: ${organizedDevices.length} devices`);
+                console.error(`  MISSING: ${expectedOutput - organizedDevices.length} devices!`);
             } else {
-                console.log('✅ Row count matches deduplicated input data');
+                console.log('✅ Row count matches expected output (deduplicated - HA children)');
             }
             console.log('═══════════════════════════════════════════════════════════\n');
 

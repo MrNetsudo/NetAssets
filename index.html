@@ -11439,21 +11439,53 @@
                 systemContact: findColumn(headers, ['system contact', 'systemcontact', 'contact'])
             };
 
-            console.log('🗺️ Column mapping:', {
-                'Device Name': columnMap.deviceName,
-                'Model': columnMap.model,
-                'Serial Number': columnMap.sn,
-                'Vendor': columnMap.vendor,
-                'Type': columnMap.deviceType
+            // 🔍 ENHANCED DIAGNOSTIC: Show ALL critical column mappings with matched headers
+            console.log('═══════════════════════════════════════════════════════════════');
+            console.log('🗺️ COLUMN MAPPING RESULTS - Florida CSV Diagnostic');
+            console.log('═══════════════════════════════════════════════════════════════');
+            console.table({
+                'deviceName': {
+                    index: columnMap.deviceName,
+                    header: columnMap.deviceName !== -1 ? headers[columnMap.deviceName] : '❌ NOT FOUND',
+                    searches: 'device name, devicename, hostname, host, name'
+                },
+                'vendor': {
+                    index: columnMap.vendor,
+                    header: columnMap.vendor !== -1 ? headers[columnMap.vendor] : '❌ NOT FOUND',
+                    searches: 'vendor, manufacturer, make'
+                },
+                'deviceVendor': {
+                    index: columnMap.deviceVendor,
+                    header: columnMap.deviceVendor !== -1 ? headers[columnMap.deviceVendor] : '❌ NOT FOUND',
+                    searches: 'device vendor, devicevendor, vendor id'
+                },
+                'model': {
+                    index: columnMap.model,
+                    header: columnMap.model !== -1 ? headers[columnMap.model] : '❌ NOT FOUND',
+                    searches: 'model, device model, product model'
+                },
+                'deviceFamily': {
+                    index: columnMap.deviceFamily,
+                    header: columnMap.deviceFamily !== -1 ? headers[columnMap.deviceFamily] : '❌ NOT FOUND',
+                    searches: 'device family, devicefamily, family'
+                },
+                'deviceType': {
+                    index: columnMap.deviceType,
+                    header: columnMap.deviceType !== -1 ? headers[columnMap.deviceType] : '❌ NOT FOUND',
+                    searches: 'device type, devicetype, type'
+                },
+                'deviceCategory': {
+                    index: columnMap.deviceCategory,
+                    header: columnMap.deviceCategory !== -1 ? headers[columnMap.deviceCategory] : '❌ NOT FOUND',
+                    searches: 'device category, devicecategory, category'
+                },
+                'sn': {
+                    index: columnMap.sn,
+                    header: columnMap.sn !== -1 ? headers[columnMap.sn] : '❌ NOT FOUND',
+                    searches: 'serial number, serialnumber, serial, sn'
+                }
             });
-
-            // Enhanced debugging: show which header matched to which column
-            console.log('🗺️ Column details:', {
-                'Model column index': columnMap.model,
-                'Model header': columnMap.model !== -1 ? headers[columnMap.model] : 'NOT FOUND',
-                'SN column index': columnMap.sn,
-                'SN header': columnMap.sn !== -1 ? headers[columnMap.sn] : 'NOT FOUND'
-            });
+            console.log('═══════════════════════════════════════════════════════════════\n');
 
             for (let i = 1; i < lines.length; i++) {
                 const line = lines[i].trim();
@@ -11486,6 +11518,27 @@
                 const rawSystemDescription = getValue(values, columnMap.systemDescription) || '';
                 const rawFirmwareVersion = getValue(values, columnMap.firmwareVersion) || '';
                 const rawSoftwareVersion = getValue(values, columnMap.softwareVersion) || '';
+
+                // 🔍 DIAGNOSTIC: Log first row's extracted values
+                if (i === 1) {
+                    console.log('═══════════════════════════════════════════════════════════════');
+                    console.log('📋 FIRST CSV ROW - RAW VALUES EXTRACTED');
+                    console.log('═══════════════════════════════════════════════════════════════');
+                    console.log('Total values in row:', values.length);
+                    console.log('Total headers:', headers.length);
+                    console.table({
+                        'Device Name': {columnIndex: columnMap.deviceName, value: rawDeviceName || '(EMPTY)'},
+                        'Vendor': {columnIndex: columnMap.vendor, value: rawVendor || '(EMPTY)'},
+                        'Device Vendor': {columnIndex: columnMap.deviceVendor, value: rawDeviceVendor || '(EMPTY)'},
+                        'Model': {columnIndex: columnMap.model, value: rawModel || '(EMPTY)'},
+                        'Device Family': {columnIndex: columnMap.deviceFamily, value: rawDeviceFamily || '(EMPTY)'},
+                        'Device Type': {columnIndex: columnMap.deviceType, value: rawDeviceType || '(EMPTY)'},
+                        'Device Category': {columnIndex: columnMap.deviceCategory, value: rawDeviceCategory || '(EMPTY)'},
+                        'Serial Number': {columnIndex: columnMap.sn, value: rawSN || '(EMPTY)'},
+                        'Device Profile': {columnIndex: columnMap.deviceProfile, value: rawDeviceProfile || '(EMPTY)'}
+                    });
+                    console.log('═══════════════════════════════════════════════════════════════\n');
+                }
 
                 // 🎯 INTELLIGENT FIELD FALLBACK LOGIC
                 // Use Device Vendor if Vendor is empty

@@ -12628,8 +12628,11 @@
 
                     const worksheet = workbook.Sheets[sheetName];
 
-                    // Convert to JSON with header row
-                    const jsonData = XLSX.utils.sheet_to_json(worksheet, { raw: false, defval: '' });
+                    // Convert to JSON - by default uses first row as object keys (headers)
+                    const jsonData = XLSX.utils.sheet_to_json(worksheet, {
+                        raw: false,
+                        defval: ''
+                    });
 
                     if (!jsonData || jsonData.length === 0) {
                         console.warn(`⚠️ Sheet "${sheetName}" is empty, skipping...`);
@@ -12647,6 +12650,30 @@
 
                     // Convert Excel data to our internal format using the same column mapping as CSV
                     const headers = Object.keys(jsonData[0]).map(h => h.toLowerCase());
+
+                    // 🔍 HEADER VALIDATION: Check if headers look like data values instead of column names
+                    const firstHeader = headers[0];
+                    const looksLikeData = /^(normal|warning|critical|down|up|\d+\.\d+\.\d+\.\d+)$/i.test(firstHeader);
+
+                    if (looksLikeData) {
+                        console.error('❌ CRITICAL: Headers appear to be data values, not column names!');
+                        console.error(`   First header detected: "${firstHeader}"`);
+                        console.error(`   This usually means the header row is missing or Excel misread the file.`);
+                        console.error(`   Expected headers like: "Status", "Device Category", "Name", etc.`);
+                        console.error(`   Got instead: ${headers.slice(0, 5).join(', ')}`);
+
+                        showNotification(
+                            `❌ Import Failed: Excel file has no header row!\n\n` +
+                            `The file appears to be missing column headers.\n` +
+                            `First row contains data: "${firstHeader}", not a column name.\n\n` +
+                            `SOLUTION:\n` +
+                            `1. If you saved a CSV as Excel: Use "Import Data" and select the original .CSV file directly instead\n` +
+                            `2. If using Excel file: Open it and ensure Row 1 has column names like "Name", "Device Vendor", "Device Family"\n` +
+                            `3. Re-save the file and try importing again`,
+                            'error'
+                        );
+                        throw new Error('Excel file has no header row or headers were misdetected.');
+                    }
                     console.log(`   📋 Headers detected:`, headers.slice(0, 10).join(', '), '...');
 
                     // Use the same column mapping logic as CSV parser
